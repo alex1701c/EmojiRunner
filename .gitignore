@@ -1,0 +1,9 @@
+/build
+/.idea
+/.vscode
+/cmake-build-debug
+src/config/ui_emojirunner_config.h 
+#Copying this file from build folder provides better autocompletion.
+#If the .ui file changes it has to be deleted and after building the project it can be copies again
+#Otherwise the changes do not take effect
+*.swap

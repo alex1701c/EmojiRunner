@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=EmojiRunner
+Comment=EmojiRunner runner
+Icon=planetkde
+
+X-KDE-ServiceTypes=Plasma/Runner
+Type=Service
+X-KDE-Library=krunner_emojirunner
+X-KDE-PluginInfo-Author=%{AUTHOR}
+X-KDE-PluginInfo-Email=%{EMAIL}
+X-KDE-PluginInfo-Name=emojirunner
+X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-License=LGPL 2.1+
+X-KDE-PluginInfo-EnabledByDefault=true

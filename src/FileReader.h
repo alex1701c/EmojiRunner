@@ -7,7 +7,7 @@
 
 class FileReader {
 public:
-    static QMap<QString,EmojiCategory> readJSONFile() ;
+    static QList<EmojiCategory> readJSONFile() ;
 };
 
 

@@ -29,23 +29,36 @@ void EmojiRunner::reloadConfiguration() {
 
     // TODO How to store favourites
     // Default favourites (ids)
-    //7;1;37;14;18;154;77;36;10;111;59;23;33;87;167
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
-
     QList<Plasma::QueryMatch> matches;
     const auto term = context.query();
 
     if (term.startsWith("emoji")) {
-        // TODO Display favourites or other search results where favourites have a higher priority
-    }
-
-    // Search all categories
-    if (config.readEntry("globalSearch", "true") == "true") {
+        // Show favourites
+        EmojiCategory favouriteCategory;
         for (const auto &category:emojiCategories) {
+            if (category.name == "Favourites") {
+                favouriteCategory = category;
+                break;
+            }
+        }
+        for (const auto &key :favouriteCategory.emojis.keys()) {
+            const auto emoji = favouriteCategory.emojis.value(key);
+            Plasma::QueryMatch match(this);
+            match.setText(emoji.emoji);
+            match.setSubtext(QString(key).replace("_", " "));
+            match.setData(emoji.emoji);
+            match.setRelevance((float) emoji.favourite / 22);
+            matches.append(match);
+        }
+    } else if (config.readEntry("globalSearch", "true") == "true") {
+        // Search all categories
+        for (const auto &category:emojiCategories) {
+            if (!category.enabled || category.name == "Favourites") continue;
             for (const auto &key :category.emojis.keys()) {
                 const auto key2 = QString(key).replace("_", "");
                 if (key2.startsWith(term, Qt::CaseInsensitive) ||
@@ -63,7 +76,6 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             }
         }
     }
-
     context.addMatches(matches);
 }
 

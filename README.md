@@ -1,4 +1,4 @@
-This project is in the early stages of development !
+This project is in development !
 
 This plugin allows you to search and copy emojis/symbols to the clipboard.
 If has the following categories:  
@@ -12,9 +12,10 @@ Right now you can search for the emojis by name without a prefix to activate the
 Debian/Ubuntu:  
 `sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext`
 
-openSUSE  
+openSUSE:  
 `sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel ktextwidgets-devel kservice-devel krunner-devel gettext-tools`  
-Fedora  
+
+Fedora:  
 `sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext`  
 
 ### Build instructions  
@@ -43,3 +44,12 @@ systemsettings5 (Head to "Search")
 You can also launch KRunner via Alt-F2 and you will find your runner.
 
 The emoji.json file is a modified version from https://github.com/github/gemoji
+
+### Screenshots:
+
+#### Search for an emoji by name
+![Connect to default country](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
+
+#### Show favourites
+They will be made configurable in a dialog and a search feature will be added
+![Connect to default country](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/favourites.png)

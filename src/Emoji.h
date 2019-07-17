@@ -12,7 +12,7 @@
 class Emoji {
 public:
     int id;
-    int relevance;
+    int favourite = 0;
     QString name;
     QString emoji;
     QString description;

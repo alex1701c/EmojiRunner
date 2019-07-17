@@ -1,9 +1,17 @@
 #include <QtCore>
 #include <QMap>
+#include <KConfigCore/KSharedConfig>
+#include <KConfigCore/KConfigGroup>
 #include "FileReader.h"
 
 QList<EmojiCategory> FileReader::readJSONFile() {
     QList<EmojiCategory> categories;
+    EmojiCategory favourites("Favourites");
+    KConfigGroup config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
+    QList<int> favouriteIds;
+    for (const auto &favouriteId:config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167")
+            .split(";", QString::SplitBehavior::SkipEmptyParts))
+        favouriteIds.append(favouriteId.toInt());
 
     QFile file(QDir::homePath() + "/.config/emojis.json");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -26,10 +34,14 @@ QList<EmojiCategory> FileReader::readJSONFile() {
                 emoji.unicodeVersion = obj.value("unicode_version").toString();
                 emoji.iosVersion = obj.value("ios_version").toString();
                 category.emojis.insert(emoji.name, emoji);
-
+                if (favouriteIds.contains(emoji.id)) {
+                    emoji.favourite = 21 - favouriteIds.indexOf(emoji.id);
+                    favourites.emojis.insert(emoji.name, emoji);
+                }
             }
             categories.append(category);
         }
     }
+    categories.append(favourites);
     return categories;
 }

@@ -3,7 +3,7 @@ add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.emojirunner\")
 set(emojirunner_SRCS emojirunner.cpp Emoji.cpp Emoji.h EmojiCategory.h FileReader.cpp FileReader.h)
 
 add_library(krunner_emojirunner MODULE ${emojirunner_SRCS})
-target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n)
+target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets)
 
 set(kcm_krunner_emojirunner_SRCS
         config/emojirunner_config.cpp
@@ -24,6 +24,6 @@ target_link_libraries(kcm_krunner_emojirunner
 add_dependencies(krunner_emojirunner kcm_krunner_emojirunner)
 
 
-install(TARGETS krunner_emojirunner kcm_krunner_emojirunner DESTINATION ${PLUGIN_INSTALL_DIR})
+install(TARGETS krunner_emojirunner  DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES plasma-runner-emojirunner.desktop config/plasma-runner-emojirunner_config.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 install(FILES emojis.json DESTINATION $ENV{HOME}/.config/)

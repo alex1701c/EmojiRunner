@@ -2,8 +2,6 @@
 
 #include <utility>
 
-#include <utility>
-
 #ifndef EMOJIRUNNER_EMOJI_H
 #define EMOJIRUNNER_EMOJI_H
 

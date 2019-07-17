@@ -1,4 +1,4 @@
-
+This project is in the early stages of development !
 
 Required Dependencies
 ----------------------
@@ -12,8 +12,6 @@ Fedora
 
 -- Build instructions --
 
-If you build the project for the first after generating the template and cmake says "No targets specified and no makefile found." you have to delete the content of the build folder ( rm -rf build/* ) and try again.
-Afterwards you can remove this message.
 ```
 cd /path/to/EmojiRunner
 mkdir -p build

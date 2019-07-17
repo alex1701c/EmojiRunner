@@ -1,3 +1,9 @@
+#include <utility>
+
+#include <utility>
+
+#include <utility>
+
 #ifndef EMOJIRUNNER_EMOJI_H
 #define EMOJIRUNNER_EMOJI_H
 
@@ -9,15 +15,13 @@ class Emoji {
 public:
     int id;
     int relevance;
+    QString name;
     QString emoji;
     QString description;
     QString category;
-    QStringList aliases;
     QStringList tags;
     QString unicodeVersion;
     QString iosVersion;
-
-    static void readJSONFile();
 };
 
 

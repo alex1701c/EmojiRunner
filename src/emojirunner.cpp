@@ -16,24 +16,24 @@
 */
 
 #include "emojirunner.h"
+#include "FileReader.h"
 
 // KF
 #include <KLocalizedString>
 #include <QtGui/QtGui>
 
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
-    : Plasma::AbstractRunner(parent, args)
-{
+        : Plasma::AbstractRunner(parent, args) {
     setObjectName(QStringLiteral("EmojiRunner"));
 }
 
-EmojiRunner::~EmojiRunner()
-{
+EmojiRunner::~EmojiRunner() = default;
+
+void EmojiRunner::reloadConfiguration() {
+    FileReader::readJSONFile();
 }
 
-
-void EmojiRunner::match(Plasma::RunnerContext &context)
-{
+void EmojiRunner::match(Plasma::RunnerContext &context) {
     const QString term = context.query();
     QList<Plasma::QueryMatch> matches;
     Plasma::QueryMatch match(this);
@@ -43,8 +43,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context)
     context.addMatches(matches);
 }
 
-void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match)
-{
+void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
     Q_UNUSED(context)
     Q_UNUSED(match)
 

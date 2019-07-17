@@ -1,5 +1,12 @@
 This project is in the early stages of development !
 
+This plugin allows you to search and copy emojis/symbols to the clipboard.
+If has the following categories:  
+Smileys & Emotion, Objects, Food & Drink, People & Body, Animals & Nature, Symbols, Travel & Places and Flags.
+
+Right now you can search for the emojis by name without a prefix to activate the plugin.
+
+
 ### Required Dependencies
 
 Debian/Ubuntu:  

@@ -14,6 +14,8 @@ public:
 
     QList<EmojiCategory> emojiCategories;
 
+    KConfigGroup config;
+
 public: // Plasma::AbstractRunner API
     void reloadConfiguration() override;
 

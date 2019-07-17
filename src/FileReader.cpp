@@ -31,6 +31,5 @@ QList<EmojiCategory> FileReader::readJSONFile() {
             categories.append(category);
         }
     }
-    qInfo() << "It Works !" << categories.at(6).emojis.value("grinning").emoji;
     return categories;
 }

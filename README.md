@@ -49,11 +49,12 @@ The emoji.json file is a modified version from https://github.com/github/gemoji
 ### Screenshots:
 
 #### Search for an emoji by name
-![Connect to default country](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
+![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
 
-#### Search for an emoji by name
-![Connect to default country](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
+#### Show favourites
+They will be made configurable in a dialog
+![Show favourites](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/favourites.png)
 
 #### Search for emojis
 This way you can search for emojis without search results from other plugins
-![Connect to default country](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)
+![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)

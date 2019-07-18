@@ -35,11 +35,13 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
     QList<Plasma::QueryMatch> matches;
-    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");
+    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool globalSearch = !term.startsWith("emoji");
     QRegExp regex(R"(emoji(?: +(.*))?)");
     regex.indexIn(term);
-    const QString search = regex.capturedTexts().last();
+    QString search = regex.capturedTexts().last();
+    if (globalSearch) search = term;
+
     if (!globalSearch && search.isEmpty()) {
         // region favourites
         EmojiCategory favouriteCategory;
@@ -54,7 +56,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             matches.append(createQueryMatch(emoji, (float) emoji.favourite / 22));
         }
         // endregion
-    } else if (!globalSearch) {
+    } else if (!globalSearch || config.readEntry("globalSearch", "true") == "true") {
         // region search: emoji <query>
         for (const auto &category:emojiCategories) {
             if (!category.enabled || category.name == "Favourites") continue;
@@ -65,20 +67,6 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
                     if (category.name == "Smileys & Emotion") relevance *= 4;
                     if (emoji.favourite != 0) relevance += 0.5;
                     matches.append(createQueryMatch(emoji, relevance));
-                }
-            }
-        }
-        //endregion
-    } else if (config.readEntry("globalSearch", "true") == "true") {
-        //region global search
-        // Search all categories
-        for (const auto &category:emojiCategories) {
-            if (!category.enabled || category.name == "Favourites") continue;
-            for (const auto &key :category.emojis.keys()) {
-                if (nameQueryMatches(key, term)) {
-                    float relevance = (float) term.length() / (key.length() * 2);
-                    if (category.name == "Smileys & Emotion") relevance *= 2;
-                    matches.append(createQueryMatch(category.emojis.value(key), relevance));
                 }
             }
         }

@@ -35,10 +35,13 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
     QList<Plasma::QueryMatch> matches;
-    const auto term = context.query();
-
-    if (term.startsWith("emoji")) {
-        // Show favourites
+    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");
+    const bool globalSearch = !term.startsWith("emoji");
+    QRegExp regex(R"(emoji(?: +(.*))?)");
+    regex.indexIn(term);
+    const QString search = regex.capturedTexts().last();
+    if (!globalSearch && search.isEmpty()) {
+        // region favourites
         EmojiCategory favouriteCategory;
         for (const auto &category:emojiCategories) {
             if (category.name == "Favourites") {
@@ -48,33 +51,38 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
         }
         for (const auto &key :favouriteCategory.emojis.keys()) {
             const auto emoji = favouriteCategory.emojis.value(key);
-            Plasma::QueryMatch match(this);
-            match.setText(emoji.emoji);
-            match.setSubtext(QString(key).replace("_", " "));
-            match.setData(emoji.emoji);
-            match.setRelevance((float) emoji.favourite / 22);
-            matches.append(match);
+            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 22));
         }
+        // endregion
+    } else if (!globalSearch) {
+        // region search: emoji <query>
+        for (const auto &category:emojiCategories) {
+            if (!category.enabled || category.name == "Favourites") continue;
+            for (const auto &key :category.emojis.keys()) {
+                if (nameQueryMatches(key, search)) {
+                    const Emoji emoji = category.emojis.value(key);
+                    float relevance = (float) search.length() / (key.length() * 8);
+                    if (category.name == "Smileys & Emotion") relevance *= 4;
+                    if (emoji.favourite != 0) relevance += 0.5;
+                    matches.append(createQueryMatch(emoji, relevance));
+                }
+            }
+        }
+        //endregion
     } else if (config.readEntry("globalSearch", "true") == "true") {
+        //region global search
         // Search all categories
         for (const auto &category:emojiCategories) {
             if (!category.enabled || category.name == "Favourites") continue;
             for (const auto &key :category.emojis.keys()) {
-                const auto key2 = QString(key).replace("_", "");
-                if (key2.startsWith(term, Qt::CaseInsensitive) ||
-                    QString(key).replace("_", "").startsWith(term, Qt::CaseInsensitive)) {
-                    Plasma::QueryMatch match(this);
-                    match.setText(category.emojis.value(key).emoji);
-                    match.setSubtext(key2);
-                    match.setData(category.emojis.value(key).emoji);
-                    // Emoji should have higher priority than the symbols
-                    float relevance = (float) term.length() / (key2.length() * 2);
+                if (nameQueryMatches(key, term)) {
+                    float relevance = (float) term.length() / (key.length() * 2);
                     if (category.name == "Smileys & Emotion") relevance *= 2;
-                    match.setRelevance(relevance);
-                    matches.append(match);
+                    matches.append(createQueryMatch(category.emojis.value(key), relevance));
                 }
             }
         }
+        //endregion
     }
     context.addMatches(matches);
 }

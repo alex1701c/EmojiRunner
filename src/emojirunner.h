@@ -16,6 +16,20 @@ public:
 
     KConfigGroup config;
 
+    static bool nameQueryMatches(const QString &key, const QString &search) {
+        return QString(key).replace("_", "").startsWith(search, Qt::CaseInsensitive) ||
+               QString(key).replace("_", " ").startsWith(search, Qt::CaseInsensitive);
+    }
+
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, float relevance) {
+        Plasma::QueryMatch match(this);
+        match.setText(emoji.emoji);
+        match.setSubtext(QString(emoji.name).replace("_", " "));
+        match.setData(emoji.emoji);
+        match.setRelevance(relevance);
+        return match;
+    }
+
 public: // Plasma::AbstractRunner API
     void reloadConfiguration() override;
 

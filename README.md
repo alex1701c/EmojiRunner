@@ -52,7 +52,7 @@ The emoji.json file is a modified version from https://github.com/github/gemoji
 ![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
 
 #### Show favourites
-They will be made configurable in a dialog
+They will be made configurable in a dialog  
 ![Show favourites](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/favourites.png)
 
 #### Search for emojis

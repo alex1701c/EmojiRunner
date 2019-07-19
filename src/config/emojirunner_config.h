@@ -42,6 +42,8 @@ public Q_SLOTS:
 
     void unicodeVersionsChanged();
 
+    void categoriesApplyChanges();
+
 
 private:
     EmojiRunnerConfigForm *m_ui;

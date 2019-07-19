@@ -52,7 +52,8 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Enable/Disable Categories</string>
+           <string>Enable/Disable Categories
+(Favourites are excluded)</string>
           </property>
          </widget>
         </item>
@@ -63,6 +64,13 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="applyCategoryChanges">
+          <property name="text">
+           <string>Apply Category Changes</string>
           </property>
          </widget>
         </item>
@@ -125,6 +133,9 @@
               <property name="text">
                <string>Apply unicode version</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
            </layout>
@@ -169,22 +180,36 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item alignment="Qt::AlignLeft">
-           <widget class="QLabel" name="favouriteListViewLabel">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QCheckBox" name="sortFavourites">
             <property name="text">
-             <string>Configure Favourites</string>
+             <string>Sort Favourites</string>
             </property>
            </widget>
           </item>
-          <item alignment="Qt::AlignRight">
-           <widget class="QLabel" name="favouriteVisibleElements">
+          <item>
+           <widget class="QPushButton" name="moveFavouriteUp">
             <property name="text">
-             <string/>
+             <string>Move Up</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="moveFavouriteDown">
+            <property name="text">
+             <string>Move Down</string>
             </property>
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="favouriteVisibleElements">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QListWidget" name="favouriteListView"/>

@@ -18,8 +18,8 @@ public:
     QString description;
     QString category;
     QStringList tags;
-    QString unicodeVersion;
-    QString iosVersion;
+    float unicodeVersion = 0;
+    float iosVersion=0;
 };
 
 

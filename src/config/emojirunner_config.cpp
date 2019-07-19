@@ -25,10 +25,18 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
         return c1.name < c2.name;
     });
 
+    // TODO Show count
+    // TODO Connect signals when unicode changes
+    // TODO Filter unicode version
+
     connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterFavourites()));
+    connect(m_ui->favouriteFilterVersions, SIGNAL(clicked(bool)), this, SLOT(filterFavourites()));
     connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
+    // Unicode Versions change => eventually reload filters
+    connect(m_ui->unicodeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionsChanged()));
+    connect(m_ui->iosComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionsChanged()));
 
     filtersChanged(false);
 
@@ -47,11 +55,16 @@ void EmojiRunnerConfig::load() {
         m_ui->categoryListView->addItem(item);
     }
 
-    // Load Unicode/Ios versions
-    m_ui->unicodeComboBox->addItems(unicodeVersions);
+    // Load Unicode versions
+    for (const auto &unicodeVersion:unicodeVersions) {
+        m_ui->unicodeComboBox->addItem(QString::number(unicodeVersion));
+    }
     if (config.readEntry("unicodeVersion").isEmpty()) m_ui->unicodeComboBox->setCurrentIndex(m_ui->unicodeComboBox->count() - 1);
     else m_ui->unicodeComboBox->setCurrentText(config.readEntry("unicodeVersion"));
-    m_ui->iosComboBox->addItems(iosVersions);
+    // Load Ios fallback versions
+    for (const auto &iosVersion:iosVersions) {
+        m_ui->iosComboBox->addItem(QString::number(iosVersion));
+    }
     if (config.readEntry("unicodeVersion").isEmpty()) m_ui->iosComboBox->setCurrentIndex(m_ui->iosComboBox->count() - 1);
     else m_ui->iosComboBox->setCurrentText(config.readEntry("iosVersion"));
 
@@ -84,6 +97,8 @@ void EmojiRunnerConfig::load() {
         }
     }
 
+    m_ui->favouriteVisibleElements->setText(QString::number(m_ui->favouriteListView->count()) + " Elements");
+
     emit changed(false);
 }
 
@@ -97,21 +112,50 @@ void EmojiRunnerConfig::defaults() {
 }
 
 void EmojiRunnerConfig::filterFavourites() {
+    const float unicodeVersion = m_ui->unicodeComboBox->itemText(m_ui->unicodeComboBox->currentIndex()).toFloat();
+    const float iosVersion = m_ui->iosComboBox->itemText(m_ui->iosComboBox->currentIndex()).toFloat();
+    bool unicode = m_ui->favouriteFilterVersions->isChecked();
+    if (unicodeVersion == 12 && iosVersion == 13) unicode = false;
     const QString text = m_ui->favouriteFilter->text();
+    int visibleItems = 0;
     int count = m_ui->favouriteListView->count();
 
     if (text.isEmpty()) {
-        for (int i = 0; i < count; i++) {
-            m_ui->favouriteListView->item(i)->setHidden(false);
+        // Show all entries
+        if (!unicode) {
+            for (int i = 0; i < count; i++) {
+                // TODO Very slow!
+                m_ui->favouriteListView->item(i)->setHidden(false);
+            }
+            visibleItems = m_ui->favouriteListView->count();
+        } else {
+            //
+            for (int i = 0; i < count; i++) {
+                const auto emoji = allEmojis.value(m_ui->favouriteListView->item(i)->data(1).toString());
+                if (emoji.unicodeVersion != 0 && emoji.unicodeVersion <= unicodeVersion) {
+                    m_ui->favouriteListView->item(i)->setHidden(false);
+                    ++visibleItems;
+                } else if (emoji.unicodeVersion == 0 && emoji.iosVersion <= iosVersion) {
+                    m_ui->favouriteListView->item(i)->setHidden(false);
+                    ++visibleItems;
+                } else {
+                    m_ui->favouriteListView->item(i)->setHidden(true);
+                }
+            }
         }
     } else {
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; ++i) {
             auto *item = m_ui->favouriteListView->item(i);
             bool hidden = true;
             const auto emoji = allEmojis.value(item->data(1).toString());
 
+            // Skip if unicode/ios version is to great
+            if (unicode && (emoji.unicodeVersion > unicodeVersion || (emoji.unicodeVersion == 0 && emoji.iosVersion > iosVersion))) {
+                item->setHidden(true);
+                continue;
+            }
+
             // Search properties based on selected filters
-            // glasses tags and description
             if (favouriteFilters.contains("name")) {
                 if (emoji.name.contains(text, Qt::CaseInsensitive) ||
                     emoji.name.contains(QString(text).replace(' ', '_'), Qt::CaseInsensitive)) {
@@ -119,15 +163,17 @@ void EmojiRunnerConfig::filterFavourites() {
                 }
             }
             if (hidden && favouriteFilters.contains("description")) {
-                if (emoji.description.contains(text, Qt::CaseInsensitive)) hidden = false;
+                if (emoji.description.contains(text, Qt::CaseInsensitive))hidden = false;
             }
             if (hidden && favouriteFilters.contains("tags")) {
-                for (const auto &t:emoji.tags) if (t.contains(text, Qt::CaseInsensitive)) hidden = false;
+                for (const auto &t:emoji.tags)if (t.contains(text, Qt::CaseInsensitive)) hidden = false;
             }
-
+            if (!hidden) ++visibleItems;
             item->setHidden(hidden);
         }
     }
+
+    m_ui->favouriteVisibleElements->setText(QString::number(visibleItems) + " Elements");
 }
 
 void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
@@ -158,6 +204,10 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
     }
 
     if (reloadFilter)filterFavourites();
+}
+
+void EmojiRunnerConfig::unicodeVersionsChanged() {
+    if (m_ui->favouriteFilterVersions->isChecked()) filterFavourites();
 }
 
 

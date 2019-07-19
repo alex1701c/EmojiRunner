@@ -29,8 +29,8 @@ QList<EmojiCategory> FileReader::readJSONFile() {
                 emoji.category = obj.value("category").toString();
                 for (const auto &tag:obj.value("tags").toArray()) emoji.tags.append(tag.toString());
                 emoji.description = obj.value("description").toString();
-                emoji.unicodeVersion = obj.value("unicode_version").toString();
-                emoji.iosVersion = obj.value("ios_version").toString();
+                emoji.unicodeVersion = obj.value("unicode_version").toString().toFloat();
+                emoji.iosVersion = obj.value("ios_version").toString().toFloat();
                 if (favouriteIds.contains(emoji.id)) {
                     emoji.favourite = 21 - favouriteIds.indexOf(emoji.id);
                     favourites.emojis.insert(emoji.name, emoji);

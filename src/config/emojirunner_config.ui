@@ -121,9 +121,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="filterVersions">
+             <widget class="QCheckBox" name="favouriteFilterVersions">
               <property name="text">
-               <string>Apply minumum versions</string>
+               <string>Apply unicode version</string>
               </property>
              </widget>
             </item>
@@ -169,11 +169,22 @@
          </layout>
         </item>
         <item>
-         <widget class="QLabel" name="favouriteListViewLabel">
-          <property name="text">
-           <string>Configure Favourites</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item alignment="Qt::AlignLeft">
+           <widget class="QLabel" name="favouriteListViewLabel">
+            <property name="text">
+             <string>Configure Favourites</string>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignRight">
+           <widget class="QLabel" name="favouriteVisibleElements">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QListWidget" name="favouriteListView"/>

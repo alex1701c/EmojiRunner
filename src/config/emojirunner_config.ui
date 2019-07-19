@@ -19,6 +19,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <widget class="QCheckBox" name="enableGlobalSearch">
+       <property name="text">
+        <string>Search for emojis globally (without &lt;emoji&gt; prefix)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QGroupBox" name="parentLayout">
      <property name="enabled">
       <bool>true</bool>
@@ -33,15 +44,75 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="title">
-      <string>EmojiRunner Config</string>
+      <string>Emoji Runner Config</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Hello World !</string>
-        </property>
-       </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Enable/Disable Categories</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="categoryListView"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Set minimum unicode version</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Unicode Version:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="unicodeComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Ios Version (fallback):</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="iosComboBox"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Configure Favourites</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="favouriteListView"/>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

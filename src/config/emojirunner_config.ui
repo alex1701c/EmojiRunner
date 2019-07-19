@@ -57,7 +57,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="categoryListView"/>
+         <widget class="QListWidget" name="categoryListView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -103,7 +110,66 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QLabel" name="label_2">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLineEdit" name="favouriteFilter">
+              <property name="placeholderText">
+               <string>Search Emojis</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="filterVersions">
+              <property name="text">
+               <string>Apply minumum versions</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QGroupBox" name="favouriteFilterGroupBox">
+              <property name="title">
+               <string>Filter By:</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QCheckBox" name="favouriteFilterName">
+                 <property name="text">
+                  <string>Name</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="favouriteFilterTags">
+                 <property name="text">
+                  <string>Tags</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="favouriteFilterDescription">
+                 <property name="text">
+                  <string>Description</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="favouriteListViewLabel">
           <property name="text">
            <string>Configure Favourites</string>
           </property>

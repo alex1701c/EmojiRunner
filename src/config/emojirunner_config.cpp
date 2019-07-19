@@ -25,10 +25,18 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
         return c1.name < c2.name;
     });
 
+    connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterFavourites()));
+    connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
+    connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
+    connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
+
+    filtersChanged(false);
+
 }
 
 void EmojiRunnerConfig::load() {
 
+    m_ui->enableGlobalSearch->setChecked(config.readEntry("globalSearch", "true") == "true");
     // Load categories
     for (const auto &category:emojiCategories) {
         if (category.name == "Favourites") continue;
@@ -53,20 +61,24 @@ void EmojiRunnerConfig::load() {
         if (category.name != "Favourites") continue;
         favouriteNames = category.emojis.keys();
         for (const auto &emoji:category.emojis.values()) {
-            auto *item = new QListWidgetItem(emoji.emoji + " " + emoji.name);
+            auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(Qt::Checked);
+            item->setData(1, emoji.name);
             m_ui->favouriteListView->addItem(item);
         }
     }
     // Load other emojis
+    allEmojis.clear();
     for (const auto &category:emojiCategories) {
         if (category.name == "Favourites") continue;
         for (const auto &emoji:category.emojis.values()) {
+            allEmojis.insert(emoji.name, emoji);
             if (favouriteNames.contains(emoji.name)) continue;
-            auto *item = new QListWidgetItem(emoji.emoji + " " + emoji.name);
+            auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(Qt::Unchecked);
+            item->setData(1, emoji.name);
             m_ui->favouriteListView->addItem(item);
 
         }
@@ -82,6 +94,70 @@ void EmojiRunnerConfig::save() {
 
 void EmojiRunnerConfig::defaults() {
     emit changed(true);
+}
+
+void EmojiRunnerConfig::filterFavourites() {
+    const QString text = m_ui->favouriteFilter->text();
+    int count = m_ui->favouriteListView->count();
+
+    if (text.isEmpty()) {
+        for (int i = 0; i < count; i++) {
+            m_ui->favouriteListView->item(i)->setHidden(false);
+        }
+    } else {
+        for (int i = 0; i < count; i++) {
+            auto *item = m_ui->favouriteListView->item(i);
+            bool hidden = true;
+            const auto emoji = allEmojis.value(item->data(1).toString());
+
+            // Search properties based on selected filters
+            // glasses tags and description
+            if (favouriteFilters.contains("name")) {
+                if (emoji.name.contains(text, Qt::CaseInsensitive) ||
+                    emoji.name.contains(QString(text).replace(' ', '_'), Qt::CaseInsensitive)) {
+                    hidden = false;
+                }
+            }
+            if (hidden && favouriteFilters.contains("description")) {
+                if (emoji.description.contains(text, Qt::CaseInsensitive)) hidden = false;
+            }
+            if (hidden && favouriteFilters.contains("tags")) {
+                for (const auto &t:emoji.tags) if (t.contains(text, Qt::CaseInsensitive)) hidden = false;
+            }
+
+            item->setHidden(hidden);
+        }
+    }
+}
+
+void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
+    // Enable/Disable the filter checkboxes and trigger search event
+    int checked = 0;
+    favouriteFilters.clear();
+    if (m_ui->favouriteFilterName->isChecked()) {
+        checked++;
+        favouriteFilters.append("name");
+    }
+    if (m_ui->favouriteFilterTags->isChecked()) {
+        checked++;
+        favouriteFilters.append("tags");
+    }
+    if (m_ui->favouriteFilterDescription->isChecked()) {
+        checked++;
+        favouriteFilters.append("description");
+    }
+
+    if (checked == 1) {
+        if (m_ui->favouriteFilterName->isChecked()) m_ui->favouriteFilterName->setDisabled(true);
+        else if (m_ui->favouriteFilterTags->isChecked()) m_ui->favouriteFilterTags->setDisabled(true);
+        else m_ui->favouriteFilterDescription->setDisabled(true);
+    } else {
+        m_ui->favouriteFilterName->setDisabled(false);
+        m_ui->favouriteFilterTags->setDisabled(false);
+        m_ui->favouriteFilterDescription->setDisabled(false);
+    }
+
+    if (reloadFilter)filterFavourites();
 }
 
 

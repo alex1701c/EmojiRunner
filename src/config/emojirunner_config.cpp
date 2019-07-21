@@ -32,10 +32,6 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
         return c1.name < c2.name;
     });
 
-    // TODO Show count
-    // TODO Connect signals when unicode changes
-    // TODO Filter unicode version
-
     // Connect slots for filters
     connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterFavourites()));
     connect(m_ui->favouriteFilterVersions, SIGNAL(clicked(bool)), this, SLOT(filterFavourites()));
@@ -134,7 +130,6 @@ void EmojiRunnerConfig::filterFavourites() {
         // Show all entries
         if (!unicode) {
             for (int i = 0; i < count; i++) {
-                // TODO Very slow!
                 m_ui->favouriteListView->item(i)->setHidden(false);
             }
             visibleItems = m_ui->favouriteListView->count();
@@ -213,7 +208,7 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
         m_ui->favouriteFilterDescription->setDisabled(false);
     }
 
-    if (reloadFilter)filterFavourites();
+    if (reloadFilter && !m_ui->favouriteFilter->text().isEmpty())filterFavourites();
 }
 
 void EmojiRunnerConfig::unicodeVersionsChanged() {
@@ -221,9 +216,7 @@ void EmojiRunnerConfig::unicodeVersionsChanged() {
 }
 
 void EmojiRunnerConfig::categoriesApplyChanges() {
-    // TODO Remove all emoji from disabled categories that are no favourites/have not been selected
     const QStringList previouslyDisabled = disabledEmojis;
-    QStringList newFavourites;
     disabledEmojis.clear();
 
     // Update list of disabled categories
@@ -241,10 +234,7 @@ void EmojiRunnerConfig::categoriesApplyChanges() {
             auto *item = m_ui->favouriteListView->item(i);
             const auto emoji = allEmojis.value(item->data(1).toString());
             if (!disabledEmojis.contains(emoji.category)) continue;
-            if (item->checkState() == Qt::Checked || emoji.favourite != 0) {
-                newFavourites.append(item->text());
-                continue;
-            }
+            if (item->checkState() == Qt::Checked || emoji.favourite != 0) continue;
             remove.insert(0, i);
         }
     }
@@ -255,25 +245,41 @@ void EmojiRunnerConfig::categoriesApplyChanges() {
     for (const auto &c:previouslyDisabled) {
         if (!disabledEmojis.contains(c)) newlyEnabled.append(c);
     }
-    qInfo() << newFavourites;
     // Add newly installed emojis
-    for (const auto &c:emojiCategories) {
-        if (!newlyEnabled.contains(c.name)) continue;
-        for (const auto &emoji:c.emojis.values()) {
-            const QString text = emoji.emoji + " " + QString(emoji.name).replace('_', ' ');
-            if (newFavourites.contains(text)) {
-                // TODO Doublicates get inserted
-                qInfo() << "SKIP" << emoji.name;
-                continue;
+    if (!newlyEnabled.isEmpty()) {
+        // Check which favourite emojis are in list
+        QStringList newFavourites;
+        const int newItemCount = m_ui->favouriteListView->count();
+        for (int i = 0; i < newItemCount; ++i) {
+            auto *item = m_ui->favouriteListView->item(i);
+            const auto emoji = allEmojis.value(item->data(1).toString());
+            if (!disabledEmojis.contains(emoji.category)) newFavourites.append(emoji.name);
+        }
+        // Add emojis, skip favourites
+        for (const auto &c:emojiCategories) {
+            if (!newlyEnabled.contains(c.name)) continue;
+            for (const auto &emoji:c.emojis.values()) {
+                const QString text = emoji.emoji + " " + QString(emoji.name).replace('_', ' ');
+
+                if (newFavourites.contains(emoji.name)) continue;
+
+                auto *item = new QListWidgetItem(text);
+                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+                item->setCheckState(Qt::Unchecked);
+                item->setData(1, emoji.name);
+                m_ui->favouriteListView->addItem(item);
             }
-            auto *item = new QListWidgetItem(text);
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            item->setCheckState(Qt::Unchecked);
-            item->setData(1, emoji.name);
-            m_ui->favouriteListView->addItem(item);
         }
     }
 
+    if (!m_ui->favouriteFilter->text().isEmpty()) {
+        const int newItemCount = m_ui->favouriteListView->count();
+        for (int i = 0; i < newItemCount; i++) {
+            const auto item = m_ui->favouriteListView->item(i);
+            item->setHidden(false);
+        }
+        m_ui->favouriteFilter->clear();
+    }
     m_ui->favouriteVisibleElements->setText(QString::number(m_ui->favouriteListView->count()) + " Elements");
 }
 

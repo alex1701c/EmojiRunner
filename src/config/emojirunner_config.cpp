@@ -42,6 +42,9 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->applyCategoryChanges, SIGNAL(clicked(bool)), this, SLOT(categoriesApplyChanges()));
     // Sort favourites
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
+    connect(m_ui->favouriteListView, SIGNAL(itemSelectionChanged()), this, SLOT(validateMoveFavouriteButtons()));
+    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteUp()));
+    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteDown()));
 
 }
 
@@ -101,6 +104,7 @@ void EmojiRunnerConfig::load() {
 
     filterActive = true;
     filterFavourites();
+    validateMoveFavouriteButtons();
 
     emit changed(false);
 }
@@ -231,7 +235,7 @@ void EmojiRunnerConfig::categoriesApplyChanges() {
             remove.insert(0, i);
         }
     }
-    for (int rm:remove)m_ui->favouriteListView->model()->removeRow(rm);
+    for (int rm:remove) m_ui->favouriteListView->model()->removeRow(rm);
 
     // Get newly enabled items
     QStringList newlyEnabled;
@@ -292,9 +296,11 @@ void EmojiRunnerConfig::showOnlyFavourites() {
 
     if (checked) {
         filterActive = false;
+        favouriteVisibleEmojis = -1;
         for (int i = 0; i < itemCount; ++i) {
             auto *item = m_ui->favouriteListView->item(i);
             if (item->checkState() == Qt::Unchecked) item->setHidden(true);
+            else ++favouriteVisibleEmojis;
         }
     } else {
         for (int i = 0; i < itemCount; ++i) {
@@ -324,6 +330,33 @@ void EmojiRunnerConfig::iosVersionsChanged() {
     } else {
         m_ui->favouriteFilter->clear();
     }
+}
+
+
+void EmojiRunnerConfig::validateMoveFavouriteButtons() {
+    if (m_ui->sortFavourites->isChecked()) {
+        m_ui->moveFavouriteUp->setDisabled(m_ui->favouriteListView->currentRow() == 0);
+        m_ui->moveFavouriteDown->setDisabled(m_ui->favouriteListView->currentRow() == favouriteVisibleEmojis);
+    } else {
+        m_ui->moveFavouriteUp->setDisabled(true);
+        m_ui->moveFavouriteDown->setDisabled(true);
+    }
+
+}
+
+
+void EmojiRunnerConfig::moveFavouriteUp() {
+    const int row = m_ui->favouriteListView->currentRow();
+    auto *item = m_ui->favouriteListView->takeItem(row);
+    m_ui->favouriteListView->insertItem(row - 1, item);
+    m_ui->favouriteListView->setCurrentRow(row - 1);
+}
+
+void EmojiRunnerConfig::moveFavouriteDown() {
+    const int row = m_ui->favouriteListView->currentRow();
+    auto *item = m_ui->favouriteListView->takeItem(row);
+    m_ui->favouriteListView->insertItem(row + 1, item);
+    m_ui->favouriteListView->setCurrentRow(row + 1);
 }
 
 

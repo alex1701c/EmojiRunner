@@ -30,6 +30,7 @@ public:
     QList<float> unicodeVersions = {3.0, 3.2, 4.0, 4.1, 5.1, 5.2, 6.0, 6.1, 7.0, 8.0, 9.0, 11.0, 12.0};
     QList<float> iosVersions = {6.0, 8.3, 9.0, 9.1, 10.0, 10.2, 12.1, 13.0};
     QStringList favouriteFilters = {"name"};
+    int favouriteVisibleEmojis = -1;
 
     void displayVisibleItems() const {
         int visibleItems = 0;
@@ -61,6 +62,11 @@ public Q_SLOTS:
 
     void showOnlyFavourites();
 
+    void validateMoveFavouriteButtons();
+
+    void moveFavouriteUp();
+
+    void moveFavouriteDown();
 
 private:
     EmojiRunnerConfigForm *m_ui;

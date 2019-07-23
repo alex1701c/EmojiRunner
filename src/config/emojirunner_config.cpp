@@ -37,15 +37,22 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     // Unicode Versions change => eventually reload filters
     connect(m_ui->unicodeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionsChanged()));
+    connect(m_ui->unicodeComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
     connect(m_ui->iosComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(iosVersionsChanged()));
+    connect(m_ui->iosComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
     // Disable categories
     connect(m_ui->applyCategoryChanges, SIGNAL(clicked(bool)), this, SLOT(categoriesApplyChanges()));
+    connect(m_ui->applyCategoryChanges, SIGNAL(clicked(bool)), this, SLOT(changed()));
     // Sort favourites
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
     connect(m_ui->favouriteListView, SIGNAL(itemSelectionChanged()), this, SLOT(validateMoveFavouriteButtons()));
-    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteUp()));
-    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteDown()));
+    connect(m_ui->favouriteChangesSaveButton, SIGNAL(clicked(bool)), this, SLOT(saveFavourites()));
+    connect(m_ui->favouriteChangesSaveButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
 
+    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteUp()));
+    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteDown()));
+    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(changed()));
 }
 
 void EmojiRunnerConfig::load() {
@@ -101,16 +108,30 @@ void EmojiRunnerConfig::load() {
     m_ui->unicodeComboBox->setCurrentText(QString::number(configUnicodeVersion));
     m_ui->iosComboBox->setCurrentText(QString::number(configIosVersion));
 
+    m_ui->favouriteListView->currentRowChanged(0);
 
     filterActive = true;
     filterFavourites();
     validateMoveFavouriteButtons();
 
-    emit changed(false);
+    emit changed(true);
 }
 
 
 void EmojiRunnerConfig::save() {
+    config.writeEntry("globalSearch", m_ui->enableGlobalSearch->isChecked() ? "true" : "false");
+    config.writeEntry("unicodeVersion", m_ui->unicodeComboBox->currentText());
+    config.writeEntry("iosVersion", m_ui->iosComboBox->currentText());
+
+    QString disabledCategories;
+    const int categoryCount = m_ui->categoryListView->count();
+    for (int i = 0; i < categoryCount; i++) {
+        const auto *item = m_ui->categoryListView->item(i);
+        if (item->checkState() == Qt::Unchecked) disabledCategories.append(item->text() + ";");
+    }
+    config.writeEntry("disabledCategories", disabledCategories);
+
+    saveFavourites();
     emit changed();
 }
 
@@ -118,7 +139,6 @@ void EmojiRunnerConfig::defaults() {
 
     m_ui->enableGlobalSearch->setChecked(true);
 
-    m_ui->favouriteFilterVersions->setChecked(true);
     m_ui->unicodeComboBox->setCurrentText("11");
     m_ui->iosComboBox->setCurrentText("13");
 
@@ -291,7 +311,6 @@ void EmojiRunnerConfig::showOnlyFavourites() {
     m_ui->favouriteFilterName->setDisabled(checked);
     m_ui->favouriteFilterTags->setDisabled(checked);
     m_ui->favouriteFilterDescription->setDisabled(checked);
-    m_ui->favouriteFilterVersions->setDisabled(checked);
 
 
     if (checked) {
@@ -357,6 +376,19 @@ void EmojiRunnerConfig::moveFavouriteDown() {
     auto *item = m_ui->favouriteListView->takeItem(row);
     m_ui->favouriteListView->insertItem(row + 1, item);
     m_ui->favouriteListView->setCurrentRow(row + 1);
+}
+
+void EmojiRunnerConfig::saveFavourites() {
+    const int favouriteCount = m_ui->favouriteListView->count();
+    QString favouriteIDs;
+    for (int i = 0; i < favouriteCount; i++) {
+        const auto *item = m_ui->favouriteListView->item(i);
+        if (item->checkState() == Qt::Checked) {
+            const auto emoji = allEmojis.value(item->data(1).toString());
+            favouriteIDs.append(QString::number(emoji.id) + ";");
+        }
+    }
+    config.writeEntry("favourites", favouriteIDs);
 }
 
 

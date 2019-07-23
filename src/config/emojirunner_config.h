@@ -68,6 +68,8 @@ public Q_SLOTS:
 
     void moveFavouriteDown();
 
+    void saveFavourites();
+
 private:
     EmojiRunnerConfigForm *m_ui;
 

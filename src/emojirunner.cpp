@@ -10,9 +10,6 @@
 #include <QClipboard>
 #include <QDebug>
 
-// TODO Unicode version filter
-
-
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
     setObjectName(QStringLiteral("EmojiRunner"));
@@ -34,11 +31,13 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
     QList<Plasma::QueryMatch> matches;
+#ifdef stage_dev
     int total = 0;
     for (const auto &c:emojiCategories) {
         total += c.emojis.count();
     }
     qInfo() << total;
+#endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool globalSearch = !term.startsWith("emoji");
     QRegExp regex(R"(emoji(?: +(.*))?)");
@@ -57,7 +56,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
         }
         for (const auto &key :favouriteCategory.emojis.keys()) {
             const auto emoji = favouriteCategory.emojis.value(key);
-            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 22));
+            matches.append(createQueryMatch(emoji, (double) emoji.favourite / 40));
         }
         // endregion
     } else if (!globalSearch || config.readEntry("globalSearch", "true") == "true") {
@@ -67,7 +66,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             for (const auto &key :category.emojis.keys()) {
                 if (nameQueryMatches(key, search)) {
                     const Emoji emoji = category.emojis.value(key);
-                    float relevance = (float) search.length() / (key.length() * 8);
+                    double relevance = (double) search.length() / (key.length() * 8);
                     if (category.name == "Smileys & Emotion") relevance *= 4;
                     if (emoji.favourite != 0) relevance += 0.5;
                     matches.append(createQueryMatch(emoji, relevance));

@@ -10,7 +10,6 @@ K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kc
 EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) {
     setupUi(this);
 }
-// TODO Higher unicode than on startup
 // TODO Moving items up does not work because itemidx != rowidx
 
 
@@ -116,6 +115,7 @@ void EmojiRunnerConfig::load() {
     m_ui->unicodeComboBox->setCurrentText(QString::number(configUnicodeVersion));
     m_ui->iosComboBox->setCurrentText(QString::number(configIosVersion));
 
+    categoriesApplyChanges();
     filterActive = true;
     filterFavourites();
     validateMoveFavouriteButtons();
@@ -264,14 +264,14 @@ void EmojiRunnerConfig::categoriesApplyChanges() {
     }
     for (int rm:remove) m_ui->favouriteListView->model()->removeRow(rm);
 
-    // Get newly enabled items
+    // Get newly enabled categories
     QStringList newlyEnabled;
     for (const auto &c:previouslyDisabled) {
         if (!disabledEmojis.contains(c)) newlyEnabled.append(c);
     }
     // Add newly installed emojis
     if (!newlyEnabled.isEmpty()) {
-        // Check which favourite emojis are in list
+        // Check which favourite emojis are in list ( because they are favourites)
         QStringList newFavourites;
         const int newItemCount = m_ui->favouriteListView->count();
         for (int i = 0; i < newItemCount; ++i) {
@@ -354,13 +354,25 @@ void EmojiRunnerConfig::iosVersionsChanged() {
 
 
 void EmojiRunnerConfig::validateMoveFavouriteButtons() {
+    // Check if there is another favourite above/below the selected one to en-/disable the buttons
+
     if (m_ui->sortFavourites->isChecked()) {
         const int rowCount = m_ui->favouriteListView->count() - 1;
         const int currentRow = m_ui->favouriteListView->currentRow();
-        m_ui->moveFavouriteUp->setDisabled(currentRow == 0);
 
+        // Handle Up Button
+        bool hasNoFavouriteAbove = true;
+        for (int i = 0; i < currentRow; i++) {
+            if (!m_ui->favouriteListView->item(i)->isHidden()) {
+                hasNoFavouriteAbove = false;
+                break;
+            }
+        }
+        m_ui->moveFavouriteUp->setDisabled(hasNoFavouriteAbove);
+
+        // Handle Down Button
         bool hasNoFavouriteBelow = true;
-        for (int i = rowCount; i >= 0; i--) {
+        for (int i = rowCount; i > currentRow; i--) {
             if (!m_ui->favouriteListView->item(i)->isHidden()) {
                 hasNoFavouriteBelow = false;
                 break;
@@ -376,17 +388,36 @@ void EmojiRunnerConfig::validateMoveFavouriteButtons() {
 
 
 void EmojiRunnerConfig::moveFavouriteUp() {
-    const int row = m_ui->favouriteListView->currentRow();
-    auto *item = m_ui->favouriteListView->takeItem(row);
-    m_ui->favouriteListView->insertItem(row - 1, item);
-    m_ui->favouriteListView->setCurrentRow(row - 1);
+    const int currentRow = m_ui->favouriteListView->currentRow();
+    int aboveIndex = true;
+
+    // Change index with one of favourite that is above
+    for (int i = currentRow - 1; i >= 0; --i) {
+        if (!m_ui->favouriteListView->item(i)->isHidden()) {
+            aboveIndex = i;
+            break;
+        }
+    }
+    auto *item = m_ui->favouriteListView->takeItem(currentRow);
+    m_ui->favouriteListView->insertItem(aboveIndex, item);
+    m_ui->favouriteListView->setCurrentRow(aboveIndex);
 }
 
 void EmojiRunnerConfig::moveFavouriteDown() {
-    const int row = m_ui->favouriteListView->currentRow();
-    auto *item = m_ui->favouriteListView->takeItem(row);
-    m_ui->favouriteListView->insertItem(row + 1, item);
-    m_ui->favouriteListView->setCurrentRow(row + 1);
+    const int count = m_ui->favouriteListView->count();
+    const int currentRow = m_ui->favouriteListView->currentRow();
+    int belowIndex = true;
+
+    // Change index with one of favourite that is above
+    for (int i = currentRow + 1; i < count; ++i) {
+        if (!m_ui->favouriteListView->item(i)->isHidden()) {
+            belowIndex = i;
+            break;
+        }
+    }
+    auto *item = m_ui->favouriteListView->takeItem(currentRow);
+    m_ui->favouriteListView->insertItem(belowIndex, item);
+    m_ui->favouriteListView->setCurrentRow(belowIndex);
 }
 
 void EmojiRunnerConfig::saveFavourites() {

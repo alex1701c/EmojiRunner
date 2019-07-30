@@ -37,7 +37,7 @@ FileReader::parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &c
             if (obj.isEmpty()) continue;
             auto emoji = Emoji::fromJSON(obj, categoryKey);
             if (favouriteIds.contains(emoji.id)) {
-                emoji.favourite = 25 - favouriteIds.indexOf(emoji.id);
+                emoji.favourite = 40 - favouriteIds.indexOf(emoji.id);
                 favourites.emojis.insert(emoji.name, emoji);
             }
             // Insert if favourite or ( the category is not disabled and versions match)

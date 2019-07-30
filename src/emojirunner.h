@@ -21,10 +21,14 @@ public:
                QString(key).replace("_", " ").startsWith(search, Qt::CaseInsensitive);
     }
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, float relevance) {
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance) {
         Plasma::QueryMatch match(this);
         match.setText(emoji.emoji);
+#ifndef stage_dev
         match.setSubtext(QString(emoji.name).replace("_", " "));
+#else
+        match.setSubtext(QString(emoji.name).replace("_", " ") + " ---- " + QString::number(relevance));
+#endif
         match.setData(emoji.emoji);
         match.setRelevance(relevance);
         return match;

@@ -10,6 +10,7 @@ K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kc
 EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) {
     setupUi(this);
 }
+// TODO Higher unicode than on startup
 // TODO Moving items up does not work because itemidx != rowidx
 
 
@@ -18,7 +19,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
-    emojiCategories = FileReader::readJSONFile();
+    emojiCategories = FileReader::readJSONFile(true);
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
     disabledEmojis = config.readEntry("disabledCategories", "").split(";", QString::SplitBehavior::SkipEmptyParts);
 
@@ -89,6 +90,7 @@ void EmojiRunnerConfig::load() {
 
     // Load other emojis
     allEmojis.clear();
+    QStringList disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
     for (const auto &category:emojiCategories) {
         if (category.name == "Favourites") continue;
         for (const auto &emoji:category.emojis.values()) {
@@ -113,8 +115,6 @@ void EmojiRunnerConfig::load() {
     configIosVersion = config.readEntry("iosVersion", "13").toFloat();
     m_ui->unicodeComboBox->setCurrentText(QString::number(configUnicodeVersion));
     m_ui->iosComboBox->setCurrentText(QString::number(configIosVersion));
-
-    m_ui->favouriteListView->currentRowChanged(0);
 
     filterActive = true;
     filterFavourites();
@@ -168,6 +168,9 @@ void EmojiRunnerConfig::filterFavourites() {
 
     const QString text = m_ui->favouriteFilter->text();
     int count = m_ui->favouriteListView->count();
+    configUnicodeVersion = m_ui->unicodeComboBox->currentText().toFloat();
+    configIosVersion = m_ui->iosComboBox->currentText().toFloat();
+
 
     if (text.isEmpty()) {
         // Show all entries if unicode matches
@@ -184,8 +187,6 @@ void EmojiRunnerConfig::filterFavourites() {
             const auto emoji = allEmojis.value(item->data(1).toString());
             bool hidden = true;
 
-            // Skip if unicode/ios version is to great
-            // Search properties based on selected filters
             if (favouriteFilters.contains("name")) {
                 if (emoji.name.contains(text, Qt::CaseInsensitive) ||
                     emoji.name.contains(QString(text).replace(' ', '_'), Qt::CaseInsensitive)) {
@@ -341,27 +342,31 @@ void EmojiRunnerConfig::showOnlyFavourites() {
 
 void EmojiRunnerConfig::unicodeVersionsChanged() {
     configUnicodeVersion = m_ui->unicodeComboBox->currentText().toFloat();
-    if (m_ui->favouriteFilter->text().isEmpty()) {
-        filterFavourites();
-    } else {
-        m_ui->favouriteFilter->clear();
-    }
+    m_ui->favouriteFilter->clear();
+    filterFavourites();
 }
 
 void EmojiRunnerConfig::iosVersionsChanged() {
     configIosVersion = m_ui->iosComboBox->currentText().toFloat();
-    if (m_ui->favouriteFilter->text().isEmpty()) {
-        filterFavourites();
-    } else {
-        m_ui->favouriteFilter->clear();
-    }
+    m_ui->favouriteFilter->clear();
+    filterFavourites();
 }
 
 
 void EmojiRunnerConfig::validateMoveFavouriteButtons() {
     if (m_ui->sortFavourites->isChecked()) {
-        m_ui->moveFavouriteUp->setDisabled(m_ui->favouriteListView->currentRow() == 0);
-        m_ui->moveFavouriteDown->setDisabled(m_ui->favouriteListView->currentRow() == favouriteVisibleEmojis);
+        const int rowCount = m_ui->favouriteListView->count() - 1;
+        const int currentRow = m_ui->favouriteListView->currentRow();
+        m_ui->moveFavouriteUp->setDisabled(currentRow == 0);
+
+        bool hasNoFavouriteBelow = true;
+        for (int i = rowCount; i >= 0; i--) {
+            if (!m_ui->favouriteListView->item(i)->isHidden()) {
+                hasNoFavouriteBelow = false;
+                break;
+            }
+        }
+        m_ui->moveFavouriteDown->setDisabled(hasNoFavouriteBelow);
     } else {
         m_ui->moveFavouriteUp->setDisabled(true);
         m_ui->moveFavouriteDown->setDisabled(true);

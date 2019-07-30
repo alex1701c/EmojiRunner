@@ -29,7 +29,7 @@ public:
         return true;
     }
 
-    static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey) {
+        static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey) {
         Emoji emoji;
         emoji.id = obj.value("id").toInt();
         emoji.name = obj.value("name").toString();

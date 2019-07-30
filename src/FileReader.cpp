@@ -27,6 +27,8 @@ FileReader::parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &c
     for (const auto &favouriteId:config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
             .split(";", QString::SplitBehavior::SkipEmptyParts))
         favouriteIds.append(favouriteId.toInt());
+    float configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
+    float configIosVersion = config.readEntry("iosVersion", "13").toFloat();
 
     for (const auto &categoryKey:emojiObject.keys()) {
         EmojiCategory category(categoryKey);
@@ -38,8 +40,9 @@ FileReader::parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &c
                 emoji.favourite = 25 - favouriteIds.indexOf(emoji.id);
                 favourites.emojis.insert(emoji.name, emoji);
             }
-            // Insert if favourite or the category is not disabled
-            if (emoji.favourite != 0 || !disabledCategories.contains(categoryKey)) {
+            // Insert if favourite or ( the category is not disabled and versions match)
+            if (emoji.favourite != 0 ||
+                (!disabledCategories.contains(categoryKey) && emoji.matchesVersions(configUnicodeVersion, configIosVersion))) {
                 category.emojis.insert(emoji.name, emoji);
             }
         }

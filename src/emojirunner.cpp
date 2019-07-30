@@ -10,6 +10,8 @@
 #include <QClipboard>
 #include <QDebug>
 
+// TODO Unicode version filter
+
 
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
@@ -26,20 +28,17 @@ void EmojiRunner::reloadConfiguration() {
     emojiCategories = FileReader::readJSONFile();
 
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
-
-    // TODO How to store favourites
-    // Default favourites (ids)
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
     QList<Plasma::QueryMatch> matches;
-    /*int total = 0;
+    int total = 0;
     for (const auto &c:emojiCategories) {
         total += c.emojis.count();
     }
-    qInfo() << total;*/
+    qInfo() << total;
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool globalSearch = !term.startsWith("emoji");
     QRegExp regex(R"(emoji(?: +(.*))?)");

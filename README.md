@@ -1,11 +1,8 @@
-This project is in development !
+## Emoji Runner
 
 This plugin allows you to search and copy emojis/symbols to the clipboard.
-If has the following categories:  
-Smileys & Emotion, Objects, Food & Drink, People & Body, Animals & Nature, Symbols, Travel & Places and Flags.
 
-In the future a config dialog which lets you configure favourites, categories etc. will be added.
-Furthermore a search by tag name will bge implemented.
+Additionally you can configure favourites, set the unicode version and enable/disable categories.
 
 ### Required Dependencies
 
@@ -49,12 +46,18 @@ The emoji.json file is a modified version from https://github.com/github/gemoji
 ### Screenshots:
 
 #### Search for an emoji by name
+This global search can be enabled/disabled in the config dialog  
 ![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
 
 #### Show favourites
-They will be made configurable in a dialog  
+They are configured in the config dialog  
 ![Show favourites](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/favourites.png)
 
 #### Search for emojis
-This way you can search for emojis without search results from other plugins
-![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)
+This way you can search for emojis without search results from other plugins  
+![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)  
+
+#### Configure settings
+You can search for emojis, set the unicode level (later versions can not be displayed) and you can disable categories  
+![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/config.png)  
+*The sorting of the favourites does not work as intended, (they are not always sorted by relevance). Help is appreciated!*  

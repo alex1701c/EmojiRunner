@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TODO Enable if the project is on Github
+# Exit immediately if something fails
+set -e
+
 if [[ $(basename "$PWD") != "EmojiRunner"* ]];then
-    #git clone https://github.com/%{USERNAME}/EmojiRunner
-    #cd EmojiRunner/
-    echo "Please go to the project folder"
-    exit
+    git clone https://github.com/alex1701c/EmojiRunner
+    cd EmojiRunner/
 fi
 
 mkdir -p build

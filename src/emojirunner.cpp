@@ -39,13 +39,13 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     qInfo() << total;
 #endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
-    const bool globalSearch = !term.startsWith("emoji");
+    const bool prefixed = term.startsWith("emoji");
     QRegExp regex(R"(emoji(?: +(.*))?)");
     regex.indexIn(term);
     QString search = regex.capturedTexts().last();
-    if (globalSearch) search = term;
+    if (!prefixed) search = term;
 
-    if (!globalSearch && search.isEmpty()) {
+    if (prefixed && search.isEmpty()) {
         // region favourites
         EmojiCategory favouriteCategory;
         for (const auto &category:emojiCategories) {
@@ -56,10 +56,10 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
         }
         for (const auto &key :favouriteCategory.emojis.keys()) {
             const auto emoji = favouriteCategory.emojis.value(key);
-            matches.append(createQueryMatch(emoji, (double) emoji.favourite / 40));
+            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21));
         }
         // endregion
-    } else if (!globalSearch || config.readEntry("globalSearch", "true") == "true") {
+    } else if (prefixed || config.readEntry("globalSearch", "true") == "true") {
         // region search: emoji <query>
         for (const auto &category:emojiCategories) {
             if (!category.enabled || category.name == "Favourites") continue;

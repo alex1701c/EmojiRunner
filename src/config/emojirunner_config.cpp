@@ -10,10 +10,7 @@ K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kc
 EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) {
     setupUi(this);
 }
-
-// TODO Implement Mode Favourites Functionality
-// TODO Handle Save
-// TODO Apply Settings directly in file read function to avoid unnecessary items
+// TODO Moving items up does not work because itemidx != rowidx
 
 
 EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) : KCModule(parent, args) {
@@ -45,6 +42,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->applyCategoryChanges, SIGNAL(clicked(bool)), this, SLOT(changed()));
     // Sort favourites
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
+    connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->favouriteListView, SIGNAL(itemSelectionChanged()), this, SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->favouriteChangesSaveButton, SIGNAL(clicked(bool)), this, SLOT(saveFavourites()));
     connect(m_ui->favouriteChangesSaveButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
@@ -68,19 +66,27 @@ void EmojiRunnerConfig::load() {
         m_ui->categoryListView->addItem(item);
     }
 
-    // Load favourites at top
+    // Load favourites at top, apply sort from config
     QStringList favouriteNames;
+    QList<Emoji> favouriteEmojisToAdd;
     for (const auto &category:emojiCategories) {
         if (category.name != "Favourites") continue;
         favouriteNames = category.emojis.keys();
         for (const auto &emoji:category.emojis.values()) {
-            auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            item->setCheckState(Qt::Checked);
-            item->setData(1, emoji.name);
-            m_ui->favouriteListView->addItem(item);
+            favouriteEmojisToAdd.append(emoji);
         }
     }
+    std::sort(favouriteEmojisToAdd.begin(), favouriteEmojisToAdd.end(), [](const Emoji &e1, const Emoji &e2) -> bool {
+        return e1.favourite > e2.favourite;
+    });
+    for (const auto &emoji:favouriteEmojisToAdd) {
+        auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(Qt::Checked);
+        item->setData(1, emoji.name);
+        m_ui->favouriteListView->addItem(item);
+    }
+
     // Load other emojis
     allEmojis.clear();
     for (const auto &category:emojiCategories) {

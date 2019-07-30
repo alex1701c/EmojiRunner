@@ -5,9 +5,8 @@
 #ifndef EMOJIRUNNER_EMOJI_H
 #define EMOJIRUNNER_EMOJI_H
 
+#include <QtCore>
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
 
 class Emoji {
 public:
@@ -28,6 +27,19 @@ public:
             return false;
         }
         return true;
+    }
+
+    static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey) {
+        Emoji emoji;
+        emoji.id = obj.value("id").toInt();
+        emoji.name = obj.value("name").toString();
+        emoji.emoji = obj.value("emoji").toString();
+        emoji.category = categoryKey;
+        for (const auto &tag:obj.value("tags").toArray()) emoji.tags.append(tag.toString());
+        emoji.description = obj.value("description").toString();
+        emoji.unicodeVersion = obj.value("unicode_version").toString().toFloat();
+        emoji.iosVersion = obj.value("ios_version").toString().toFloat();
+        return emoji;
     }
 };
 

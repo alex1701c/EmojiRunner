@@ -35,6 +35,11 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
     QList<Plasma::QueryMatch> matches;
+    /*int total = 0;
+    for (const auto &c:emojiCategories) {
+        total += c.emojis.count();
+    }
+    qInfo() << total;*/
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool globalSearch = !term.startsWith("emoji");
     QRegExp regex(R"(emoji(?: +(.*))?)");

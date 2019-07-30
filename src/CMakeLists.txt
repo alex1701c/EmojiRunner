@@ -1,13 +1,13 @@
 add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.emojirunner\")
 
-set(emojirunner_SRCS emojirunner.cpp Emoji.cpp Emoji.h EmojiCategory.h FileReader.cpp FileReader.h)
+set(emojirunner_SRCS emojirunner.cpp Emoji.h EmojiCategory.h FileReader.cpp FileReader.h)
 
 add_library(krunner_emojirunner MODULE ${emojirunner_SRCS})
 target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets)
 
 set(kcm_krunner_emojirunner_SRCS
         config/emojirunner_config.cpp
-        Emoji.cpp Emoji.h FileReader.cpp FileReader.h)
+        Emoji.h FileReader.cpp FileReader.h)
 
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS config/emojirunner_config.ui)
 add_library(kcm_krunner_emojirunner MODULE ${kcm_krunner_emojirunner_SRCS})

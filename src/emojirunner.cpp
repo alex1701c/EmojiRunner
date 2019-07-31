@@ -25,6 +25,9 @@ void EmojiRunner::reloadConfiguration() {
     emojiCategories = FileReader::readJSONFile();
 
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
+
+    tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
+    descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
@@ -64,13 +67,21 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
         for (const auto &category:emojiCategories) {
             if (!category.enabled || category.name == "Favourites") continue;
             for (const auto &key :category.emojis.keys()) {
+                const Emoji emoji = category.emojis.value(key);
+                double relevance = -1;
                 if (nameQueryMatches(key, search)) {
-                    const Emoji emoji = category.emojis.value(key);
-                    double relevance = (double) search.length() / (key.length() * 8);
-                    if (category.name == "Smileys & Emotion") relevance *= 4;
-                    if (emoji.favourite != 0) relevance += 0.5;
-                    matches.append(createQueryMatch(emoji, relevance));
+                    relevance = (double) search.length() / (key.length() * 8);
+                } else if (tagSearchEnabled) {
+                    relevance = tagsQueryMatches(search, emoji);
                 }
+                if (descriptionSearchEnabled && relevance == -1) {
+                    relevance = descriptionQueryMatches(search, emoji);
+                }
+
+                if (relevance == -1) continue;
+                if (emoji.favourite != 0) relevance += 0.5;
+                if (category.name == "Smileys & Emotion") relevance *= 2;
+                matches.append(createQueryMatch(emoji, relevance));
             }
         }
         //endregion

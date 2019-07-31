@@ -19,15 +19,47 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
-     <item>
-      <widget class="QCheckBox" name="enableGlobalSearch">
-       <property name="text">
-        <string>Search for emojis globally (without &lt;emoji&gt; prefix)</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QCheckBox" name="enableGlobalSearch">
+     <property name="text">
+      <string>Search for emojis globally (without &lt;emoji&gt; prefix)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="favouriteFilterGroupBox_2">
+     <property name="title">
+      <string>Search for emojis by:</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QCheckBox" name="favouriteFilterName_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Name</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="favouriteFilterTags_2">
+        <property name="text">
+         <string>Tags</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="favouriteFilterDescription_2">
+        <property name="text">
+         <string>Description</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="parentLayout">
@@ -135,11 +167,14 @@
             <item>
              <widget class="QGroupBox" name="favouriteFilterGroupBox">
               <property name="title">
-               <string>Filter By:</string>
+               <string>Filter Results fot this dialog by:</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QCheckBox" name="favouriteFilterName">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string>Name</string>
                  </property>

@@ -33,6 +33,8 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
+    connect(m_ui->favouriteFilterDescription_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->favouriteFilterTags_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
     // Unicode Versions change => eventually reload filters
     connect(m_ui->unicodeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionsChanged()));
     connect(m_ui->unicodeComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
@@ -56,6 +58,8 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
 
 void EmojiRunnerConfig::load() {
     m_ui->enableGlobalSearch->setChecked(config.readEntry("globalSearch", "true") == "true");
+    m_ui->favouriteFilterDescription_2->setChecked(config.readEntry("searchByDescription", "false") == "true");
+    m_ui->favouriteFilterTags_2->setChecked(config.readEntry("searchByTags", "false") == "true");
 
     // Load categories
     for (const auto &category:emojiCategories) {
@@ -127,6 +131,8 @@ void EmojiRunnerConfig::load() {
 
 void EmojiRunnerConfig::save() {
     config.writeEntry("globalSearch", m_ui->enableGlobalSearch->isChecked() ? "true" : "false");
+    config.writeEntry("searchByTags", m_ui->favouriteFilterTags_2->isChecked() ? "true" : "false");
+    config.writeEntry("searchByDescription", m_ui->favouriteFilterDescription_2->isChecked() ? "true" : "false");
     config.writeEntry("unicodeVersion", m_ui->unicodeComboBox->currentText());
     config.writeEntry("iosVersion", m_ui->iosComboBox->currentText());
 
@@ -145,7 +151,8 @@ void EmojiRunnerConfig::save() {
 void EmojiRunnerConfig::defaults() {
 
     m_ui->enableGlobalSearch->setChecked(true);
-
+    m_ui->favouriteFilterDescription_2->setChecked(false);
+    m_ui->favouriteFilterTags_2->setChecked(false);
     m_ui->unicodeComboBox->setCurrentText("11");
     m_ui->iosComboBox->setCurrentText("13");
 

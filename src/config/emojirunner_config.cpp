@@ -10,8 +10,6 @@ K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kc
 EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) {
     setupUi(this);
 }
-// TODO Moving items up does not work because itemidx != rowidx
-
 
 EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) : KCModule(parent, args) {
     m_ui = new EmojiRunnerConfigForm(this);

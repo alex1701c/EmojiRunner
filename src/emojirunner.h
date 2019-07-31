@@ -7,39 +7,17 @@
 class EmojiRunner : public Plasma::AbstractRunner {
 Q_OBJECT
 
+// TODO Clean history option
+// TODO Cleanup code
+
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
-
-    ~EmojiRunner() override;
 
     QList<EmojiCategory> emojiCategories;
 
     KConfigGroup config;
 
     bool tagSearchEnabled, descriptionSearchEnabled = false;
-
-    static bool nameQueryMatches(const QString &key, const QString &search) {
-        return QString(key).replace("_", "").startsWith(search, Qt::CaseInsensitive) ||
-               QString(key).replace("_", " ").startsWith(search, Qt::CaseInsensitive);
-    }
-
-    static double tagsQueryMatches(const QString &search, const Emoji &emoji) {
-        for (const auto &tag:emoji.tags) {
-            if (tag.contains(search, Qt::CaseInsensitive)) {
-                double relevance = (double) search.length() / (tag.length() * 8);
-                return relevance;
-            }
-        }
-
-        return -1;
-    }
-
-    static double descriptionQueryMatches(const QString &search, const Emoji &emoji) {
-        if (emoji.description.contains(search, Qt::CaseInsensitive)) {
-            return (double) search.length() / (emoji.description.length() * 8);
-        }
-        return -1;
-    }
 
     Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance) {
         Plasma::QueryMatch match(this);

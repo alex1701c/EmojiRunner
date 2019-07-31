@@ -13,13 +13,8 @@
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
     setObjectName(QStringLiteral("EmojiRunner"));
-    setIgnoredTypes(Plasma::RunnerContext::Directory |
-                    Plasma::RunnerContext::File |
-                    Plasma::RunnerContext::NetworkLocation
-    );
+    setIgnoredTypes(Plasma::RunnerContext::NetworkLocation);
 }
-
-EmojiRunner::~EmojiRunner() = default;
 
 void EmojiRunner::reloadConfiguration() {
     emojiCategories = FileReader::readJSONFile();
@@ -69,14 +64,10 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             for (const auto &key :category.emojis.keys()) {
                 const Emoji emoji = category.emojis.value(key);
                 double relevance = -1;
-                if (nameQueryMatches(key, search)) {
-                    relevance = (double) search.length() / (key.length() * 8);
-                } else if (tagSearchEnabled) {
-                    relevance = tagsQueryMatches(search, emoji);
-                }
-                if (descriptionSearchEnabled && relevance == -1) {
-                    relevance = descriptionQueryMatches(search, emoji);
-                }
+
+                if (emoji.nameQueryMatches(search)) relevance = (double) search.length() / (key.length() * 8);
+                else if (tagSearchEnabled) relevance = emoji.tagsQueryMatches(search);
+                if (descriptionSearchEnabled && relevance == -1) relevance = emoji.descriptionQueryMatches(search);
 
                 if (relevance == -1) continue;
                 if (emoji.favourite != 0) relevance += 0.5;

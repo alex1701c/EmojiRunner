@@ -17,7 +17,7 @@ public:
 
     KConfigGroup config;
 
-    bool tagSearchEnabled, descriptionSearchEnabled = false;
+    bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled = false;
 
     Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance) {
         Plasma::QueryMatch match(this);

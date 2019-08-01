@@ -11,22 +11,27 @@ QList<EmojiCategory> FileReader::readJSONFile(bool getAllEmojis) {
     QFile file(QDir::homePath() + "/.config/emojis.json");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         const QString content = file.readAll();
+
+        QList<int> favouriteIds;
+        for (const auto &favouriteId:config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
+                .split(";", QString::SplitBehavior::SkipEmptyParts))
+            favouriteIds.append(favouriteId.toInt());
+
         auto emojiObject = QJsonDocument::fromJson(content.toLocal8Bit()).object();
-        if (getAllEmojis) return parseAllEmojis(emojiObject, categories, config);
-        return parseEnabledEmojis(emojiObject, categories, config);
+        if (getAllEmojis) return parseAllEmojis(emojiObject, categories, favouriteIds);
+        return parseEnabledEmojis(emojiObject, categories, config, favouriteIds);
+
     }
     return categories;
 }
 
 QList<EmojiCategory>
-FileReader::parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const KConfigGroup &config) {
+FileReader::parseEnabledEmojis(const QJsonObject &emojiObject, QList<EmojiCategory> &categories,
+                               const KConfigGroup &config, const QList<int> &favouriteIds) {
 
     EmojiCategory favourites("Favourites");
     QStringList disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
-    QList<int> favouriteIds;
-    for (const auto &favouriteId:config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
-            .split(";", QString::SplitBehavior::SkipEmptyParts))
-        favouriteIds.append(favouriteId.toInt());
+
     float configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
     float configIosVersion = config.readEntry("iosVersion", "13").toFloat();
 
@@ -53,13 +58,9 @@ FileReader::parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &c
 }
 
 QList<EmojiCategory>
-FileReader::parseAllEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const KConfigGroup &config) {
+FileReader::parseAllEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const QList<int> &favouriteIds) {
 
     EmojiCategory favourites("Favourites");
-    QList<int> favouriteIds;
-    for (const auto &favouriteId:config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
-            .split(";", QString::SplitBehavior::SkipEmptyParts))
-        favouriteIds.append(favouriteId.toInt());
 
     for (const auto &categoryKey:emojiObject.keys()) {
         EmojiCategory category(categoryKey);

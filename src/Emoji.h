@@ -6,6 +6,7 @@
 #define EMOJIRUNNER_EMOJI_H
 
 #include <QtCore>
+#include <QtWidgets/QListWidgetItem>
 
 
 class Emoji {
@@ -42,6 +43,14 @@ public:
     bool matchesVersions(float configUnicodeVersion, float configIosVersion) const {
         if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion) return false;
         return !(unicodeVersion == 0 && iosVersion > configIosVersion);
+    }
+
+    QListWidgetItem *toListWidgetItem() const {
+        auto *item = new QListWidgetItem(this->emoji + " " + QString(this->name).replace('_', ' '));
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(this->favourite != 0 ? Qt::Checked : Qt::Unchecked);
+        item->setData(1, this->name);
+        return item;
     }
 
     static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey) {

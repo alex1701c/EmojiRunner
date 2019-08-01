@@ -9,10 +9,14 @@ class FileReader {
 public:
     static QList<EmojiCategory> readJSONFile(bool getAllEmojis = false);
 
-    static QList<EmojiCategory> parseAllEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const KConfigGroup &config);
+    static QList<EmojiCategory> parseAllEmojis(QJsonObject &emojiObject,
+                                               QList<EmojiCategory> &categories,
+                                               const QList<int> &favouriteIds);
 
-    static QList<EmojiCategory>
-    parseEnabledEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const KConfigGroup &config);
+    static QList<EmojiCategory> parseEnabledEmojis(const QJsonObject &emojiObject,
+                                                   QList<EmojiCategory> &categories,
+                                                   const KConfigGroup &config,
+                                                   const QList<int> &favouriteIds);
 };
 
 

@@ -83,11 +83,7 @@ void EmojiRunnerConfig::load() {
         return e1.favourite > e2.favourite;
     });
     for (const auto &emoji:favouriteEmojisToAdd) {
-        auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(Qt::Checked);
-        item->setData(1, emoji.name);
-        m_ui->favouriteListView->addItem(item);
+        m_ui->favouriteListView->addItem(emoji.toListWidgetItem());
     }
 
     // Load other emojis
@@ -98,11 +94,7 @@ void EmojiRunnerConfig::load() {
         for (const auto &emoji:category.emojis.values()) {
             allEmojis.insert(emoji.name, emoji);
             if (favouriteNames.contains(emoji.name)) continue;
-            auto *item = new QListWidgetItem(emoji.emoji + " " + QString(emoji.name).replace('_', ' '));
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            item->setCheckState(Qt::Unchecked);
-            item->setData(1, emoji.name);
-            m_ui->favouriteListView->addItem(item);
+            m_ui->favouriteListView->addItem(emoji.toListWidgetItem());
         }
     }
 
@@ -179,14 +171,7 @@ void EmojiRunnerConfig::filterFavourites() {
 
 
     if (text.isEmpty()) {
-        // Show all entries if unicode matches
-        for (int i = 0; i < count; i++) {
-            auto *item = m_ui->favouriteListView->item(i);
-            const auto emoji = allEmojis.value(item->data(1).toString());
-            m_ui->favouriteListView->item(i)->setHidden(
-                    !emoji.matchesVersions(configUnicodeVersion, configIosVersion) && item->checkState() == Qt::Unchecked
-            );
-        }
+        unhideAll();
     } else {
         for (int i = 0; i < count; ++i) {
             auto *item = m_ui->favouriteListView->item(i);
@@ -293,10 +278,7 @@ void EmojiRunnerConfig::categoriesApplyChanges() {
 
                 if (newFavourites.contains(emoji.name)) continue;
 
-                auto *item = new QListWidgetItem(text);
-                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-                item->setCheckState(Qt::Unchecked);
-                item->setData(1, emoji.name);
+                auto *item = emoji.toListWidgetItem();
                 m_ui->favouriteListView->addItem(item);
                 item->setHidden(!emoji.matchesVersions(configUnicodeVersion, configIosVersion));
             }
@@ -328,18 +310,12 @@ void EmojiRunnerConfig::showOnlyFavourites() {
 
     if (checked) {
         filterActive = false;
-        favouriteVisibleEmojis = -1;
         for (int i = 0; i < itemCount; ++i) {
             auto *item = m_ui->favouriteListView->item(i);
             if (item->checkState() == Qt::Unchecked) item->setHidden(true);
-            else ++favouriteVisibleEmojis;
         }
     } else {
-        for (int i = 0; i < itemCount; ++i) {
-            auto *item = m_ui->favouriteListView->item(i);
-            const auto emoji = allEmojis.value(item->data(1).toString());
-            item->setHidden(!emoji.matchesVersions(configUnicodeVersion, configIosVersion) && item->checkState() == Qt::Unchecked);
-        }
+        unhideAll();
         filterActive = true;
     }
 
@@ -437,6 +413,16 @@ void EmojiRunnerConfig::saveFavourites() {
         }
     }
     config.writeEntry("favourites", favouriteIDs);
+}
+
+void EmojiRunnerConfig::unhideAll() {
+    const int itemCount = m_ui->favouriteListView->count();
+
+    for (int i = 0; i < itemCount; ++i) {
+        auto *item = m_ui->favouriteListView->item(i);
+        const auto emoji = allEmojis.value(item->data(1).toString());
+        item->setHidden(!emoji.matchesVersions(configUnicodeVersion, configIosVersion) && item->checkState() == Qt::Unchecked);
+    }
 }
 
 

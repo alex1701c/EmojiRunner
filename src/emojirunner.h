@@ -7,9 +7,6 @@
 class EmojiRunner : public Plasma::AbstractRunner {
 Q_OBJECT
 
-// TODO Clean history option
-// TODO Cleanup code
-
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 

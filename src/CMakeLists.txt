@@ -28,3 +28,4 @@ install(TARGETS krunner_emojirunner kcm_krunner_emojirunner DESTINATION ${PLUGIN
 install(FILES plasma-runner-emojirunner.desktop config/plasma-runner-emojirunner_config.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 install(FILES emojis.json DESTINATION $ENV{HOME}/.config/)
 install(FILES emojirunner-launcher.desktop DESTINATION $ENV{HOME}/.local/share/applications/)
+install(FILES paste.py DESTINATION $ENV{HOME}/.local/share/emojirunner/)

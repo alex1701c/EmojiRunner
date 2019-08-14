@@ -24,6 +24,7 @@ void EmojiRunner::reloadConfiguration() {
     globalSearchEnabled = config.readEntry("globalSearch", "true") == "true";
     tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
     descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
+    singleRunnerModePaste = config.readEntry("singleRunnerModePaste", "true") == "true";
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
@@ -85,6 +86,10 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     Q_UNUSED(context)
 
     QApplication::clipboard()->setText(match.text());
+    // Script triggers Ctrl+V key combination
+    if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
+        QProcess::startDetached("python3", QStringList() << QDir::homePath() + "/.local/share/emojirunner/paste.py");
+    }
 }
 
 K_EXPORT_PLASMA_RUNNER(emojirunner, EmojiRunner)

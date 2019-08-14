@@ -7,6 +7,10 @@ if [[ $(basename "$PWD") != "EmojiRunner"* ]];then
     git clone https://github.com/alex1701c/EmojiRunner
     cd EmojiRunner/
 fi
+# Handle permissions for uinput module
+sudo addgroup uinput
+sudo adduser $(whoami) uinput
+echo '"KERNEL=="uinput", GROUP="uinput", MODE="0660"' >> /etc/udev/rules.d/uinput.rules
 
 mkdir -p build
 cd build

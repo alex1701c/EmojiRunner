@@ -26,6 +26,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="singleRunnerModePaste">
+     <property name="text">
+      <string>Automatically paste emojis when using shortcuts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="favouriteFilterGroupBox_2">
      <property name="title">
       <string>Search for emojis by:</string>

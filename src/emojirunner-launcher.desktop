@@ -1,0 +1,15 @@
+[Desktop Action launch_with_favourites]
+Name=Show favourites and launch
+Exec=qdbus org.kde.krunner /App org.kde.krunner.App.querySingleRunner "emojirunner" "emoji "
+
+[Desktop Entry]
+Actions=launch_with_favourites;
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=qdbus org.kde.krunner /App org.kde.krunner.App.displaySingleRunner "emojirunner"
+Name=Emoji Runner
+Comment=Search for emojis and symbols
+Categories=Utility
+Icon=preferences-desktop-emoticons

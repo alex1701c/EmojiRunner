@@ -21,7 +21,7 @@ void EmojiRunner::reloadConfiguration() {
 
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
 
-    globalSearchEnabled =  config.readEntry("globalSearch", "true") == "true";
+    globalSearchEnabled = config.readEntry("globalSearch", "true") == "true";
     tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
     descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
 }
@@ -58,7 +58,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21));
         }
         // endregion
-    } else if (prefixed ||globalSearchEnabled) {
+    } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         // region search: emoji <query>
         for (const auto &category:emojiCategories) {
             if (!category.enabled || category.name == "Favourites") continue;

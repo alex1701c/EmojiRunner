@@ -4,6 +4,10 @@
 #include <KConfigCore/KConfigGroup>
 #include "FileReader.h"
 
+/**
+ * Open emojis.json file and call parse method to filter the emojis
+ * @param getAllEmojis
+ */
 QList<EmojiCategory> FileReader::readJSONFile(bool getAllEmojis) {
     QList<EmojiCategory> categories;
     KConfigGroup config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
@@ -25,6 +29,14 @@ QList<EmojiCategory> FileReader::readJSONFile(bool getAllEmojis) {
     return categories;
 }
 
+/**
+ * Read emojis from object and insert the in the corresponding category if they are enabled
+ * This method is used to get the emoji list for the runner
+ * @param emojiObject
+ * @param categories
+ * @param config
+ * @param favouriteIds
+ */
 QList<EmojiCategory>
 FileReader::parseEnabledEmojis(const QJsonObject &emojiObject, QList<EmojiCategory> &categories,
                                const KConfigGroup &config, const QList<int> &favouriteIds) {
@@ -57,6 +69,12 @@ FileReader::parseEnabledEmojis(const QJsonObject &emojiObject, QList<EmojiCatego
     return categories;
 }
 
+/**
+ * Read all emojis from object and insert the in the corresponding category
+ * @param emojiObject
+ * @param categories
+ * @param favouriteIds
+ */
 QList<EmojiCategory>
 FileReader::parseAllEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const QList<int> &favouriteIds) {
 

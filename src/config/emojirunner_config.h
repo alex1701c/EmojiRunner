@@ -31,15 +31,7 @@ public:
     QList<float> iosVersions = {6.0, 8.3, 9.0, 9.1, 10.0, 10.2, 12.1, 13.0};
     QStringList favouriteFilters = {"name"};
 
-    void displayVisibleItems() const {
-        int visibleItems = 0;
-        int count = this->m_ui->favouriteListView->count();
-        for (int i = 0; i < count; ++i) {
-            if (!this->m_ui->favouriteListView->item(i)->isHidden()) ++visibleItems;
-        }
-
-        m_ui->favouriteVisibleElements->setText(QString::number(visibleItems) + " Elements");
-    }
+    void displayVisibleItems() const;
 
     void unhideAll();
 
@@ -68,8 +60,6 @@ public Q_SLOTS:
     void moveFavouriteUp();
 
     void moveFavouriteDown();
-
-    void saveFavourites();
 
 private:
     EmojiRunnerConfigForm *m_ui;

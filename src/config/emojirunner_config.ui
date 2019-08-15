@@ -107,13 +107,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="applyCategoryChanges">
-          <property name="text">
-           <string>Apply Category Changes</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QLabel" name="label_3">
@@ -187,7 +180,7 @@
                   <bool>true</bool>
                  </property>
                  <property name="title">
-                  <string>Filter Results fot this dialog by:</string>
+                  <string>Filter results for this dialog by:</string>
                  </property>
                  <property name="flat">
                   <bool>true</bool>
@@ -259,13 +252,6 @@
              </item>
              <item>
               <widget class="QListWidget" name="favouriteListView"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="favouriteChangesSaveButton">
-               <property name="text">
-                <string>Save Favourite Changes!</string>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>

@@ -69,6 +69,6 @@ This way you can search for emojis without search results from other plugins
 ![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)  
 
 #### Configure settings
-You can search for emojis, set the unicode level (later versions can not be displayed) and you can disable categories  
+You can search for emojis, set the unicode level (later versions can not be displayed) and you can enable/disable categories  
 ![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/config.png)  
 *The sorting of the favourites inside Krunner does not work as intended, (they are not always sorted by relevance). Help is appreciated!*  

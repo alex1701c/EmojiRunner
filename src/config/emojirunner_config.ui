@@ -83,7 +83,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="title">
-      <string>Emoji Runner Config</string>
+      <string/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -155,103 +155,122 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QLineEdit" name="favouriteFilter">
-              <property name="placeholderText">
-               <string>Search Emojis</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QGroupBox" name="favouriteFilterGroupBox">
-              <property name="title">
-               <string>Filter Results fot this dialog by:</string>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Configure Favourites</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
-                <widget class="QCheckBox" name="favouriteFilterName">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QLineEdit" name="favouriteFilter">
+                   <property name="placeholderText">
+                    <string>Search Emojis</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QGroupBox" name="favouriteFilterGroupBox">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
-                 <property name="text">
-                  <string>Name</string>
+                 <property name="title">
+                  <string>Filter Results fot this dialog by:</string>
                  </property>
-                 <property name="checked">
+                 <property name="flat">
                   <bool>true</bool>
                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <item>
+                   <widget class="QCheckBox" name="favouriteFilterName">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="text">
+                     <string>Name</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="favouriteFilterTags">
+                    <property name="text">
+                     <string>Tags</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="favouriteFilterDescription">
+                    <property name="text">
+                     <string>Description</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
                <item>
-                <widget class="QCheckBox" name="favouriteFilterTags">
+                <widget class="QCheckBox" name="sortFavourites">
                  <property name="text">
-                  <string>Tags</string>
+                  <string>Sort Favourites</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="favouriteFilterDescription">
+                <widget class="QPushButton" name="moveFavouriteUp">
                  <property name="text">
-                  <string>Description</string>
+                  <string>Move Up</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="moveFavouriteDown">
+                 <property name="text">
+                  <string>Move Down</string>
                  </property>
                 </widget>
                </item>
               </layout>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <item>
-           <widget class="QCheckBox" name="sortFavourites">
-            <property name="text">
-             <string>Sort Favourites</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="moveFavouriteUp">
-            <property name="text">
-             <string>Move Up</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="moveFavouriteDown">
-            <property name="text">
-             <string>Move Down</string>
-            </property>
+             </item>
+             <item>
+              <widget class="QLabel" name="favouriteVisibleElements">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="favouriteListView"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="favouriteChangesSaveButton">
+               <property name="text">
+                <string>Save Favourite Changes!</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="favouriteVisibleElements">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListWidget" name="favouriteListView"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="favouriteChangesSaveButton">
-          <property name="text">
-           <string>Save Favourite Changes!</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </item>

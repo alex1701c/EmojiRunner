@@ -251,7 +251,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QListWidget" name="favouriteListView"/>
+              <widget class="QListWidget" name="emojiListView"/>
              </item>
             </layout>
            </widget>

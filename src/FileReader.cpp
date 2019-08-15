@@ -40,10 +40,8 @@ QList<EmojiCategory> FileReader::readJSONFile(bool getAllEmojis) {
 QList<EmojiCategory>
 FileReader::parseEnabledEmojis(const QJsonObject &emojiObject, QList<EmojiCategory> &categories,
                                const KConfigGroup &config, const QList<int> &favouriteIds) {
-
     EmojiCategory favourites("Favourites");
     QStringList disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
-
     float configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
     float configIosVersion = config.readEntry("iosVersion", "13").toFloat();
 
@@ -77,9 +75,7 @@ FileReader::parseEnabledEmojis(const QJsonObject &emojiObject, QList<EmojiCatego
  */
 QList<EmojiCategory>
 FileReader::parseAllEmojis(QJsonObject &emojiObject, QList<EmojiCategory> &categories, const QList<int> &favouriteIds) {
-
     EmojiCategory favourites("Favourites");
-
     for (const auto &categoryKey:emojiObject.keys()) {
         EmojiCategory category(categoryKey);
         for (const auto &jsonObj:emojiObject[categoryKey].toArray()) {

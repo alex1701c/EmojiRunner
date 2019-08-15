@@ -43,15 +43,15 @@ public Q_SLOTS:
 
     void defaults() override;
 
-    void filterFavourites();
+    void filterEmojiListView();
 
     void filtersChanged(bool reloadFilter = true);
 
-    void unicodeVersionsChanged();
+    void unicodeVersionChanged();
 
-    void iosVersionsChanged();
+    void iosVersionChanged();
 
-    void categoriesApplyChanges();
+    void categoriesChanged();
 
     void showOnlyFavourites();
 

@@ -2,7 +2,8 @@
 
 This plugin allows you to search, copy and  paste emojis/symbols.
 
-Additionally you can configure favourites, set the unicode version and enable/disable categories.
+Additionally you can configure favourites, set the unicode version and enable/disable categories.  
+If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/ 
 
 ### Required Dependencies
 
@@ -39,7 +40,9 @@ The emoji.json file is a modified version from https://github.com/github/gemoji
 ### Enable Shortcuts
 This project has a EmojiRunnerCommands.khotkeys file.
 This file contains two shortcuts (of course you can change them): 
-- Ctrl+Alt+Space  Shows only EmojiRunner and favourites, if one emoji is selected it gets pasted to the current text input (demonstrated in gif)
+- Ctrl+Alt+Space  Shows only EmojiRunner and favourites,
+if one emoji is selected it gets pasted to the current text input (demonstrated in gif).
+For this the Runner emits the Ctrl+V key combination using xdotool
 - Ctrl+Alt+Shift+Space Same as above except the favourites are not shown  
 
 These shortcuts start Krunner using qdbus. For example the command to launch the favourites is:  

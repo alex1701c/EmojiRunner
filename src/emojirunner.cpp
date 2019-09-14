@@ -88,7 +88,11 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     QApplication::clipboard()->setText(match.text());
     // Script triggers Ctrl+V key combination
     if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
-        QProcess::startDetached("python3", QStringList() << QDir::homePath() + "/.local/share/emojirunner/paste.py");
+        // Works always but is slow and resource intensive
+        // QProcess::startDetached("python3", QStringList() << QDir::homePath() + "/.local/share/emojirunner/paste.py");
+        // Does not always work
+        // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
+        QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");
     }
 }
 

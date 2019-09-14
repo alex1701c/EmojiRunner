@@ -7,17 +7,15 @@ Additionally you can configure favourites, set the unicode version and enable/di
 ### Required Dependencies
 
 Debian/Ubuntu:  
-`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext python3 python3-uinput`
+`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext python3 python3-uinput xdotool`
 
 openSUSE:  
 `sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel
-ktextwidgets-devel kservice-devel krunner-devel gettext-tools`  
+ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool`  
 
 Fedora:  
-`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext python3 python-uinput`  
+`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext python3 python-uinput xdotool`  
 
-You can also install the python library using:
-`pip3 install python-uinput --user`
 ### Build instructions  
 
 The easiest way to install is:  
@@ -35,11 +33,6 @@ make
 sudo make install
 kquitapp5 krunner 2> /dev/null; kstart5 --windowclass krunner krunner > /dev/null 2>&1 &
 ```
-
-If you want to paste the emojis directly using the shortcuts sure that your user has permissions to access the uinput module:
-- Create uinput group `sudo addgroup uinput`
-- Add yourself to this group `sudo adduser $(whoami) uinput`
-- Create udev rule by writing `KERNEL=="uinput", GROUP="uinput", MODE="0660"` to `/etc/udev/rules.d/uinput.rules`  
 
 The emoji.json file is a modified version from https://github.com/github/gemoji  
 

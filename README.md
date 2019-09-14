@@ -7,14 +7,14 @@ Additionally you can configure favourites, set the unicode version and enable/di
 ### Required Dependencies
 
 Debian/Ubuntu:  
-`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext python3 python3-uinput xdotool`
+`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext xdotool`
 
 openSUSE:  
 `sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel
 ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool`  
 
 Fedora:  
-`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext python3 python-uinput xdotool`  
+`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext xdotool`  
 
 ### Build instructions  
 
@@ -39,12 +39,15 @@ The emoji.json file is a modified version from https://github.com/github/gemoji
 ### Enable Shortcuts
 This project has a EmojiRunnerCommands.khotkeys file.
 This file contains two shortcuts (of course you can change them): 
-- Ctrl+Alt+Space  Shows runner and favourites, if one emoji is selected it gets pasted to the current text input (demonstrated in gif)
-- Ctrl+Alt+Shift+Space Same as above except the favourites are not shown
+- Ctrl+Alt+Space  Shows only EmojiRunner and favourites, if one emoji is selected it gets pasted to the current text input (demonstrated in gif)
+- Ctrl+Alt+Shift+Space Same as above except the favourites are not shown  
+
+These shortcuts start Krunner using qdbus. For example the command to launch the favourites is:  
+`qdbus org.kde.krunner /App org.kde.krunner.App.querySingleRunner "emojirunner" "emoji "`
 
 You can import them in the System Settings module "Custom Shortcuts" by clicking on edit and then import.  
  
-The feature to paste the emojis to the can be disabled in the config dialog.  
+The feature to paste the emojis can be disabled in the config dialog.  
 
 ![Search for emoji and paste](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/paste_emoji.gif)
 ### Screenshots:

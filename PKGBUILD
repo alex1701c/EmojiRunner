@@ -19,7 +19,7 @@ install=
 changelog=
 source=("https://github.com/alex1701c/EmojiRunner/archive/1.1.3.tar.gz")
 noextract=()
-md5sums=(8f5abe20749d0731454a43ea19614662)
+md5sums=(SKIP)
 
 prepare(){
 	cd  "EmojiRunner-$pkgver"

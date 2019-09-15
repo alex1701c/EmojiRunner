@@ -12,7 +12,7 @@ QList<EmojiCategory> FileReader::readJSONFile(bool getAllEmojis) {
     QList<EmojiCategory> categories;
     KConfigGroup config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
 
-    QFile file(QDir::homePath() + "/.config/emojis.json");
+    QFile file("/usr/share/emojirunner/emojis.json");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         const QString content = file.readAll();
 

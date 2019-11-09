@@ -17,6 +17,9 @@ public:
                                                    QList<EmojiCategory> &categories,
                                                    const KConfigGroup &config,
                                                    const QList<int> &favouriteIds);
+
+    static QList<EmojiCategory>
+    parseCustomEmojis(QList<EmojiCategory> &categories, const QList<int> &favouriteIds, bool getAllEmojis, const KConfigGroup &config);
 };
 
 

@@ -44,6 +44,9 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     regex.indexIn(term);
     QString search = regex.capturedTexts().last();
     if (!prefixed) search = term;
+    /*for (const auto &c :emojiCategories) {
+        qInfo() << c.name << c.enabled << c.emojis.keys();
+    }*/
 
     if (prefixed && search.isEmpty()) {
         // region favourites
@@ -62,6 +65,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         // region search: emoji <query>
         for (const auto &category:emojiCategories) {
+            // TODO Category enabled check is unnecessary
             if (!category.enabled || category.name == "Favourites") continue;
             for (const auto &key :category.emojis.keys()) {
                 const auto emoji = category.emojis.value(key);

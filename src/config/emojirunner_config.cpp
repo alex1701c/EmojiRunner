@@ -200,8 +200,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
             bool hidden = true;
 
             if (filterName) {
-                if (emoji.name.contains(text, Qt::CaseInsensitive) ||
-                    emoji.name.contains(QString(text).replace(' ', '_'), Qt::CaseInsensitive)) {
+                if (emoji.displayName.contains(text, Qt::CaseInsensitive) || emoji.name.contains(text, Qt::CaseInsensitive)) {
                     hidden = false;
                 }
             }
@@ -301,7 +300,7 @@ void EmojiRunnerConfig::categoriesChanged() {
         for (const auto &c:emojiCategories) {
             if (!newlyEnabled.contains(c.name)) continue;
             for (const auto &emoji:c.emojis.values()) {
-                const QString text = emoji.emoji + " " + QString(emoji.name).replace('_', ' ');
+                const QString text = emoji.emoji + " " + emoji.displayName;
 
                 if (newFavourites.contains(emoji.name)) continue;
 

@@ -40,13 +40,12 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 #endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool prefixed = term.startsWith("emoji");
-    QRegExp regex(R"(emoji(?: +(.*))?)");
-    regex.indexIn(term);
-    QString search = regex.capturedTexts().last();
-    if (!prefixed) search = term;
-    /*for (const auto &c :emojiCategories) {
-        qInfo() << c.name << c.enabled << c.emojis.keys();
-    }*/
+    QString search = term;
+    if (prefixed) {
+        QRegExp regex(R"(emoji(?: +(.*))?)");
+        regex.indexIn(term);
+        search = regex.capturedTexts().at(1);
+    }
 
     if (prefixed && search.isEmpty()) {
         // region favourites
@@ -74,7 +73,6 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
                 else if (tagSearchEnabled) relevance = emoji.tagsQueryMatches(search);
                 if (descriptionSearchEnabled && relevance == -1) relevance = emoji.descriptionQueryMatches(search);
 
-                //
                 if (relevance == -1) continue;
                 if (emoji.favourite != 0) relevance += 0.5;
                 if (category.name == "Smileys & Emotion") relevance *= 2;
@@ -90,10 +88,7 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     Q_UNUSED(context)
 
     QApplication::clipboard()->setText(match.text());
-    // Script triggers Ctrl+V key combination
     if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
-        // Works always but is slow and resource intensive
-        // QProcess::startDetached("python3", QStringList() << QDir::homePath() + "/.local/share/emojirunner/paste.py");
         // Does not always work
         // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
         QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");

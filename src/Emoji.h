@@ -14,6 +14,8 @@ public:
     int id = 0;
     int favourite = 0;
     QString name;
+    // Name where underscores are replaced by spaces
+    QString displayName;
     QString emoji;
     QString description;
     QString category;
@@ -22,19 +24,18 @@ public:
     float iosVersion = 0;
 
     bool nameQueryMatches(const QString &search) const {
-        return QString(this->name).remove("_").contains(search, Qt::CaseInsensitive) ||
-               QString(this->name).replace("_", " ").contains(search, Qt::CaseInsensitive);
+        return this->displayName.contains(search) || this->name.contains(search);
     }
 
     double tagsQueryMatches(const QString &search) const {
         for (const auto &tag:this->tags) {
-            if (tag.contains(search, Qt::CaseInsensitive)) return (double) search.length() / (tag.length() * 8);
+            if (tag.contains(search)) return (double) search.length() / (tag.length() * 8);
         }
         return -1;
     }
 
     double descriptionQueryMatches(const QString &search) const {
-        if (this->description.contains(search, Qt::CaseInsensitive)) {
+        if (this->description.contains(search)) {
             return (double) search.length() / (this->description.length() * 8);
         }
         return -1;
@@ -46,7 +47,7 @@ public:
     }
 
     QListWidgetItem *toListWidgetItem() const {
-        auto *item = new QListWidgetItem(this->emoji + " " + QString(this->name).replace('_', ' '));
+        auto *item = new QListWidgetItem(this->emoji + " " + this->displayName);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(this->favourite != 0 ? Qt::Checked : Qt::Unchecked);
         item->setData(1, this->name);
@@ -57,6 +58,7 @@ public:
         Emoji emoji;
         emoji.id = obj.value("id").toInt();
         emoji.name = obj.value("name").toString();
+        emoji.displayName = QString(emoji.name).replace("_", " ");
         emoji.emoji = obj.value("emoji").toString();
         emoji.category = categoryKey;
         for (const auto &tag:obj.value("tags").toArray()) emoji.tags.append(tag.toString());

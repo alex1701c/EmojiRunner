@@ -20,7 +20,7 @@ public:
         Plasma::QueryMatch match(this);
         match.setText(emoji.emoji);
 #ifndef stage_dev
-        match.setSubtext(QString(emoji.name).replace("_", " "));
+        match.setSubtext(emoji.displayName);
 #else
         match.setSubtext(QString(emoji.name).replace("_", " ") + " ---- " + QString::number(relevance));
 #endif

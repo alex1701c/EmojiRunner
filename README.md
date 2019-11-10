@@ -20,7 +20,9 @@ Fedora:
 ### Build instructions  
 
 The easiest way to install is:  
-`curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh | bash`
+`curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh | bash`  
+Or you can install it just for your user without admin privileges:  
+`curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install-user.sh | bash`
 
 Or you can do it manually:
 

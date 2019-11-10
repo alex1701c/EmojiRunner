@@ -17,7 +17,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
 }
 
 void EmojiRunner::reloadConfiguration() {
-    emojiCategories = FileReader::readJSONFile();
+    emojiCategories = FileReader::getEmojiCategories(false);
 
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
 
@@ -65,8 +65,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         // region search: emoji <query>
         for (const auto &category:emojiCategories) {
-            // TODO Category enabled check is unnecessary
-            if (!category.enabled || category.name == "Favourites") continue;
+            if (category.name == "Favourites") continue;
             for (const auto &key :category.emojis.keys()) {
                 const auto emoji = category.emojis.value(key);
                 double relevance = -1;
@@ -75,6 +74,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
                 else if (tagSearchEnabled) relevance = emoji.tagsQueryMatches(search);
                 if (descriptionSearchEnabled && relevance == -1) relevance = emoji.descriptionQueryMatches(search);
 
+                //
                 if (relevance == -1) continue;
                 if (emoji.favourite != 0) relevance += 0.5;
                 if (category.name == "Smileys & Emotion") relevance *= 2;

@@ -7,6 +7,10 @@
 
 class FileReader {
 public:
+    static QList<EmojiCategory> getEmojiCategories(bool getAllEmojis = false);
+
+    static QMap<QString,EmojiCategory> parseEmojiFile(bool getAllEmojis ,QFile& emojiJSONFile);
+
     static QList<EmojiCategory> readJSONFile(bool getAllEmojis = false);
 
     static QList<EmojiCategory> parseAllEmojis(QJsonObject &emojiObject,

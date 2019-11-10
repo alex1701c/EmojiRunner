@@ -11,7 +11,6 @@ class EmojiCategory {
 public:
     QString name;
     QMap<QString, Emoji> emojis;
-    bool enabled = true;
 
     EmojiCategory() = default;
 

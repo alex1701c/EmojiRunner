@@ -16,7 +16,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
-    emojiCategories = FileReader::readJSONFile(true);
+    emojiCategories = FileReader::getEmojiCategories(true);
     config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
     disabledEmojis = config.readEntry("disabledCategories", "").split(";", QString::SplitBehavior::SkipEmptyParts);
 

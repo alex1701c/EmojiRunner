@@ -9,6 +9,7 @@ set(kcm_krunner_emojirunner_SRCS
         config/emojirunner_config.cpp
         Emoji.h FileReader.cpp FileReader.h)
 
+#add_subdirectory(tests)
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS config/emojirunner_config.ui)
 add_library(kcm_krunner_emojirunner MODULE ${kcm_krunner_emojirunner_SRCS})
 target_link_libraries(kcm_krunner_emojirunner

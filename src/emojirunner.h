@@ -11,9 +11,7 @@ public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
     QList<EmojiCategory> emojiCategories;
-
-    KConfigGroup config;
-
+    QFileSystemWatcher watcher;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste = false;
 
     Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance) {
@@ -30,11 +28,14 @@ public:
     }
 
 public: // Plasma::AbstractRunner API
-    void reloadConfiguration() override;
 
     void match(Plasma::RunnerContext &context) override;
 
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
+
+public Q_SLOTS:
+
+    void reloadPluginConfiguration(const QString& configFile = "");
 };
 
 #endif

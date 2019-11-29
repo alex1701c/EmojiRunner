@@ -5,6 +5,20 @@
 #include "FileReader.h"
 
 /**
+ * Initialize reusable variables
+ */
+FileReader::FileReader(const KConfigGroup &config) {
+    for (const auto &idString: config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
+            .split(";", QString::SplitBehavior::SkipEmptyParts)) {
+        favouriteIds.append(idString.toInt());
+    }
+
+    configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
+    configIosVersion = config.readEntry("iosVersion", "13").toFloat();
+    disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
+}
+
+/**
  * Reads the emojis from the different files
  * Rewrite of readJSONFile function but more maintainable and ~20% faster
  *
@@ -13,7 +27,6 @@
  */
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) {
     QList<EmojiCategory> categories;
-    KConfigGroup config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
 
     // Emojis for user level install
     QFile globalFile("/usr/share/emojirunner/emojis.json");
@@ -56,20 +69,6 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
 
     // Initialize config variables
     auto favourites = EmojiCategory("Favourites");
-    QStringList disabledCategories;
-    float configUnicodeVersion = 0.0;
-    float configIosVersion = 0.0;
-    KConfigGroup config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
-    QList<int> favouriteIds;
-    for (const auto &idString: config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
-            .split(";", QString::SplitBehavior::SkipEmptyParts)) {
-        favouriteIds.append(idString.toInt());
-    }
-    if (!getAllEmojis) {
-        configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
-        configIosVersion = config.readEntry("iosVersion", "13").toFloat();
-        disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
-    }
 
     // Read categories and items from object
     const QJsonObject emojiRootObject = emojis.object();
@@ -77,7 +76,7 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
         // Get items array and check continue conditions
         const QJsonValue value = emojiRootObject.value(key);
         if (!value.isArray()) continue;
-        QJsonArray items = value.toArray();
+        const QJsonArray items = value.toArray();
         if (items.isEmpty()) continue;
 
         // Create a new category/find the existing one and add the emojis to it
@@ -96,7 +95,7 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
                 customEmoji.favourite = 21 - favouritesIdx;
                 favourites.emojis.insert(customEmoji.name, customEmoji);
             }
-            // Edd emoji to category
+            // Add emoji to category
             if (getAllEmojis || customEmoji.favourite != 0 ||
                 (!categoryDisabled && customEmoji.matchesVersions(configUnicodeVersion, configIosVersion))) {
                 category.emojis.insert(customEmoji.name, customEmoji);

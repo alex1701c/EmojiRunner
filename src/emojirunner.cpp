@@ -14,17 +14,46 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
     setObjectName(QStringLiteral("EmojiRunner"));
     setIgnoredTypes(Plasma::RunnerContext::NetworkLocation);
+
+    const QString configFolder = QDir::homePath() + "/.config/krunnerplugins/";
+    const QDir configDir(configFolder);
+    if (!configDir.exists()) configDir.mkpath(configFolder);
+    // Create file
+    QFile configFile(configFolder + "emojirunnerrc");
+    if (!configFile.exists()) {
+        configFile.open(QIODevice::WriteOnly);
+        configFile.close();
+    }
+    // Add file watcher for config
+    watcher.addPath(configFolder + "emojirunnerrc");
+    connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(reloadPluginConfiguration(QString)));
+
+    reloadPluginConfiguration();
 }
 
-void EmojiRunner::reloadConfiguration() {
-    emojiCategories = FileReader::getEmojiCategories(false);
+void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
+    QTime start = QTime::currentTime();
+    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/jetbrainsrunnerrc")
+            ->group("Config");
+    // Force sync from file
+    if (!configFile.isEmpty()) config.config()->reparseConfiguration();
 
-    config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
+    // If the file gets edited with a text editor, it often gets replaced by the edited version
+    // https://stackoverflow.com/a/30076119/9342842
+    if (!configFile.isEmpty()) {
+        if (QFile::exists(configFile)) {
+            watcher.addPath(configFile);
+        }
+    }
+
+    FileReader reader(config);
+    emojiCategories = reader.getEmojiCategories(false);
 
     globalSearchEnabled = config.readEntry("globalSearch", "true") == "true";
     tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
     descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
     singleRunnerModePaste = config.readEntry("singleRunnerModePaste", "true") == "true";
+    qInfo() << start.msecsTo(QTime::currentTime());
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
@@ -40,6 +69,8 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 #endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
     const bool prefixed = term.startsWith("emoji");
+    if (!globalSearchEnabled && !prefixed) return;
+
     QString search = term;
     if (prefixed) {
         QRegExp regex(R"(emoji(?: +(.*))?)");

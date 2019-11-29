@@ -16,9 +16,13 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
-    emojiCategories = FileReader::getEmojiCategories(true);
-    config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("EmojiRunner");
-    disabledEmojis = config.readEntry("disabledCategories", "").split(";", QString::SplitBehavior::SkipEmptyParts);
+    config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/jetbrainsrunnerrc")
+            ->group("Config");
+    config.config()->reparseConfiguration();
+
+    FileReader reader(config);
+    emojiCategories = reader.getEmojiCategories(true);
+    disabledEmojiCategorieNames = reader.disabledCategories;
 
     std::sort(emojiCategories.begin(), emojiCategories.end(), [](const EmojiCategory &c1, const EmojiCategory &c2) -> bool {
         if (c1.name == "Smileys & Emotion") return true;
@@ -66,7 +70,7 @@ void EmojiRunnerConfig::load() {
         auto *item = new QListWidgetItem();
         item->setText(category.name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        disabledEmojis.contains(category.name) ? item->setCheckState(Qt::Unchecked) : item->setCheckState(Qt::Checked);
+        item->setCheckState(disabledEmojiCategorieNames.contains(category.name) ? Qt::Unchecked : Qt::Checked);
         m_ui->categoryListView->addItem(item);
     }
 
@@ -89,7 +93,6 @@ void EmojiRunnerConfig::load() {
 
     // Load other emojis
     allEmojis.clear();
-    QStringList disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
     for (const auto &category:emojiCategories) {
         if (category.name == "Favourites") continue;
         for (const auto &emoji:category.emojis.values()) {
@@ -100,16 +103,12 @@ void EmojiRunnerConfig::load() {
     }
 
     // Load versions
-    for (const auto &unicodeVersion:unicodeVersions) {
-        m_ui->unicodeComboBox->addItem(QString::number(unicodeVersion));
-    }
-    for (const auto &iosVersion:iosVersions) {
-        m_ui->iosComboBox->addItem(QString::number(iosVersion));
-    }
+    m_ui->unicodeComboBox->addItems({"3.0", "3.2", "4.0", "4.1", "5.1", "5.2", "6.0", "6.1", "7.0", "8.0", "9.0", "11.0", "12.0"});
+    m_ui->iosComboBox->addItems({"6.0", "8.3", "9.0", "9.1", "10.0", "10.2", "12.1", "13.0"});
     configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
     configIosVersion = config.readEntry("iosVersion", "13").toFloat();
-    m_ui->unicodeComboBox->setCurrentText(QString::number(configUnicodeVersion));
-    m_ui->iosComboBox->setCurrentText(QString::number(configIosVersion));
+    m_ui->unicodeComboBox->setCurrentText(config.readEntry("unicodeVersion", "11.0"));
+    m_ui->iosComboBox->setCurrentText(config.readEntry("iosVersion", "13.0"));
 
     categoriesChanged();
     filterActive = true;
@@ -150,6 +149,8 @@ void EmojiRunnerConfig::save() {
     }
     config.writeEntry("favourites", favouriteIDs);
 
+    config.sync();
+
     emit changed();
 }
 
@@ -183,7 +184,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
     if (!filterActive) return;
 
     const QString text = m_ui->favouriteFilter->text();
-    int count = m_ui->emojiListView->count();
+    const int count = m_ui->emojiListView->count();
     configUnicodeVersion = m_ui->unicodeComboBox->currentText().toFloat();
     configIosVersion = m_ui->iosComboBox->currentText().toFloat();
 
@@ -257,24 +258,24 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
  * Check for newly enabled/disabled categories and add/remove the emojis
  */
 void EmojiRunnerConfig::categoriesChanged() {
-    const QStringList previouslyDisabled = disabledEmojis;
-    disabledEmojis.clear();
+    const QStringList previouslyDisabled = disabledEmojiCategorieNames;
+    disabledEmojiCategorieNames.clear();
 
     // Update list of disabled categories
     const int count = m_ui->categoryListView->count();
     for (int i = 0; i < count; ++i) {
         const auto *item = m_ui->categoryListView->item(i);
-        if (item->checkState() == Qt::Unchecked) disabledEmojis.append(item->text());
+        if (item->checkState() == Qt::Unchecked) disabledEmojiCategorieNames.append(item->text());
     }
 
     // Remove items of disabled categories from list
     const int emojiItems = m_ui->emojiListView->count();
     QList<int> remove;
-    if (!disabledEmojis.isEmpty()) {
+    if (!disabledEmojiCategorieNames.isEmpty()) {
         for (int i = 0; i < emojiItems; ++i) {
             auto *item = m_ui->emojiListView->item(i);
             const auto emoji = allEmojis.value(item->data(1).toString());
-            if (!disabledEmojis.contains(emoji.category)) continue;
+            if (!disabledEmojiCategorieNames.contains(emoji.category)) continue;
             if (item->checkState() == Qt::Checked) continue;
             remove.insert(0, i);
         }
@@ -284,7 +285,7 @@ void EmojiRunnerConfig::categoriesChanged() {
     // Get newly enabled categories
     QStringList newlyEnabled;
     for (const auto &c:previouslyDisabled) {
-        if (!disabledEmojis.contains(c)) newlyEnabled.append(c);
+        if (!disabledEmojiCategorieNames.contains(c)) newlyEnabled.append(c);
     }
     // Add newly installed emojis
     if (!newlyEnabled.isEmpty()) {
@@ -294,7 +295,7 @@ void EmojiRunnerConfig::categoriesChanged() {
         for (int i = 0; i < newItemCount; ++i) {
             auto *item = m_ui->emojiListView->item(i);
             const auto emoji = allEmojis.value(item->data(1).toString());
-            if (!disabledEmojis.contains(emoji.category)) newFavourites.append(emoji.name);
+            if (!disabledEmojiCategorieNames.contains(emoji.category)) newFavourites.append(emoji.name);
         }
         // Add emojis, skip favourites
         for (const auto &c:emojiCategories) {

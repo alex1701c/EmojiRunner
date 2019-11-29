@@ -41,7 +41,7 @@ public:
         return -1;
     }
 
-    bool matchesVersions(float configUnicodeVersion, float configIosVersion) const {
+    bool matchesVersions(const float &configUnicodeVersion, const float &configIosVersion) const {
         if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion) return false;
         return !(unicodeVersion == 0 && iosVersion > configIosVersion);
     }

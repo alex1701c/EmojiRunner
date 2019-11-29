@@ -92,7 +92,7 @@
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Enable/Disable Categories
-(Favourites are excluded)</string>
+(Favourites are always shown)</string>
           </property>
          </widget>
         </item>

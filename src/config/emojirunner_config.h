@@ -61,6 +61,10 @@ public Q_SLOTS:
 
     void moveFavouriteDown();
 
+    void checkMaxFavourites();
+
+    void changeFontSize(int value);
+
 private:
     EmojiRunnerConfigForm *m_ui;
 

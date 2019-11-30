@@ -22,7 +22,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
-    config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/jetbrainsrunnerrc")
+    config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/emojirunnerrc")
             ->group("Config");
     config.config()->reparseConfiguration();
 
@@ -151,7 +151,7 @@ void EmojiRunnerConfig::save() {
     config.writeEntry("unicodeVersion", m_ui->unicodeComboBox->currentText());
     config.writeEntry("iosVersion", m_ui->iosComboBox->currentText());
 
-    // Save categories
+    // Save disabled categories
     QString disabledCategories;
     const int categoryCount = m_ui->categoryListView->count();
     for (int i = 0; i < categoryCount; i++) {
@@ -164,7 +164,7 @@ void EmojiRunnerConfig::save() {
     // Save favourites and search for custom emojis
     const int emojiCount = m_ui->emojiListView->count();
     QString favouriteIDs;
-    for (int i = 0; i < emojiCount; i++) {
+    for (int i = 0; i < emojiCount; ++i) {
         const auto *item = m_ui->emojiListView->item(i);
         const auto emoji = allEmojis.value(item->data(1).toString());
         if (item->checkState() == Qt::Checked) {
@@ -174,54 +174,7 @@ void EmojiRunnerConfig::save() {
     }
     config.writeEntry("favourites", favouriteIDs);
 
-
-    QJsonDocument doc;
-    QJsonArray customArray;
-    QJsonObject rootObject;
-
-    // Read existing file
-    QFile customEmojisFile(QDir::homePath() + "/.local/share/emojirunner/customemojis.json");
-    if (customEmojisFile.exists() && customEmojisFile.open(QFile::ReadOnly)) {
-        doc = QJsonDocument::fromJson(customEmojisFile.readAll());
-        customEmojisFile.close();
-    }
-
-    // If the user overrides existing emojis manually the changes are kept
-    if (doc.isObject()) {
-        rootObject = doc.object();
-    }
-
-    // Write emojis in json array
-    const int customEmojiCount = customEmojis.count();
-    for (int i = 0; i < customEmojiCount; ++i) {
-        const Emoji &e = customEmojis.at(i);
-        QJsonObject customObj;
-        customObj.insert("emoji", e.emoji);
-        customObj.insert("name", e.name);
-        customObj.insert("id", QString::number(2000 + i));
-        QJsonArray tags;
-        for (const auto &t:e.tags) tags.append(t);
-        customObj.insert("tags", tags);
-        customObj.insert("unicode_version", 1);
-        customObj.insert("ios_version", 0);
-        customArray.append(QJsonValue(customObj));
-    }
-
-    // Update values
-    rootObject.insert("Custom", customArray);
-    doc.setObject(rootObject);
-
-    // Make sure that folder exists
-    const QString configFolder = QDir::homePath() + "/.local/share/emojirunner/";
-    const QDir configDir(configFolder);
-    if (!configDir.exists()) configDir.mkpath(configFolder);
-
-    // Write to file
-    QFile configFile(configFolder + "customemojis.json");
-    if (configFile.open(QIODevice::WriteOnly)) {
-        configFile.write(doc.toJson());
-        configFile.close();
-    }
+    if (!customEmojis.isEmpty()) Emoji::writeToJSONFile(customEmojis);
 
     config.sync();
 

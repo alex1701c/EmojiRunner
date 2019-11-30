@@ -10,7 +10,9 @@ Q_OBJECT
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
+    const QString customEmojiFile = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
     QList<EmojiCategory> emojiCategories;
+    EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste = false;
 
@@ -35,7 +37,7 @@ public: // Plasma::AbstractRunner API
 
 public Q_SLOTS:
 
-    void reloadPluginConfiguration(const QString& configFile = "");
+    void reloadPluginConfiguration(const QString &configFile = "");
 };
 
 #endif

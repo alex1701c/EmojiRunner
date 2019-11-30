@@ -26,8 +26,6 @@ FileReader::FileReader(const KConfigGroup &config) {
  * @return
  */
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) {
-    QList<EmojiCategory> categories;
-
     // Emojis for user level install
     QFile globalFile("/usr/share/emojirunner/emojis.json");
     QFile localFile(QDir::homePath() + "/.local/share/emojirunner/emojis.json");

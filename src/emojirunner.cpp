@@ -27,13 +27,13 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     // Add file watcher for config
     watcher.addPath(configFolder + "emojirunnerrc");
     connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(reloadPluginConfiguration(QString)));
-
+    // customemojis.json file
+    if (QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
     reloadPluginConfiguration();
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
-    QTime start = QTime::currentTime();
-    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/jetbrainsrunnerrc")
+    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/emojirunnerrc")
             ->group("Config");
     // Force sync from file
     if (!configFile.isEmpty()) config.config()->reparseConfiguration();
@@ -44,6 +44,7 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
         if (QFile::exists(configFile)) {
             watcher.addPath(configFile);
         }
+        if (configFile != customEmojiFile && QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
     }
 
     FileReader reader(config);
@@ -53,13 +54,19 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
     descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
     singleRunnerModePaste = config.readEntry("singleRunnerModePaste", "true") == "true";
-    qInfo() << start.msecsTo(QTime::currentTime());
+
+    // Items only change in reload config method => read once and reuse
+    for (const auto &category:emojiCategories) {
+        if (category.name == "Favourites") {
+            favouriteCategory = category;
+            break;
+        }
+    }
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
     if (!context.isValid()) return;
 
-    QList<Plasma::QueryMatch> matches;
 #ifdef stage_dev
     int total = 0;
     for (const auto &c:emojiCategories) {
@@ -80,39 +87,24 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 
     if (prefixed && search.isEmpty()) {
         // region favourites
-        EmojiCategory favouriteCategory;
-        for (const auto &category:emojiCategories) {
-            if (category.name == "Favourites") {
-                favouriteCategory = category;
-                break;
-            }
-        }
-        for (const auto &key :favouriteCategory.emojis.keys()) {
-            const auto emoji = favouriteCategory.emojis.value(key);
-            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21));
+        for (const auto &emoji :favouriteCategory.emojis.values()) {
+            context.addMatch(createQueryMatch(emoji, (float) emoji.favourite / 21));
         }
         // endregion
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         // region search: emoji <query>
+        QList<Plasma::QueryMatch> matches;
         for (const auto &category:emojiCategories) {
             if (category.name == "Favourites") continue;
-            for (const auto &key :category.emojis.keys()) {
-                const auto emoji = category.emojis.value(key);
-                double relevance = -1;
-
-                if (emoji.nameQueryMatches(search)) relevance = (double) search.length() / (key.length() * 8);
-                else if (tagSearchEnabled) relevance = emoji.tagsQueryMatches(search);
-                if (descriptionSearchEnabled && relevance == -1) relevance = emoji.descriptionQueryMatches(search);
-
+            for (const auto &emoji :category.emojis.values()) {
+                double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
-                if (emoji.favourite != 0) relevance += 0.5;
-                if (category.name == "Smileys & Emotion") relevance *= 2;
                 matches.append(createQueryMatch(emoji, relevance));
             }
         }
+        context.addMatches(matches);
         //endregion
     }
-    context.addMatches(matches);
 }
 
 void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {

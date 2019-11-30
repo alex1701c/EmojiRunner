@@ -23,6 +23,8 @@ public:
 
     KConfigGroup config;
     bool filterActive = false;
+    bool customEntriesExist = false;
+    bool customFilterChecked = false;
     float configUnicodeVersion;
     float configIosVersion;
 
@@ -63,11 +65,14 @@ public Q_SLOTS:
 
     void checkMaxFavourites();
 
+
     void changeFontSize(int value);
 
     void addEmoji();
 
     void editEmoji();
+    void deleteEmoji();
+    void validateEditingOptions();
 
     void applyEmojiPopupResults(const Emoji &emoji, const QString &originalName = "");
 

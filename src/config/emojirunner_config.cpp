@@ -43,6 +43,8 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterDescription_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->favouriteFilterTags_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->favouriteFilterCustom, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->favouriteFilterCustom, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     // Unicode Versions change
     connect(m_ui->unicodeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionChanged()));
     connect(m_ui->unicodeComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
@@ -55,6 +57,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->emojiListView, SIGNAL(itemSelectionChanged()), this, SLOT(validateMoveFavouriteButtons()));
+    connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(checkMaxFavourites()));
     // Move favourites up/down
     connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteUp()));
@@ -64,11 +67,14 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     // Slider for font size
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changed()));
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFontSize(int)));
-    // Buttons for adding/updating emojis
+    // Buttons for adding/updating/deleting emojis
+    connect(m_ui->emojiListView, SIGNAL(currentRowChanged(int)), SLOT(validateEditingOptions()));
     connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(addEmoji()));
     connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(editEmoji()));
+    connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(deleteEmoji()));
 }
 
 void EmojiRunnerConfig::load() {
@@ -83,6 +89,7 @@ void EmojiRunnerConfig::load() {
         auto *item = new QListWidgetItem();
         item->setText(category.name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        if (category.name == "Custom") customEntriesExist = true;
         item->setCheckState(disabledEmojiCategoryNames.contains(category.name) ? Qt::Unchecked : Qt::Checked);
         m_ui->categoryListView->addItem(item);
     }
@@ -127,6 +134,7 @@ void EmojiRunnerConfig::load() {
     filterActive = true;
     filterEmojiListView();
     validateMoveFavouriteButtons();
+    validateEditingOptions();
 
     emit changed(true);
 }
@@ -150,7 +158,8 @@ void EmojiRunnerConfig::save() {
     }
     config.writeEntry("disabledCategories", disabledCategories);
 
-    // Save favourites
+    QList<Emoji> customEmojis;
+    // Save favourites and search for custom emojis
     const int favouriteCount = m_ui->emojiListView->count();
     QString favouriteIDs;
     for (int i = 0; i < favouriteCount; i++) {
@@ -158,9 +167,16 @@ void EmojiRunnerConfig::save() {
         if (item->checkState() == Qt::Checked) {
             const auto emoji = allEmojis.value(item->data(1).toString());
             favouriteIDs.append(QString::number(emoji.id) + ";");
+            if (emoji.category == "Custom") customEmojis.append(emoji);
         }
     }
     config.writeEntry("favourites", favouriteIDs);
+
+
+    // TODO Check if file/folder exists, else create it
+    // Load file in json document/create new document
+    // Delete custom group if exists, else create custom group
+    // Write entries file, if other categories that "Custom" are in the file, they should not be changed
 
     config.sync();
 
@@ -205,6 +221,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
         bool filterName = favouriteFilters.contains("name");
         bool filterDescription = favouriteFilters.contains("description");
         bool filterTags = favouriteFilters.contains("tags");
+        bool custom = favouriteFilters.contains("custom");
         for (int i = 0; i < count; ++i) {
             auto *item = m_ui->emojiListView->item(i);
             const auto emoji = allEmojis.value(item->data(1).toString());
@@ -212,6 +229,12 @@ void EmojiRunnerConfig::filterEmojiListView() {
 
             // If the category is disabled and it is not a favourite it should always be hidden
             if (item->checkState() != Qt::Checked && disabledEmojiCategoryNames.contains(emoji.category)) {
+                item->setHidden(true);
+                continue;
+            }
+
+            // If custom is selected only the custom entries are filterd by the criterias
+            if (custom && emoji.category != "Custom") {
                 item->setHidden(true);
                 continue;
             }
@@ -256,6 +279,17 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
         checked++;
         favouriteFilters.append("description");
     }
+    bool customFilterChanged = false;
+    if (m_ui->favouriteFilterCustom->isChecked()) {
+        favouriteFilters.append("custom");
+        if (!customFilterChecked) customFilterChanged = true;
+        customFilterChecked = true;
+    } else {
+        if (customFilterChecked) {
+            customFilterChanged = true;
+        }
+        customFilterChecked = false;
+    }
 
     if (checked == 1) {
         if (m_ui->favouriteFilterName->isChecked()) m_ui->favouriteFilterName->setDisabled(true);
@@ -267,7 +301,7 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
         m_ui->favouriteFilterDescription->setDisabled(false);
     }
 
-    if (reloadFilter && !m_ui->favouriteFilter->text().isEmpty()) filterEmojiListView();
+    if (reloadFilter && (!m_ui->favouriteFilter->text().isEmpty() || customFilterChanged)) filterEmojiListView();
 }
 
 /**
@@ -336,15 +370,15 @@ void EmojiRunnerConfig::iosVersionChanged() {
  * Check if there is another favourite above/below the selected and en-/disable the corresponding button
  */
 void EmojiRunnerConfig::validateMoveFavouriteButtons() {
-
-    if (m_ui->sortFavourites->isChecked()) {
+    const auto *currentItem = m_ui->emojiListView->currentItem();
+    if (m_ui->sortFavourites->isChecked() || (currentItem != nullptr && currentItem->checkState() == Qt::Checked)) {
         const int rowCount = m_ui->emojiListView->count() - 1;
         const int currentRow = m_ui->emojiListView->currentRow();
 
         // Handle Up Button
         bool hasNoFavouriteAbove = true;
         for (int i = 0; i < currentRow; i++) {
-            if (!m_ui->emojiListView->item(i)->isHidden()) {
+            if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
                 hasNoFavouriteAbove = false;
                 break;
             }
@@ -354,7 +388,7 @@ void EmojiRunnerConfig::validateMoveFavouriteButtons() {
         // Handle Down Button
         bool hasNoFavouriteBelow = true;
         for (int i = rowCount; i > currentRow; i--) {
-            if (!m_ui->emojiListView->item(i)->isHidden()) {
+            if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
                 hasNoFavouriteBelow = false;
                 break;
             }
@@ -372,14 +406,21 @@ void EmojiRunnerConfig::validateMoveFavouriteButtons() {
  */
 void EmojiRunnerConfig::moveFavouriteUp() {
     const int currentRow = m_ui->emojiListView->currentRow();
-    int aboveIndex = true;
+    int aboveIndex = -1;
 
     // Change index with one of favourite that is above
     for (int i = currentRow - 1; i >= 0; --i) {
-        if (!m_ui->emojiListView->item(i)->isHidden()) {
+        if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
             aboveIndex = i;
             break;
         }
+    }
+    // If for example an emoji has been favourized which is at the end of the list, it gets moved right below
+    // the favourite which is above, otherwise the emoji would be put above and this would be confusing if the user
+    // could not see the favourite above because of the emojis in between
+    if (aboveIndex > 0) {
+        const auto *item = m_ui->emojiListView->item(aboveIndex + 1);
+        if (!item->isHidden() && item->checkState() == Qt::Unchecked) aboveIndex++;
     }
     auto *item = m_ui->emojiListView->takeItem(currentRow);
     m_ui->emojiListView->insertItem(aboveIndex, item);
@@ -395,7 +436,7 @@ void EmojiRunnerConfig::moveFavouriteDown() {
     int belowIndex = true;
 
     for (int i = currentRow + 1; i < count; ++i) {
-        if (!m_ui->emojiListView->item(i)->isHidden()) {
+        if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
             belowIndex = i;
             break;
         }
@@ -410,15 +451,18 @@ void EmojiRunnerConfig::moveFavouriteDown() {
  */
 void EmojiRunnerConfig::unhideAll() {
     const int itemCount = m_ui->emojiListView->count();
+    bool custom = favouriteFilters.contains("custom");
+
     for (int i = 0; i < itemCount; ++i) {
         auto *item = m_ui->emojiListView->item(i);
         const auto emoji = allEmojis.value(item->data(1).toString());
         item->setHidden(
-                (
-                        !emoji.matchesVersions(configUnicodeVersion, configIosVersion) ||
-                        disabledEmojiCategoryNames.contains(emoji.category)
-                )
-                && item->checkState() == Qt::Unchecked
+                ((
+                         !emoji.matchesVersions(configUnicodeVersion, configIosVersion) ||
+                         disabledEmojiCategoryNames.contains(emoji.category)
+                 )
+                 && item->checkState() == Qt::Unchecked) ||
+                (custom && emoji.category != "Custom")
         );
     }
 }
@@ -437,6 +481,9 @@ void EmojiRunnerConfig::displayVisibleItems() const {
     m_ui->favouriteVisibleElements->setText(QString::number(visibleItems) + " Elements");
 }
 
+/**
+ * Checks if the number of favourites is greater than 20, if true it shows the maxFavouritesLabel with a warning
+ */
 void EmojiRunnerConfig::checkMaxFavourites() {
     int favourites = 0;
     int count = this->m_ui->emojiListView->count();
@@ -452,19 +499,27 @@ void EmojiRunnerConfig::checkMaxFavourites() {
     }
 }
 
+/*
+ * Change the font size based on the value
+ */
 void EmojiRunnerConfig::changeFontSize(int value) {
     auto f = QFont(m_ui->emojiListView->font());
     f.setPixelSize(value / 2);
     m_ui->emojiListView->setFont(f);
 }
 
+/**
+ * Show popup to add a new emoji
+ */
 void EmojiRunnerConfig::addEmoji() {
-    //qInfo() << reinterpret_cast<QDialogButtonBox *>(sender())->buttons().count();
     auto *popup = new EmojiRunnerPopup(this);
     popup->show();
     connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
 }
 
+/**
+ * Show popup to edit an emoji
+ */
 void EmojiRunnerConfig::editEmoji() {
     const auto *item = m_ui->emojiListView->currentItem();
     if (item != nullptr) {
@@ -474,30 +529,56 @@ void EmojiRunnerConfig::editEmoji() {
     }
 }
 
+/**
+ * Applies the results of the popup to the emojiListView
+ *
+ * @param emoji
+ * @param originalName
+ */
 void EmojiRunnerConfig::applyEmojiPopupResults(const Emoji &emoji, const QString &originalName) {
     if (!allEmojis.contains(emoji.name) && originalName.isEmpty()) {
         m_ui->emojiListView->insertItem(0, emoji.toListWidgetItem());
+        if (!customEntriesExist) {
+            customEntriesExist = true;
+            auto *item = new QListWidgetItem();
+            item->setText("Custom");
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setCheckState(Qt::Checked);
+            m_ui->categoryListView->addItem(item);
+        }
     } else {
-        const auto items = m_ui->emojiListView->findItems(originalName, Qt::MatchEndsWith);
-
+        const auto items = m_ui->emojiListView->findItems(" " + originalName, Qt::MatchEndsWith);
         if (items.count() == 1) {
             auto *item = items.at(0);
             const int row = m_ui->emojiListView->row(item);
-            m_ui->emojiListView->takeItem(row);
+            delete m_ui->emojiListView->takeItem(row);
             m_ui->emojiListView->insertItem(row, emoji.toListWidgetItem());
         } else {
-            qInfo() << "TODO" << emoji.name;
+            m_ui->emojiListView->insertItem(0, emoji.toListWidgetItem());
+            qInfo() << "Could not update" << emoji.name << originalName;
         }
-
-/*        const int emojiCount=m_ui->emojiListView->count();
-        for(int i=0;i<emojiCount;++i){
-            auto *item = m_ui->emojiListView->item(i);
-            if()
-        }*/
     }
     allEmojis.insert(emoji.name, emoji);
+}
 
-    qInfo() << emoji.name;
+/**
+ * Deletes emoji from ListView
+ */
+void EmojiRunnerConfig::deleteEmoji() {
+    QMessageBox::StandardButton reply = QMessageBox::
+    question(this, "Confirm Delete", "Do you want to delete this custom emoji ?",
+             QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) delete m_ui->emojiListView->takeItem(m_ui->emojiListView->currentRow());
+}
+
+/**
+ * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView
+ */
+void EmojiRunnerConfig::validateEditingOptions() {
+    const auto *item = m_ui->emojiListView->currentItem();
+    const bool disabled = item == nullptr || allEmojis.value(item->data(1).toString()).category != "Custom";
+    m_ui->editEmojiPushButton->setDisabled(disabled);
+    m_ui->deleteEmojiPushButton->setDisabled(disabled);
 }
 
 

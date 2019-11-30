@@ -17,7 +17,6 @@ EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji) : QDialog(paren
 }
 
 void EmojiRunnerPopup::setDataOfEmoji() {
-    this->categoryComboBox->setCurrentText(emoji.category);
     this->emojiLineEdit->setText(emoji.emoji);
     this->nameLineEdit->setText(emoji.displayName);
     this->tagsLineEdit->setText(emoji.tags.join(","));
@@ -25,7 +24,7 @@ void EmojiRunnerPopup::setDataOfEmoji() {
 }
 
 void EmojiRunnerPopup::writeDataToEmoji() {
-    emoji.category = this->categoryComboBox->currentText();
+    emoji.category = "Custom";
     emoji.emoji = this->emojiLineEdit->text();
     emoji.name = this->nameLineEdit->text();
     emoji.displayName = QString(emoji.name).replace("_", " ");

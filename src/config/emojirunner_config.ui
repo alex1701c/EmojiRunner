@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>669</width>
+    <width>726</width>
     <height>580</height>
    </rect>
   </property>
@@ -213,6 +213,13 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QCheckBox" name="favouriteFilterCustom">
+                    <property name="text">
+                     <string>Custom Emojis</string>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
@@ -223,7 +230,7 @@
                <item>
                 <widget class="QCheckBox" name="sortFavourites">
                  <property name="text">
-                  <string>Sort Favourites</string>
+                  <string>Show Only Favourites</string>
                  </property>
                 </widget>
                </item>
@@ -256,6 +263,13 @@
                 <widget class="QPushButton" name="editEmojiPushButton">
                  <property name="text">
                   <string>Edit Emoji</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="deleteEmojiPushButton">
+                 <property name="text">
+                  <string>Delete Emoji</string>
                  </property>
                 </widget>
                </item>

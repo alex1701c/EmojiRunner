@@ -1,9 +1,13 @@
 #include "emojirunner_config.h"
+#include "emojirunner_popup.h"
 #include <KSharedConfig>
 #include <KPluginFactory>
 #include <krunner/abstractrunner.h>
 #include <FileReader.h>
 #include <QDebug>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QInputDialog>
 
 K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kcm_krunner_emojirunner");)
 
@@ -22,7 +26,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
 
     FileReader reader(config);
     emojiCategories = reader.getEmojiCategories(true);
-    disabledEmojiCategorieNames = reader.disabledCategories;
+    disabledEmojiCategoryNames = reader.disabledCategories;
 
     std::sort(emojiCategories.begin(), emojiCategories.end(), [](const EmojiCategory &c1, const EmojiCategory &c2) -> bool {
         if (c1.name == "Smileys & Emotion") return true;
@@ -60,6 +64,11 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     // Slider for font size
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changed()));
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFontSize(int)));
+    // Buttons for adding/updating emojis
+    connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(addEmoji()));
+    connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(editEmoji()));
 }
 
 void EmojiRunnerConfig::load() {
@@ -74,7 +83,7 @@ void EmojiRunnerConfig::load() {
         auto *item = new QListWidgetItem();
         item->setText(category.name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(disabledEmojiCategorieNames.contains(category.name) ? Qt::Unchecked : Qt::Checked);
+        item->setCheckState(disabledEmojiCategoryNames.contains(category.name) ? Qt::Unchecked : Qt::Checked);
         m_ui->categoryListView->addItem(item);
     }
 
@@ -202,7 +211,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
             bool hidden = true;
 
             // If the category is disabled and it is not a favourite it should always be hidden
-            if (item->checkState() != Qt::Checked && disabledEmojiCategorieNames.contains(emoji.category)) {
+            if (item->checkState() != Qt::Checked && disabledEmojiCategoryNames.contains(emoji.category)) {
                 item->setHidden(true);
                 continue;
             }
@@ -265,14 +274,14 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
  * Check for newly enabled/disabled categories and add/remove the emojis
  */
 void EmojiRunnerConfig::categoriesChanged() {
-    const QStringList previouslyDisabled = disabledEmojiCategorieNames;
-    disabledEmojiCategorieNames.clear();
+    const QStringList previouslyDisabled = disabledEmojiCategoryNames;
+    disabledEmojiCategoryNames.clear();
 
     // Update list of disabled categories
     const int count = m_ui->categoryListView->count();
     for (int i = 0; i < count; ++i) {
         const auto *item = m_ui->categoryListView->item(i);
-        if (item->checkState() == Qt::Unchecked) disabledEmojiCategorieNames.append(item->text());
+        if (item->checkState() == Qt::Unchecked) disabledEmojiCategoryNames.append(item->text());
     }
     filterEmojiListView();
 }
@@ -407,7 +416,7 @@ void EmojiRunnerConfig::unhideAll() {
         item->setHidden(
                 (
                         !emoji.matchesVersions(configUnicodeVersion, configIosVersion) ||
-                        disabledEmojiCategorieNames.contains(emoji.category)
+                        disabledEmojiCategoryNames.contains(emoji.category)
                 )
                 && item->checkState() == Qt::Unchecked
         );
@@ -447,7 +456,49 @@ void EmojiRunnerConfig::changeFontSize(int value) {
     auto f = QFont(m_ui->emojiListView->font());
     f.setPixelSize(value / 2);
     m_ui->emojiListView->setFont(f);
-
 }
+
+void EmojiRunnerConfig::addEmoji() {
+    //qInfo() << reinterpret_cast<QDialogButtonBox *>(sender())->buttons().count();
+    auto *popup = new EmojiRunnerPopup(this);
+    popup->show();
+    connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
+}
+
+void EmojiRunnerConfig::editEmoji() {
+    const auto *item = m_ui->emojiListView->currentItem();
+    if (item != nullptr) {
+        auto *popup = new EmojiRunnerPopup(this, allEmojis.value(item->data(1).toString()));
+        popup->show();
+        connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
+    }
+}
+
+void EmojiRunnerConfig::applyEmojiPopupResults(const Emoji &emoji, const QString &originalName) {
+    if (!allEmojis.contains(emoji.name) && originalName.isEmpty()) {
+        m_ui->emojiListView->insertItem(0, emoji.toListWidgetItem());
+    } else {
+        const auto items = m_ui->emojiListView->findItems(originalName, Qt::MatchEndsWith);
+
+        if (items.count() == 1) {
+            auto *item = items.at(0);
+            const int row = m_ui->emojiListView->row(item);
+            m_ui->emojiListView->takeItem(row);
+            m_ui->emojiListView->insertItem(row, emoji.toListWidgetItem());
+        } else {
+            qInfo() << "TODO" << emoji.name;
+        }
+
+/*        const int emojiCount=m_ui->emojiListView->count();
+        for(int i=0;i<emojiCount;++i){
+            auto *item = m_ui->emojiListView->item(i);
+            if()
+        }*/
+    }
+    allEmojis.insert(emoji.name, emoji);
+
+    qInfo() << emoji.name;
+}
+
 
 #include "emojirunner_config.moc"

@@ -74,37 +74,31 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     }
     qInfo() << total;
 #endif
-    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ");// Remove escape character
+    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ").toLower();// Remove escape character
     const bool prefixed = term.startsWith("emoji");
     if (!globalSearchEnabled && !prefixed) return;
 
     QString search = term;
     if (prefixed) {
-        QRegExp regex(R"(emoji(?: +(.*))?)");
-        regex.indexIn(term);
-        search = regex.capturedTexts().at(1);
+        prefixRegex.indexIn(term);
+        search = prefixRegex.capturedTexts().at(1);
     }
-
+    QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
-        // region favourites
         for (const auto &emoji :favouriteCategory.emojis.values()) {
-            context.addMatch(createQueryMatch(emoji, (float) emoji.favourite / 21));
+            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21));
         }
-        // endregion
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
-        // region search: emoji <query>
-        QList<Plasma::QueryMatch> matches;
         for (const auto &category:emojiCategories) {
             if (category.name == "Favourites") continue;
             for (const auto &emoji :category.emojis.values()) {
-                double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
+                const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
                 matches.append(createQueryMatch(emoji, relevance));
             }
         }
-        context.addMatches(matches);
-        //endregion
     }
+    context.addMatches(matches);
 }
 
 void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
@@ -116,6 +110,19 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
         // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
         QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");
     }
+}
+
+Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const double relevance) {
+    Plasma::QueryMatch match(this);
+    match.setText(emoji.emoji);
+#ifndef stage_dev
+    match.setSubtext(emoji.name);
+#else
+    match.setSubtext(QString(emoji.name).replace("_", " ") + " ---- " + QString::number(relevance));
+#endif
+    match.setData(emoji.emoji);
+    match.setRelevance(relevance);
+    return match;
 }
 
 K_EXPORT_PLASMA_RUNNER(emojirunner, EmojiRunner)

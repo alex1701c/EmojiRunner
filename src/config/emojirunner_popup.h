@@ -23,6 +23,8 @@ public Q_SLOTS:
 
     void writeDataToEmoji();
 
+    void validateButtonBox();
+
 Q_SIGNALS:
 
     void finished(Emoji, QString);

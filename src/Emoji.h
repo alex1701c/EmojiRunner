@@ -14,8 +14,6 @@ public:
     int id = 0;
     int favourite = 0;
     QString name;
-    // Name where underscores are replaced by spaces
-    QString displayName;
     QString emoji;
     QString description;
     QString category;
@@ -47,7 +45,7 @@ public:
      * @return  double
      */
     double getMatchTextRelevance(const QString &search, const bool tagSearch, const bool descriptionSearch) const {
-        if (this->displayName.contains(search) || this->name.contains(search)) {
+        if (this->name.contains(search)) {
             return (double) search.size() / (this->name.length() * 8);
         }
         if (descriptionSearch && this->description.contains(search)) {
@@ -65,7 +63,7 @@ public:
      * If the emoji matches the unicode version or the fallback ios version
      * @param configUnicodeVersion
      * @param configIosVersion
-     * @return
+     * @return bool
      */
     bool matchesVersions(const float &configUnicodeVersion, const float &configIosVersion) const {
         if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion) return false;
@@ -77,7 +75,7 @@ public:
      * @return QListWidgetItem
      */
     QListWidgetItem *toListWidgetItem() const {
-        auto *item = new QListWidgetItem(this->emoji + " " + this->displayName);
+        auto *item = new QListWidgetItem(this->emoji + " " + this->name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(this->favourite != 0 ? Qt::Checked : Qt::Unchecked);
         item->setData(1, this->name);
@@ -85,7 +83,7 @@ public:
     }
 
     /**
-     * Returns an EMoji instance based on the data from the JSON object
+     * Returns an Emoji instance based on the data from the JSON object
      * @param obj
      * @param categoryKey
      * @return Emoji
@@ -93,12 +91,11 @@ public:
     static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey) {
         Emoji emoji;
         emoji.id = obj.value("id").toInt();
-        emoji.name = obj.value("name").toString();
-        emoji.displayName = QString(emoji.name).replace("_", " ");
+        emoji.name = obj.value("name").toString().toLower();
         emoji.emoji = obj.value("emoji").toString();
         emoji.category = categoryKey;
-        for (const auto &tag:obj.value("tags").toArray()) emoji.tags.append(tag.toString());
-        emoji.description = obj.value("description").toString();
+        for (const auto &tag:obj.value("tags").toArray()) emoji.tags.append(tag.toString().toLower());
+        emoji.description = obj.value("description").toString().toLower();
         emoji.unicodeVersion = obj.value("unicode_version").toString().toFloat();
         emoji.iosVersion = obj.value("ios_version").toString().toFloat();
         return emoji;
@@ -132,9 +129,10 @@ public:
             const Emoji &e = emojis.at(i);
             QJsonObject customObj;
             customObj.insert("emoji", e.emoji);
-            customObj.insert("name", e.name);
-            customObj.insert("id", QString::number(2000 + i));
+            customObj.insert("name", e.name.toLower());
+            customObj.insert("id", QJsonValue(2000 + i));
             customObj.insert("tags", QJsonArray::fromStringList(e.tags));
+            customObj.insert("description", e.description.toLower());
             customObj.insert("unicode_version", 1);
             customObj.insert("ios_version", 0);
             emojiJsonArray.append(QJsonValue(customObj));

@@ -11,23 +11,13 @@ public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
     const QString customEmojiFile = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
+    QRegExp prefixRegex = QRegExp(R"(emoji(?: +(.*))?)");
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste = false;
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance) {
-        Plasma::QueryMatch match(this);
-        match.setText(emoji.emoji);
-#ifndef stage_dev
-        match.setSubtext(emoji.displayName);
-#else
-        match.setSubtext(QString(emoji.name).replace("_", " ") + " ---- " + QString::number(relevance));
-#endif
-        match.setData(emoji.emoji);
-        match.setRelevance(relevance);
-        return match;
-    }
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance);
 
 public: // Plasma::AbstractRunner API
 

@@ -40,6 +40,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->enableGlobalSearch, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->singleRunnerModePaste, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterEmojiListView()));
+    connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
@@ -210,7 +211,7 @@ void EmojiRunnerConfig::defaults() {
 void EmojiRunnerConfig::filterEmojiListView() {
     if (!filterActive) return;
 
-    const QString text = m_ui->favouriteFilter->text();
+    const QString text = m_ui->favouriteFilter->text().toLower();
     const int count = m_ui->emojiListView->count();
 
     if (text.isEmpty()) {
@@ -231,22 +232,22 @@ void EmojiRunnerConfig::filterEmojiListView() {
                 continue;
             }
 
-            // If custom is selected only the custom entries are filterd by the criterias
+            // If custom is selected only the custom entries are filtered by the criterias
             if (custom && emoji.category != "Custom") {
                 item->setHidden(true);
                 continue;
             }
 
             if (filterName) {
-                if (emoji.displayName.contains(text, Qt::CaseInsensitive) || emoji.name.contains(text, Qt::CaseInsensitive)) {
+                if (emoji.name.contains(text)) {
                     hidden = false;
                 }
             }
             if (hidden && filterDescription) {
-                if (emoji.description.contains(text, Qt::CaseInsensitive)) hidden = false;
+                if (emoji.description.contains(text)) hidden = false;
             }
             if (hidden && filterTags) {
-                for (const auto &t:emoji.tags) if (t.contains(text, Qt::CaseInsensitive)) hidden = false;
+                for (const auto &t:emoji.tags) if (t.contains(text)) hidden = false;
             }
             if (emoji.matchesVersions(configUnicodeVersion, configIosVersion) || item->checkState() == Qt::Checked) {
                 item->setHidden(hidden);
@@ -369,7 +370,9 @@ void EmojiRunnerConfig::iosVersionChanged() {
  */
 void EmojiRunnerConfig::validateMoveFavouriteButtons() {
     const auto *currentItem = m_ui->emojiListView->currentItem();
-    if (m_ui->sortFavourites->isChecked() || (currentItem != nullptr && currentItem->checkState() == Qt::Checked)) {
+    if (m_ui->sortFavourites->isChecked() ||
+    (currentItem != nullptr && currentItem->checkState() == Qt::Checked && m_ui->favouriteFilter->text().isEmpty())
+    ) {
         const int rowCount = m_ui->emojiListView->count() - 1;
         const int currentRow = m_ui->emojiListView->currentRow();
 
@@ -449,7 +452,7 @@ void EmojiRunnerConfig::moveFavouriteDown() {
  */
 void EmojiRunnerConfig::unhideAll() {
     const int itemCount = m_ui->emojiListView->count();
-    bool custom = favouriteFilters.contains("custom");
+    const bool custom = favouriteFilters.contains("custom");
 
     for (int i = 0; i < itemCount; ++i) {
         auto *item = m_ui->emojiListView->item(i);
@@ -470,7 +473,7 @@ void EmojiRunnerConfig::unhideAll() {
  */
 void EmojiRunnerConfig::displayVisibleItems() const {
     int visibleItems = 0;
-    int count = this->m_ui->emojiListView->count();
+    const int count = this->m_ui->emojiListView->count();
     for (int i = 0; i < count; ++i) {
         const auto *item = this->m_ui->emojiListView->item(i);
         if (!item->isHidden()) ++visibleItems;
@@ -484,7 +487,7 @@ void EmojiRunnerConfig::displayVisibleItems() const {
  */
 void EmojiRunnerConfig::checkMaxFavourites() {
     int favourites = 0;
-    int count = this->m_ui->emojiListView->count();
+    const int count = this->m_ui->emojiListView->count();
     for (int i = 0; i < count; ++i) {
         if (this->m_ui->emojiListView->item(i)->checkState() == Qt::Checked) favourites++;
     }

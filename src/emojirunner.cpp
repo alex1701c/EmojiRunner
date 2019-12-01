@@ -81,7 +81,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     QString search = term;
     if (prefixed) {
         prefixRegex.indexIn(term);
-        search = prefixRegex.capturedTexts().at(1);
+        search = prefixRegex.capturedTexts().at(1).simplified();
     }
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {

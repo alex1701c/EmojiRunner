@@ -2,7 +2,7 @@
 
 This plugin allows you to search, copy and  paste emojis/symbols.
 
-Additionally you can configure favourites, set the unicode version and enable/disable categories.  
+Additionally you can configure favourites, set the unicode version, enable/disable categories and add custom emojis.  
 If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/ 
 
 ### Required Dependencies
@@ -72,4 +72,10 @@ This way you can search for emojis without search results from other plugins
 #### Configure settings
 You can search for emojis, set the unicode level (later versions can not be displayed) and you can enable/disable categories  
 ![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/config.png)  
-*The sorting of the favourites inside Krunner does not work as intended, (they are not always sorted by relevance). Help is appreciated!*  
+
+#### Add a custom emoji
+You must provide a name and and emoji, the description and tags are optional  
+![Add a custom emoji](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/enter_custom_emoji.png)  
+This gets saved in the ~/.local/share/emojirunner/customemojis.json file.  
+In this file you can also override the existing emojis, but you have to do that manually.  
+![Custom emojis file](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/custom_emojis_file.png)    

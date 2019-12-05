@@ -205,9 +205,6 @@ void EmojiRunnerConfig::defaults() {
     emit changed(true);
 }
 
-/**
- * Filters emojis based on filters and the search term
- */
 void EmojiRunnerConfig::filterEmojiListView() {
     if (!filterActive) return;
 
@@ -258,10 +255,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
     displayVisibleItems();
 }
 
-/**
- * Enable/Disable filter checkboxes and search with new filters
- * @param reloadFilter
- */
+
 void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
     // Enable/Disable the filter checkboxes and trigger search event
     int checked = 0;
@@ -303,9 +297,6 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
     if (reloadFilter && (!m_ui->favouriteFilter->text().isEmpty() || customFilterChanged)) filterEmojiListView();
 }
 
-/**
- * Check for newly enabled/disabled categories and add/remove the emojis
- */
 void EmojiRunnerConfig::categoriesChanged() {
     const QStringList previouslyDisabled = disabledEmojiCategoryNames;
     disabledEmojiCategoryNames.clear();
@@ -319,9 +310,6 @@ void EmojiRunnerConfig::categoriesChanged() {
     filterEmojiListView();
 }
 
-/**
- * Toggle if only checked items are shown
- */
 void EmojiRunnerConfig::showOnlyFavourites() {
     const bool checked = m_ui->sortFavourites->isChecked();
     const int itemCount = m_ui->emojiListView->count();
@@ -347,27 +335,18 @@ void EmojiRunnerConfig::showOnlyFavourites() {
     displayVisibleItems();
 }
 
-/**
- * Update configUnicodeVersion variable, clear filter text and call filterFavourites()
- */
 void EmojiRunnerConfig::unicodeVersionChanged() {
     configUnicodeVersion = m_ui->unicodeComboBox->currentText().toFloat();
     m_ui->favouriteFilter->clear();
     filterEmojiListView();
 }
 
-/**
- * Update configIosVersion variable, clear filter text and call filterFavourites()
- */
 void EmojiRunnerConfig::iosVersionChanged() {
     configIosVersion = m_ui->iosComboBox->currentText().toFloat();
     m_ui->favouriteFilter->clear();
     filterEmojiListView();
 }
 
-/**
- * Check if there is another favourite above/below the selected and en-/disable the corresponding button
- */
 void EmojiRunnerConfig::validateMoveFavouriteButtons() {
     const auto *currentItem = m_ui->emojiListView->currentItem();
     if (m_ui->sortFavourites->isChecked() ||
@@ -402,9 +381,6 @@ void EmojiRunnerConfig::validateMoveFavouriteButtons() {
 
 }
 
-/**
- * Change index with one of favourite that is below
- */
 void EmojiRunnerConfig::moveFavouriteUp() {
     const int currentRow = m_ui->emojiListView->currentRow();
     int aboveIndex = -1;
@@ -428,9 +404,6 @@ void EmojiRunnerConfig::moveFavouriteUp() {
     m_ui->emojiListView->setCurrentRow(aboveIndex);
 }
 
-/**
- * Change index with one of favourite that is above
- */
 void EmojiRunnerConfig::moveFavouriteDown() {
     const int count = m_ui->emojiListView->count();
     const int currentRow = m_ui->emojiListView->currentRow();
@@ -447,9 +420,6 @@ void EmojiRunnerConfig::moveFavouriteDown() {
     m_ui->emojiListView->setCurrentRow(belowIndex);
 }
 
-/**
- * Show all items if they mathe the unicode version or if they are checked
- */
 void EmojiRunnerConfig::unhideAll() {
     const int itemCount = m_ui->emojiListView->count();
     const bool custom = favouriteFilters.contains("custom");
@@ -468,9 +438,6 @@ void EmojiRunnerConfig::unhideAll() {
     }
 }
 
-/**
- * Count visible items and update the value in the UI
- */
 void EmojiRunnerConfig::displayVisibleItems() const {
     int visibleItems = 0;
     const int count = this->m_ui->emojiListView->count();
@@ -482,9 +449,6 @@ void EmojiRunnerConfig::displayVisibleItems() const {
     m_ui->favouriteVisibleElements->setText(QString::number(visibleItems) + " Elements");
 }
 
-/**
- * Checks if the number of favourites is greater than 20, if true it shows the maxFavouritesLabel with a warning
- */
 void EmojiRunnerConfig::checkMaxFavourites() {
     int favourites = 0;
     const int count = this->m_ui->emojiListView->count();
@@ -500,27 +464,18 @@ void EmojiRunnerConfig::checkMaxFavourites() {
     }
 }
 
-/*
- * Change the font size based on the value
- */
 void EmojiRunnerConfig::changeFontSize(int value) {
     auto f = QFont(m_ui->emojiListView->font());
     f.setPixelSize(value / 2);
     m_ui->emojiListView->setFont(f);
 }
 
-/**
- * Show popup to add a new emoji
- */
 void EmojiRunnerConfig::addEmoji() {
     auto *popup = new EmojiRunnerPopup(this);
     popup->show();
     connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
 }
 
-/**
- * Show popup to edit an emoji
- */
 void EmojiRunnerConfig::editEmoji() {
     const auto *item = m_ui->emojiListView->currentItem();
     if (item != nullptr) {
@@ -530,12 +485,13 @@ void EmojiRunnerConfig::editEmoji() {
     }
 }
 
-/**
- * Applies the results of the popup to the emojiListView
- *
- * @param emoji
- * @param originalName
- */
+void EmojiRunnerConfig::deleteEmoji() {
+    QMessageBox::StandardButton reply = QMessageBox::
+    question(this, "Confirm Delete", "Do you want to delete this custom emoji ?",
+             QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) delete m_ui->emojiListView->takeItem(m_ui->emojiListView->currentRow());
+}
+
 void EmojiRunnerConfig::applyEmojiPopupResults(const Emoji &emoji, const QString &originalName) {
     if (!allEmojis.contains(emoji.name) && originalName.isEmpty()) {
         m_ui->emojiListView->insertItem(0, emoji.toListWidgetItem());
@@ -562,19 +518,6 @@ void EmojiRunnerConfig::applyEmojiPopupResults(const Emoji &emoji, const QString
     allEmojis.insert(emoji.name, emoji);
 }
 
-/**
- * Deletes emoji from ListView
- */
-void EmojiRunnerConfig::deleteEmoji() {
-    QMessageBox::StandardButton reply = QMessageBox::
-    question(this, "Confirm Delete", "Do you want to delete this custom emoji ?",
-             QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::Yes) delete m_ui->emojiListView->takeItem(m_ui->emojiListView->currentRow());
-}
-
-/**
- * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView
- */
 void EmojiRunnerConfig::validateEditingOptions() {
     const auto *item = m_ui->emojiListView->currentItem();
     if (item == nullptr) {

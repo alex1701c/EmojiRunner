@@ -11,7 +11,7 @@ Q_OBJECT
     QString originalName;
     Emoji emoji;
 public:
-    explicit EmojiRunnerPopup(QWidget *parent = nullptr, Emoji emoji = Emoji());
+    explicit EmojiRunnerPopup(QWidget *parent, Emoji emoji = Emoji());
 
     void setDataOfEmoji();
 

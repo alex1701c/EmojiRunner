@@ -18,9 +18,8 @@ public:
 class EmojiRunnerConfig : public KCModule {
 Q_OBJECT
 
-public:
-    explicit EmojiRunnerConfig(QWidget *parent = nullptr, const QVariantList &args = QVariantList());
-
+private:
+    EmojiRunnerConfigForm *m_ui;
     KConfigGroup config;
     bool filterActive = false;
     bool customEntriesExist = false;
@@ -33,9 +32,8 @@ public:
     QStringList disabledEmojiCategoryNames;
     QStringList favouriteFilters = {"name"};
 
-    void displayVisibleItems() const;
-
-    void unhideAll();
+public:
+    explicit EmojiRunnerConfig(QWidget *parent = nullptr, const QVariantList &args = QVariantList());
 
 public Q_SLOTS:
 
@@ -45,42 +43,99 @@ public Q_SLOTS:
 
     void defaults() override;
 
+    /**
+     * Filters emojis based on filters and the search term
+     */
     void filterEmojiListView();
 
+    /**
+     * Enable/Disable filter checkboxes and search with new filters
+     * @param reloadFilter
+     */
     void filtersChanged(bool reloadFilter = true);
 
-    void unicodeVersionChanged();
-
-    void iosVersionChanged();
-
+    /**
+     * Check for newly enabled/disabled categories and add/remove the emojis
+     */
     void categoriesChanged();
 
+    /**
+     * Toggle if only checked items are shown
+     */
     void showOnlyFavourites();
 
+    /**
+     * Update configUnicodeVersion variable, clear filter text and call filterFavourites()
+     */
+    void unicodeVersionChanged();
+
+    /**
+     * Update configIosVersion variable, clear filter text and call filterFavourites()
+     */
+    void iosVersionChanged();
+
+    /**
+     * Check if there is another favourite above/below the selected and en-/disable the corresponding button
+     */
     void validateMoveFavouriteButtons();
 
+    /**
+     * Change index with one of favourite that is below
+     */
     void moveFavouriteUp();
 
+    /**
+     * Change index with one of favourite that is above
+     */
     void moveFavouriteDown();
 
+    /**
+     * Show all items if they mathe the unicode version or if they are checked
+     */
+    void unhideAll();
+
+    /**
+     * Count visible items and update the value in the UI
+     */
+    void displayVisibleItems() const;
+
+    /**
+     * Checks if the number of favourites is greater than 20, if true it shows the maxFavouritesLabel with a warning
+     */
     void checkMaxFavourites();
 
-
+    /*
+     * Change the font size based on the value
+     */
     void changeFontSize(int value);
 
+    /**
+     * Show popup to add a new emoji
+     */
     void addEmoji();
 
+    /**
+     * Show popup to edit an emoji
+     */
     void editEmoji();
 
+    /**
+     * Deletes emoji from ListView
+     */
     void deleteEmoji();
 
-    void validateEditingOptions();
-
+    /**
+     * Applies the results of the popup to the emojiListView
+     *
+     * @param emoji
+     * @param originalName
+     */
     void applyEmojiPopupResults(const Emoji &emoji, const QString &originalName = "");
 
-private:
-    EmojiRunnerConfigForm *m_ui;
-
+    /**
+     * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView
+     */
+    void validateEditingOptions();
 };
 
 #endif

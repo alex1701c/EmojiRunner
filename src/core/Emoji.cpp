@@ -41,7 +41,7 @@ QListWidgetItem *Emoji::toListWidgetItem() const {
     auto *item = new QListWidgetItem(this->emoji + " " + this->name);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(this->favourite != 0 ? Qt::Checked : Qt::Unchecked);
-    item->setData(Qt::UserRole, QVariant::fromValue(*this));
+    item->setData(Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(this)));
     return item;
 }
 

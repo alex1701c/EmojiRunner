@@ -326,7 +326,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QListWidget" name="emojiListView"/>
+              <widget class="QListWidget" name="emojiListView">
+               <property name="dragEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="dragDropMode">
+                <enum>QAbstractItemView::InternalMove</enum>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

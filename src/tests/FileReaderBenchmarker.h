@@ -10,7 +10,7 @@
 #include <iostream>
 #include <KSharedConfig>
 #include <KConfigGroup>
-#include "../FileReader.h"
+#include "core/FileReader.h"
 
 class FileReaderBenchmarker : public QObject {
 Q_OBJECT

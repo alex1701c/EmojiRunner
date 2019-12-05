@@ -6,9 +6,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(performancetest_includes_SRCS
         FileReaderBenchmarker.h
-        ../EmojiCategory.h
-        ../Emoji.h
-        ../FileReader.cpp
+        ../core/EmojiCategory.h
+        ../core/Emoji.h
+        ../core/FileReader.cpp
         )
 
 add_executable(performancetests ${performancetest_includes_SRCS})

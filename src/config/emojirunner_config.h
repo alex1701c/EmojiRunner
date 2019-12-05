@@ -4,7 +4,7 @@
 #include "ui_emojirunner_config.h"
 #include <KCModule>
 #include <KConfigCore/KConfigGroup>
-#include <EmojiCategory.h>
+#include <core/EmojiCategory.h>
 #include "ui_emojirunner_popup.h"
 #include "emojirunner_popup.h"
 
@@ -71,7 +71,9 @@ public Q_SLOTS:
     void addEmoji();
 
     void editEmoji();
+
     void deleteEmoji();
+
     void validateEditingOptions();
 
     void applyEmojiPopupResults(const Emoji &emoji, const QString &originalName = "");

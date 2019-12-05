@@ -2,10 +2,19 @@
 #define EMOJIRUNNER_H
 
 #include <KRunner/AbstractRunner>
-#include "EmojiCategory.h"
+#define NO_GUI
+#include "core/EmojiCategory.h"
+#include <QtCore>
+// For autotyping
+extern "C" {
+#include <xdo.h>
+}
+
 
 class EmojiRunner : public Plasma::AbstractRunner {
 Q_OBJECT
+public:
+    ~EmojiRunner() override;
 
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
@@ -19,11 +28,15 @@ public:
 
     Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance);
 
+    xdo_t *xdo = xdo_new(nullptr);
+
 public: // Plasma::AbstractRunner API
 
     void match(Plasma::RunnerContext &context) override;
 
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
+
+    void emitCTRLV();
 
 public Q_SLOTS:
 

@@ -4,9 +4,6 @@
 #include <KConfigCore/KConfigGroup>
 #include "FileReader.h"
 
-/**
- * Initialize reusable variables
- */
 FileReader::FileReader(const KConfigGroup &config) {
     for (const auto &idString: config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
             .split(";", QString::SplitBehavior::SkipEmptyParts)) {
@@ -18,14 +15,7 @@ FileReader::FileReader(const KConfigGroup &config) {
     disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
 }
 
-/**
- * Reads the emojis from the different files
- * Rewrite of readJSONFile function but more maintainable and ~20% faster
- *
- * @param getAllEmojis
- * @return
- */
-QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) {
+QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
     // Emojis for user level install
     QFile globalFile("/usr/share/emojirunner/emojis.json");
     QFile localFile(QDir::homePath() + "/.local/share/emojirunner/emojis.json");
@@ -59,7 +49,7 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) {
     return preconfiguredEmojis.values();
 }
 
-QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile &emojiJSONFile) {
+QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile &emojiJSONFile) const {
     // Initialize emojis object and check exit conditions
     const QJsonDocument emojis = QJsonDocument::fromJson(emojiJSONFile.readAll());
     QMap<QString, EmojiCategory> categories;

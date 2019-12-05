@@ -1,5 +1,5 @@
 #include "emojirunner.h"
-#include "FileReader.h"
+#include "core/FileReader.h"
 
 #include <KLocalizedString>
 #include <KConfigCore/KConfig>
@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+
 
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
@@ -27,9 +28,12 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     // Add file watcher for config
     watcher.addPath(configFolder + "emojirunnerrc");
     connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(reloadPluginConfiguration(QString)));
-    // customemojis.json file
     if (QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
     reloadPluginConfiguration();
+}
+
+EmojiRunner::~EmojiRunner() {
+    xdo_free(xdo);
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
@@ -81,7 +85,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     QString search = term;
     if (prefixed) {
         prefixRegex.indexIn(term);
-        search = prefixRegex.capturedTexts().at(1).simplified();
+        search = prefixRegex.cap(1).simplified();
     }
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
@@ -108,7 +112,14 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
         // Does not always work
         // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
-        QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");
+        // Works but is slower and starts two new processes
+        // QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");
+
+        // Wait for krunner to be closed before typing
+        QTimer::singleShot(10, this, [this]() {
+            emitCTRLV();
+        });
+
     }
 }
 
@@ -124,6 +135,14 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const doubl
     match.setRelevance(relevance);
     return match;
 }
+
+void EmojiRunner::emitCTRLV() {
+    // Unfortunately this seems only to work with plain text, help is appreciated
+    //xdo_enter_text_window(xdo, CURRENTWINDOW, str.toStdString().c_str(), 0);
+    // EMit Ctrl+V to paste clipboard content
+    xdo_send_keysequence_window(xdo, CURRENTWINDOW, "ctrl+v", 0);
+}
+
 
 K_EXPORT_PLASMA_RUNNER(emojirunner, EmojiRunner)
 

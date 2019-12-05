@@ -1,13 +1,19 @@
 add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.emojirunner\")
 
-set(emojirunner_SRCS emojirunner.cpp Emoji.h EmojiCategory.h FileReader.cpp FileReader.h)
-
+set(emojirunner_SRCS runner/emojirunner.cpp core/Emoji.cpp core/EmojiCategory.h core/FileReader.cpp core/Config.h)
 add_library(krunner_emojirunner MODULE ${emojirunner_SRCS})
-target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets)
 
-set(kcm_krunner_emojirunner_SRCS
-        config/emojirunner_config.cpp
-        Emoji.h FileReader.cpp FileReader.h config/emojirunner_popup.cpp config/emojirunner_popup.h)
+
+find_path(XDO_HEADER xdo.h)
+find_library(XDO_LIB "xdo")
+if(NOT XDO_LIB)
+    message(FATAL_ERROR "Could not find libxdo-dev, please install xdotools via your package manager or https://github.com/jordansissel/xdotool")
+endif()
+
+target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
+target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets ${XDO_LIB})
+
+set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp core/Config.h)
 
 #add_subdirectory(tests)
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS ../cmake-build-debug/emojirunner_dialog.ui)
@@ -31,4 +37,4 @@ set(EMOJI_FILE_INSTALL_DIR "/usr/share/emojirunner" CACHE STRING "Default instal
 install(TARGETS krunner_emojirunner kcm_krunner_emojirunner DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES plasma-runner-emojirunner.desktop config/plasma-runner-emojirunner_config.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 # Location gets changed for installation without admin priviledget
-install(FILES emojis.json DESTINATION ${EMOJI_FILE_INSTALL_DIR})
+install(FILES core/emojis.json DESTINATION ${EMOJI_FILE_INSTALL_DIR})

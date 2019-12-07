@@ -75,21 +75,6 @@ public Q_SLOTS:
     void iosVersionChanged();
 
     /**
-     * Check if there is another favourite above/below the selected and en-/disable the corresponding button
-     */
-    void validateMoveFavouriteButtons();
-
-    /**
-     * Change index with one of favourite that is below
-     */
-    void moveFavouriteUp();
-
-    /**
-     * Change index with one of favourite that is above
-     */
-    void moveFavouriteDown();
-
-    /**
      * Show all items if they mathe the unicode version or if they are checked
      */
     void unhideAll();

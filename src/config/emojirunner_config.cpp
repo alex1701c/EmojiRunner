@@ -18,11 +18,6 @@ EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) 
     setupUi(this);
 }
 
-/**
- * TODO Validate buttons when using drag and drop stuff
- * TODO Optimize validation events when item is checked
- *
- */
 EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) : KCModule(parent, args) {
     m_ui = new EmojiRunnerConfigForm(this);
     auto *layout = new QGridLayout(this);
@@ -46,7 +41,6 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->enableGlobalSearch, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->singleRunnerModePaste, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterEmojiListView()));
-    connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
     connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
@@ -64,15 +58,9 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->categoryListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(categoriesChanged()));
     // Sort favourites
     connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
-    connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(validateMoveFavouriteButtons()));
-    connect(m_ui->emojiListView, SIGNAL(itemSelectionChanged()), this, SLOT(validateMoveFavouriteButtons()));
-    connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(validateMoveFavouriteButtons()));
     connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(checkMaxFavourites()));
-    // Move favourites up/down
-    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteUp()));
-    connect(m_ui->moveFavouriteUp, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(moveFavouriteDown()));
-    connect(m_ui->moveFavouriteDown, SIGNAL(clicked(bool)), this, SLOT(changed()));
+    // For Drag/Drop events
+    connect(m_ui->emojiListView, SIGNAL(currentRowChanged(int)), SLOT(changed()));
     // Slider for font size
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changed()));
     connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFontSize(int)));
@@ -143,7 +131,6 @@ void EmojiRunnerConfig::load() {
     categoriesChanged();
     filterActive = true;
     filterEmojiListView();
-    validateMoveFavouriteButtons();
     validateEditingOptions();
 
     emit changed(true);
@@ -352,79 +339,6 @@ void EmojiRunnerConfig::iosVersionChanged() {
     configIosVersion = m_ui->iosComboBox->currentText().toFloat();
     m_ui->favouriteFilter->clear();
     filterEmojiListView();
-}
-
-void EmojiRunnerConfig::validateMoveFavouriteButtons() {
-    const auto *currentItem = m_ui->emojiListView->currentItem();
-    if (m_ui->sortFavourites->isChecked() ||
-        (currentItem != nullptr && currentItem->checkState() == Qt::Checked && m_ui->favouriteFilter->text().isEmpty())
-            ) {
-        const int rowCount = m_ui->emojiListView->count() - 1;
-        const int currentRow = m_ui->emojiListView->currentRow();
-
-        // Handle Up Button
-        bool hasNoFavouriteAbove = true;
-        for (int i = 0; i < currentRow; i++) {
-            if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
-                hasNoFavouriteAbove = false;
-                break;
-            }
-        }
-        m_ui->moveFavouriteUp->setDisabled(hasNoFavouriteAbove);
-
-        // Handle Down Button
-        bool hasNoFavouriteBelow = true;
-        for (int i = rowCount; i > currentRow; i--) {
-            if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
-                hasNoFavouriteBelow = false;
-                break;
-            }
-        }
-        m_ui->moveFavouriteDown->setDisabled(hasNoFavouriteBelow);
-    } else {
-        m_ui->moveFavouriteUp->setDisabled(true);
-        m_ui->moveFavouriteDown->setDisabled(true);
-    }
-
-}
-
-void EmojiRunnerConfig::moveFavouriteUp() {
-    const int currentRow = m_ui->emojiListView->currentRow();
-    int aboveIndex = -1;
-
-    // Change index with one of favourite that is above
-    for (int i = currentRow - 1; i >= 0; --i) {
-        if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
-            aboveIndex = i;
-            break;
-        }
-    }
-    // If for example an emoji has been favourized which is at the end of the list, it gets moved right below
-    // the favourite which is above, otherwise the emoji would be put above and this would be confusing if the user
-    // could not see the favourite above because of the emojis in between
-    if (aboveIndex > 0) {
-        const auto *item = m_ui->emojiListView->item(aboveIndex + 1);
-        if (!item->isHidden() && item->checkState() == Qt::Unchecked) aboveIndex++;
-    }
-    auto *item = m_ui->emojiListView->takeItem(currentRow);
-    m_ui->emojiListView->insertItem(aboveIndex, item);
-    m_ui->emojiListView->setCurrentRow(aboveIndex);
-}
-
-void EmojiRunnerConfig::moveFavouriteDown() {
-    const int count = m_ui->emojiListView->count();
-    const int currentRow = m_ui->emojiListView->currentRow();
-    int belowIndex = true;
-
-    for (int i = currentRow + 1; i < count; ++i) {
-        if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
-            belowIndex = i;
-            break;
-        }
-    }
-    auto *item = m_ui->emojiListView->takeItem(currentRow);
-    m_ui->emojiListView->insertItem(belowIndex, item);
-    m_ui->emojiListView->setCurrentRow(belowIndex);
 }
 
 void EmojiRunnerConfig::unhideAll() {

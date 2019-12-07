@@ -1,11 +1,8 @@
-#include <utility>
-
-#include <utility>
-
 #ifndef EMOJIRUNNER_EMOJI_H
 #define EMOJIRUNNER_EMOJI_H
 
 #include <QtCore>
+#include <utility>
 #include <QtWidgets/QListWidgetItem>
 
 
@@ -49,12 +46,6 @@ public:
     bool matchesVersions(const float &configUnicodeVersion, const float &configIosVersion) const;
 
     /**
-     * Returns a QListWidgetItem with the data of the emoji
-     * @return QListWidgetItem
-     */
-    QListWidgetItem *toListWidgetItem() const;
-
-    /**
      * Returns an Emoji instance based on the data from the JSON object
      * @param obj
      * @param categoryKey
@@ -70,7 +61,5 @@ public:
      */
     static void writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath = "", const QString &category = "Custom");
 };
-
-Q_DECLARE_METATYPE(Emoji)
 
 #endif //EMOJIRUNNER_EMOJI_H

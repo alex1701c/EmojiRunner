@@ -90,7 +90,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
         for (const auto &emoji :favouriteCategory.emojis.values()) {
-            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21));
+            matches.append(createQueryMatch(emoji, (qreal) emoji.favourite / 21));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category:emojiCategories) {
@@ -123,7 +123,7 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     }
 }
 
-Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const double relevance) {
+Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal relevance) {
     Plasma::QueryMatch match(this);
     match.setText(emoji.emoji);
 #ifndef stage_dev

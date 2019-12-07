@@ -37,14 +37,6 @@ bool Emoji::matchesVersions(const float &configUnicodeVersion, const float &conf
     return !(unicodeVersion == 0 && iosVersion > configIosVersion);
 }
 
-QListWidgetItem *Emoji::toListWidgetItem() const {
-    auto *item = new QListWidgetItem(this->emoji + " " + this->name);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setCheckState(this->favourite != 0 ? Qt::Checked : Qt::Unchecked);
-    item->setData(Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(this)));
-    return item;
-}
-
 Emoji Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey) {
     Emoji emoji;
     emoji.id = obj.value("id").toInt();

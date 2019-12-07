@@ -13,10 +13,9 @@ endif()
 target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
 target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets ${XDO_LIB})
 
-set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp core/Config.h)
+set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp core/Config.h config/utilities.h)
 
 #add_subdirectory(tests)
-ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS ../cmake-build-debug/emojirunner_dialog.ui)
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS config/emojirunner_config.ui)
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS config/emojirunner_popup.ui)
 add_library(kcm_krunner_emojirunner MODULE ${kcm_krunner_emojirunner_SRCS})

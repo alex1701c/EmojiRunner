@@ -26,7 +26,7 @@ public:
     QFileSystemWatcher watcher;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste = false;
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, double relevance);
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance);
 
     xdo_t *xdo = xdo_new(nullptr);
 

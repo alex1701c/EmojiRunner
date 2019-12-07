@@ -33,7 +33,10 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
 }
 
 EmojiRunner::~EmojiRunner() {
+#ifdef XDO_LIB
     xdo_free(xdo);
+#endif
+
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
@@ -90,7 +93,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
         for (const auto &emoji :favouriteCategory.emojis.values()) {
-            matches.append(createQueryMatch(emoji, (qreal) emoji.favourite / 21));
+            matches.append(createQueryMatch(emoji, emoji.favourite / 21));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category:emojiCategories) {
@@ -112,8 +115,6 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
         // Does not always work
         // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
-        // Works but is slower and starts two new processes
-        // QProcess::startDetached("sh", QStringList() << "-c" << "xdotool key ctrl+v");
 
         // Wait for krunner to be closed before typing
         QTimer::singleShot(10, this, [this]() {
@@ -136,11 +137,15 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal
     return match;
 }
 
+
 void EmojiRunner::emitCTRLV() {
-    // Unfortunately this seems only to work with plain text, help is appreciated
-    //xdo_enter_text_window(xdo, CURRENTWINDOW, str.toStdString().c_str(), 0);
-    // EMit Ctrl+V to paste clipboard content
+#ifdef XDO_LIB
+    // Emit Ctrl+V to paste clipboard content
     xdo_send_keysequence_window(xdo, CURRENTWINDOW, "ctrl+v", 0);
+#else
+    // Works but is slower and starts new process
+    QProcess::startDetached("xdotool", QStringList() << "key" << "ctrl+v");
+#endif
 }
 
 

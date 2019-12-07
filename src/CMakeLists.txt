@@ -7,11 +7,13 @@ add_library(krunner_emojirunner MODULE ${emojirunner_SRCS})
 find_path(XDO_HEADER xdo.h)
 find_library(XDO_LIB "xdo")
 if(NOT XDO_LIB)
-    message(FATAL_ERROR "Could not find libxdo-dev, please install xdotools via your package manager or https://github.com/jordansissel/xdotool")
+    message(WARNING "Could not find libxdo-dev, proceeding with xdotool https://github.com/jordansissel/xdotool")
+    target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets)
+else()
+    add_definitions(-DXDO_LIB)
+    target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
+    target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets ${XDO_LIB})
 endif()
-
-target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
-target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets ${XDO_LIB})
 
 set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp core/Config.h config/utilities.h)
 

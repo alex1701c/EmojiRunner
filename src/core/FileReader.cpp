@@ -3,16 +3,17 @@
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
 #include "FileReader.h"
+#include <core/Config.h>
 
 FileReader::FileReader(const KConfigGroup &config) {
-    for (const auto &idString: config.readEntry("favourites", "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168")
+    for (const auto &idString: config.readEntry(Config::Favourites, Config::DefaultFavourites)
             .split(";", QString::SplitBehavior::SkipEmptyParts)) {
         favouriteIds.append(idString.toInt());
     }
 
-    configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
-    configIosVersion = config.readEntry("iosVersion", "13").toFloat();
-    disabledCategories = config.readEntry("disabledCategories").split(";", QString::SplitBehavior::SkipEmptyParts);
+    configUnicodeVersion = config.readEntry(Config::UnicodeVersion, QVariant(Config::DefaultUnicodeVersion).toFloat());
+    configIosVersion = config.readEntry(Config::IosVersion, QVariant(Config::DefaultIosVersion).toFloat());
+    disabledCategories = config.readEntry(Config::DisabledCategories).split(";", QString::SplitBehavior::SkipEmptyParts);
 }
 
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
@@ -42,7 +43,6 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
                 }
             }
             preconfiguredEmojis.insert(category.name, category);
-
         }
     }
 
@@ -56,7 +56,7 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
     if (!emojis.isObject() || emojis.object().keys().isEmpty()) return categories;
 
     // Initialize config variables
-    auto favourites = EmojiCategory("Favourites");
+    auto favourites = EmojiCategory(Config::FavouritesCategory);
 
     // Read categories and items from object
     const QJsonObject emojiRootObject = emojis.object();

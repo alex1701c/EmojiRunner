@@ -121,6 +121,11 @@ public Q_SLOTS:
      * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView
      */
     void validateEditingOptions();
+
+    /**
+     * Hides/Unhides the search options for the emoji list view to give the results more space
+     */
+    void toggleFavouriteOptions();
 };
 
 #endif

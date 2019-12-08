@@ -7,7 +7,6 @@
 
 class FileReader {
 public:
-    KConfigGroup config;
     QList<int> favouriteIds;
     float configUnicodeVersion;
     float configIosVersion;
@@ -22,8 +21,8 @@ public:
      * Reads the emojis from the different files
      * Rewrite of readJSONFile function but more maintainable and ~20% faster
      *
-     * @param getAllEmojis
-     * @return
+     * @param getAllEmojis If the function should read all emojis or just the valid ones
+     * @return QList<EmojiCategory>
      */
     QList<EmojiCategory> getEmojiCategories(bool getAllEmojis) const;
 
@@ -31,7 +30,7 @@ public:
      * Returns map of category name and emoji list from the given file
      * @param getAllEmojis
      * @param emojiJSONFile
-     * @return
+     * @return QMap<QString, EmojiCategory>
      */
     QMap<QString, EmojiCategory> parseEmojiFile(bool getAllEmojis, QFile &emojiJSONFile) const;
 };

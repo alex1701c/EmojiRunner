@@ -1,6 +1,7 @@
 #include "emojirunner_popup.h"
 
 #include <utility>
+#include <core/Config.h>
 
 EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji) : QDialog(parent) {
     setupUi(this);
@@ -23,7 +24,7 @@ void EmojiRunnerPopup::setDataOfEmoji() {
 }
 
 void EmojiRunnerPopup::writeDataToEmoji() {
-    emoji.category = "Custom";
+    emoji.category = Config::CustomCategory;
     emoji.emoji = this->emojiLineEdit->text();
     emoji.name = this->nameLineEdit->text();
     emoji.tags = this->tagsLineEdit->text().toLower().split(",", QString::SkipEmptyParts);

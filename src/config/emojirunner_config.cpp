@@ -11,6 +11,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "utilities.h"
+#include <core/Config.h>
 
 K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kcm_krunner_emojirunner");)
 
@@ -18,13 +19,17 @@ EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) 
     setupUi(this);
 }
 
+/**
+ * TODO Fix bug that custom emojis are not loaded !!!
+ */
+
 EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) : KCModule(parent, args) {
     m_ui = new EmojiRunnerConfigForm(this);
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
-    config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/emojirunnerrc")
-            ->group("Config");
+    config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName)
+            ->group(Config::RootGroup);
     config.config()->reparseConfiguration();
 
     FileReader reader(config);
@@ -32,7 +37,8 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     disabledEmojiCategoryNames = reader.disabledCategories;
 
     std::sort(emojiCategories.begin(), emojiCategories.end(), [](const EmojiCategory &c1, const EmojiCategory &c2) -> bool {
-        if (c1.name == "Smileys & Emotion") return true;
+        if (c1.name == Config::Config::CustomCategory) return true;
+        if (c1.name == Config::SmileysEmotionsCategory && c2.name != Config::CustomCategory) return true;
         return c1.name < c2.name;
     });
 
@@ -72,21 +78,23 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
     connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(editEmoji()));
     connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
     connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(deleteEmoji()));
+    // Toggle favourite search options
+    connect(m_ui->toggleFavouritesPushButton, SIGNAL(clicked(bool)), this, SLOT(toggleFavouriteOptions()));
 }
 
 void EmojiRunnerConfig::load() {
-    m_ui->enableGlobalSearch->setChecked(config.readEntry("globalSearch", "true") == "true");
-    m_ui->singleRunnerModePaste->setChecked(config.readEntry("singleRunnerModePaste", "true") == "true");
-    m_ui->favouriteFilterDescription_2->setChecked(config.readEntry("searchByDescription", "false") == "true");
-    m_ui->favouriteFilterTags_2->setChecked(config.readEntry("searchByTags", "false") == "true");
+    m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
+    m_ui->singleRunnerModePaste->setChecked(config.readEntry(Config::SingleRunnerModePaste, true));
+    m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
+    m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, false));
 
     // Load categories
     for (const auto &category:emojiCategories) {
-        if (category.name == "Favourites") continue;
+        if (category.name == Config::FavouritesCategory) continue;
         auto *item = new QListWidgetItem();
         item->setText(category.name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        if (category.name == "Custom") customEntriesExist = true;
+        if (category.name == Config::CustomCategory) customEntriesExist = true;
         item->setCheckState(disabledEmojiCategoryNames.contains(category.name) ? Qt::Unchecked : Qt::Checked);
         m_ui->categoryListView->addItem(item);
     }
@@ -95,7 +103,7 @@ void EmojiRunnerConfig::load() {
     QStringList favouriteNames;
     QList<Emoji> favouriteEmojisToAdd;
     for (const auto &category:emojiCategories) {
-        if (category.name != "Favourites") continue;
+        if (category.name != Config::FavouritesCategory) continue;
         favouriteNames = category.emojis.keys();
         for (const auto &emoji:category.emojis.values()) {
             favouriteEmojisToAdd.append(emoji);
@@ -111,7 +119,7 @@ void EmojiRunnerConfig::load() {
     // Load other emojis
     allEmojis.clear();
     for (const auto &category:emojiCategories) {
-        if (category.name == "Favourites") continue;
+        if (category.name == Config::FavouritesCategory) continue;
         for (const auto &emoji:category.emojis.values()) {
             allEmojis.insert(emoji.name, emoji);
             if (favouriteNames.contains(emoji.name)) continue;
@@ -121,13 +129,14 @@ void EmojiRunnerConfig::load() {
     }
 
     // Load versions
-    m_ui->unicodeComboBox->addItems({"3.0", "3.2", "4.0", "4.1", "5.1", "5.2", "6.0", "6.1", "7.0", "8.0", "9.0", "11.0", "12.0"});
-    m_ui->iosComboBox->addItems({"6.0", "8.3", "9.0", "9.1", "10.0", "10.2", "12.1", "13.0"});
-    configUnicodeVersion = config.readEntry("unicodeVersion", "11").toFloat();
-    configIosVersion = config.readEntry("iosVersion", "13").toFloat();
-    m_ui->unicodeComboBox->setCurrentText(config.readEntry("unicodeVersion", "11.0"));
-    m_ui->iosComboBox->setCurrentText(config.readEntry("iosVersion", "13.0"));
+    m_ui->unicodeComboBox->addItems(QString(Config::UnicodeVersionChoices).split(','));
+    m_ui->iosComboBox->addItems(QString(Config::IosVersionChoices).split(','));
+    configUnicodeVersion = config.readEntry(Config::UnicodeVersion, QVariant(Config::DefaultUnicodeVersion).toFloat());
+    configIosVersion = config.readEntry(Config::IosVersion, QVariant(Config::DefaultIosVersion).toFloat());
+    m_ui->unicodeComboBox->setCurrentText(config.readEntry(Config::UnicodeVersion, Config::DefaultUnicodeVersion));
+    m_ui->iosComboBox->setCurrentText(config.readEntry(Config::IosVersion, Config::DefaultIosVersion));
 
+    m_ui->maxFavouritesLabel->setHidden(true);
     categoriesChanged();
     filterActive = true;
     filterEmojiListView();
@@ -139,12 +148,12 @@ void EmojiRunnerConfig::load() {
 
 void EmojiRunnerConfig::save() {
     // Save general settings
-    config.writeEntry("globalSearch", m_ui->enableGlobalSearch->isChecked() ? "true" : "false");
-    config.writeEntry("singleRunnerModePaste", m_ui->singleRunnerModePaste->isChecked() ? "true" : "false");
-    config.writeEntry("searchByTags", m_ui->favouriteFilterTags_2->isChecked() ? "true" : "false");
-    config.writeEntry("searchByDescription", m_ui->favouriteFilterDescription_2->isChecked() ? "true" : "false");
-    config.writeEntry("unicodeVersion", m_ui->unicodeComboBox->currentText());
-    config.writeEntry("iosVersion", m_ui->iosComboBox->currentText());
+    config.writeEntry(Config::GlobalSearch, m_ui->enableGlobalSearch->isChecked());
+    config.writeEntry(Config::SingleRunnerModePaste, m_ui->singleRunnerModePaste->isChecked());
+    config.writeEntry(Config::SearchByTags, m_ui->favouriteFilterTags_2->isChecked());
+    config.writeEntry(Config::SearchByDescription, m_ui->favouriteFilterDescription_2->isChecked());
+    config.writeEntry(Config::UnicodeVersion, m_ui->unicodeComboBox->currentText());
+    config.writeEntry(Config::IosVersion, m_ui->iosComboBox->currentText());
 
     // Save disabled categories
     QString disabledCategories;
@@ -153,7 +162,7 @@ void EmojiRunnerConfig::save() {
         const auto *item = m_ui->categoryListView->item(i);
         if (item->checkState() == Qt::Unchecked) disabledCategories.append(item->text() + ";");
     }
-    config.writeEntry("disabledCategories", disabledCategories);
+    config.writeEntry(Config::DisabledCategories, disabledCategories);
 
     QList<Emoji> customEmojis;
     // Save favourites and search for custom emojis
@@ -165,9 +174,9 @@ void EmojiRunnerConfig::save() {
         if (item->checkState() == Qt::Checked) {
             favouriteIDs.append(QString::number(emoji.id) + ";");
         }
-        if (emoji.category == "Custom") customEmojis.append(emoji);
+        if (emoji.category == Config::CustomCategory) customEmojis.append(emoji);
     }
-    config.writeEntry("favourites", favouriteIDs);
+    config.writeEntry(Config::Favourites, favouriteIDs);
 
     if (!customEmojis.isEmpty()) Emoji::writeToJSONFile(customEmojis);
 
@@ -224,7 +233,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
             }
 
             // If custom is selected only the custom entries are filtered by the criterias
-            if (custom && emoji.category != "Custom") {
+            if (custom && emoji.category != Config::CustomCategory) {
                 item->setHidden(true);
                 continue;
             }
@@ -452,6 +461,15 @@ void EmojiRunnerConfig::validateEditingOptions() {
     const bool disabled = emoji.category != "Custom";
     m_ui->editEmojiPushButton->setDisabled(disabled);
     m_ui->deleteEmojiPushButton->setDisabled(disabled);
+}
+
+void EmojiRunnerConfig::toggleFavouriteOptions() {
+    const bool hide = !m_ui->favouriteFilterGroupBox->isHidden();
+    m_ui->toggleFavouritesPushButton->setIcon(QIcon::fromTheme(hide ? "arrow-down" : "arrow-up"));
+    m_ui->favouriteFilterGroupBox->setHidden(hide);
+    m_ui->sortFavourites->setHidden(hide);
+    m_ui->customButtonsWidget->setHidden(hide);
+    m_ui->fontSizeContainerWidget->setHidden(hide);
 }
 
 

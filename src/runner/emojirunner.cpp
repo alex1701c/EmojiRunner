@@ -1,5 +1,6 @@
 #include "emojirunner.h"
 #include "core/FileReader.h"
+#include "core/Config.h"
 
 #include <KLocalizedString>
 #include <KConfigCore/KConfig>
@@ -20,13 +21,13 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     const QDir configDir(configFolder);
     if (!configDir.exists()) configDir.mkpath(configFolder);
     // Create file
-    QFile configFile(configFolder + "emojirunnerrc");
+    QFile configFile(configFolder + Config::ConfigFileName);
     if (!configFile.exists()) {
         configFile.open(QIODevice::WriteOnly);
         configFile.close();
     }
     // Add file watcher for config
-    watcher.addPath(configFolder + "emojirunnerrc");
+    watcher.addPath(configFolder + Config::ConfigFileName);
     connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(reloadPluginConfiguration(QString)));
     if (QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
     reloadPluginConfiguration();
@@ -40,8 +41,8 @@ EmojiRunner::~EmojiRunner() {
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
-    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/emojirunnerrc")
-            ->group("Config");
+    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName)
+            ->group(Config::RootGroup);
     // Force sync from file
     if (!configFile.isEmpty()) config.config()->reparseConfiguration();
 
@@ -57,14 +58,14 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     FileReader reader(config);
     emojiCategories = reader.getEmojiCategories(false);
 
-    globalSearchEnabled = config.readEntry("globalSearch", "true") == "true";
-    tagSearchEnabled = config.readEntry("searchByTags", "false") == "true";
-    descriptionSearchEnabled = config.readEntry("searchByDescription", "false") == "true";
-    singleRunnerModePaste = config.readEntry("singleRunnerModePaste", "true") == "true";
+    globalSearchEnabled = config.readEntry(Config::GlobalSearch, true);
+    tagSearchEnabled = config.readEntry(Config::SearchByTags, false);
+    descriptionSearchEnabled = config.readEntry(Config::SearchByDescription, false);
+    singleRunnerModePaste = config.readEntry(Config::SingleRunnerModePaste, true);
 
     // Items only change in reload config method => read once and reuse
     for (const auto &category:emojiCategories) {
-        if (category.name == "Favourites") {
+        if (category.name == Config::FavouritesCategory) {
             favouriteCategory = category;
             break;
         }
@@ -97,7 +98,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category:emojiCategories) {
-            if (category.name == "Favourites") continue;
+            if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji :category.emojis.values()) {
                 const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
@@ -113,8 +114,6 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
 
     QApplication::clipboard()->setText(match.text());
     if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
-        // Does not always work
-        // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
 
         // Wait for krunner to be closed before typing
         QTimer::singleShot(10, this, [this]() {
@@ -145,6 +144,9 @@ void EmojiRunner::emitCTRLV() {
 #else
     // Works but is slower and starts new process
     QProcess::startDetached("xdotool", QStringList() << "key" << "ctrl+v");
+
+    // Does not always work
+    // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
 #endif
 }
 

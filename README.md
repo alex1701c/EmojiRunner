@@ -7,7 +7,7 @@ If you don't have colorful emojis please try the solution from https://github.co
 
 ### Required Dependencies
 
-Note: If the build dependency libxdo-dev is not at compile time installed the plugin will use the `xdotool` program to paste emojis 
+Note: If the xdo.h file is not at compile time available the plugin will use the `xdotool` program to paste emojis, 
 but having the library installed is recommended.  
 
 Debian/Ubuntu:  
@@ -15,13 +15,14 @@ Debian/Ubuntu:
 
 openSUSE:  
 `sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel
-ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool kconfigwidgets-devel`  
+ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool-devel kconfigwidgets-devel`  
 
 Fedora:  
 `sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext xdotool`  
 
 Arch (Manjaro):  
 `sudo pacman -S cmake extra-cmake-modules xdotool`  
+*This xdotool package includes the xdo.h file*
 
 ### Build instructions  
 
@@ -76,12 +77,14 @@ This way you can search for emojis without search results from other plugins
 ![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/search_with_prefix.png)  
 
 #### Configure settings
-You can search for emojis, set the unicode level (later versions can not be displayed) and you can enable/disable categories  
+You can search for emojis, set the unicode level (later versions can not be displayed) and you can enable/disable categories.
+Additionally you can sort the favourites using drag and drop  
 ![Search for emojis](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/config.png)  
 
 #### Add a custom emoji
 You must provide a name and and emoji, the description and tags are optional  
 ![Add a custom emoji](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/enter_custom_emoji.png)  
+
 This gets saved in the ~/.local/share/emojirunner/customemojis.json file.  
 In this file you can also override the existing emojis, but you have to do that manually.  
 ![Custom emojis file](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/custom_emojis_file.png)    

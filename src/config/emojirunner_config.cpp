@@ -19,15 +19,12 @@ EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) 
     setupUi(this);
 }
 
-/**
- * TODO Fix bug that custom emojis are not loaded !!!
- */
-
 EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) : KCModule(parent, args) {
     m_ui = new EmojiRunnerConfigForm(this);
     auto *layout = new QGridLayout(this);
     layout->addWidget(m_ui, 0, 0);
 
+    createConfigFile();
     config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName)
             ->group(Config::RootGroup);
     config.config()->reparseConfiguration();

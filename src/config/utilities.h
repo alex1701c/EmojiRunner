@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QListWidgetItem>
 #include <core/Emoji.h>
+#include <core/Config.h>
 
 namespace Utilities {
 
@@ -18,4 +19,20 @@ namespace Utilities {
         return item;
     }
 }
+
+/**
+ * Create the config file and parent folder if they do not exist already
+ */
+void createConfigFile() {
+    const QString configFolder = QDir::homePath() + "/.config/krunnerplugins/";
+    const QDir configDir(configFolder);
+    if (!configDir.exists()) configDir.mkpath(configFolder);
+    // Create file
+    QFile configFile(configFolder + Config::ConfigFileName);
+    if (!configFile.exists()) {
+        configFile.open(QIODevice::WriteOnly);
+        configFile.close();
+    }
+}
+
 #endif //EMOJIRUNNER_UTILITIES_H

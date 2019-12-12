@@ -39,44 +39,8 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
         return c1.name < c2.name;
     });
 
-    // Connect slots for filters
-    connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(changed()));
-    connect(m_ui->enableGlobalSearch, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->singleRunnerModePaste, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->favouriteFilter, SIGNAL(textChanged(QString)), this, SLOT(filterEmojiListView()));
-    connect(m_ui->favouriteFilterName, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
-    connect(m_ui->favouriteFilterDescription, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
-    connect(m_ui->favouriteFilterTags, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
-    connect(m_ui->favouriteFilterDescription_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->favouriteFilterTags_2, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->favouriteFilterCustom, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->favouriteFilterCustom, SIGNAL(clicked(bool)), this, SLOT(filtersChanged()));
-    // Unicode Versions change
-    connect(m_ui->unicodeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(unicodeVersionChanged()));
-    connect(m_ui->unicodeComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
-    connect(m_ui->iosComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(iosVersionChanged()));
-    connect(m_ui->iosComboBox, SIGNAL(currentTextChanged(QString)), this, SLOT(changed()));
-    // Disable categories
-    connect(m_ui->categoryListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(changed()));
-    connect(m_ui->categoryListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(categoriesChanged()));
-    // Sort favourites
-    connect(m_ui->sortFavourites, SIGNAL(clicked(bool)), this, SLOT(showOnlyFavourites()));
-    connect(m_ui->emojiListView, SIGNAL(itemChanged(QListWidgetItem * )), SLOT(checkMaxFavourites()));
-    // For Drag/Drop events
-    connect(m_ui->emojiListView, SIGNAL(currentRowChanged(int)), SLOT(changed()));
-    // Slider for font size
-    connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changed()));
-    connect(m_ui->fontSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFontSize(int)));
-    // Buttons for adding/updating/deleting emojis
-    connect(m_ui->emojiListView, SIGNAL(currentRowChanged(int)), SLOT(validateEditingOptions()));
-    connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->addEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(addEmoji()));
-    connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->editEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(editEmoji()));
-    connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(changed()));
-    connect(m_ui->deleteEmojiPushButton, SIGNAL(clicked(bool)), this, SLOT(deleteEmoji()));
-    // Toggle favourite search options
-    connect(m_ui->toggleFavouritesPushButton, SIGNAL(clicked(bool)), this, SLOT(toggleFavouriteOptions()));
+    connectSignals();
+    m_ui->emojiListView->setUniformItemSizes(true);
 }
 
 void EmojiRunnerConfig::load() {
@@ -134,12 +98,11 @@ void EmojiRunnerConfig::load() {
     m_ui->iosComboBox->setCurrentText(config.readEntry(Config::IosVersion, Config::DefaultIosVersion));
 
     m_ui->maxFavouritesLabel->setHidden(true);
+    validateEditingOptions();
     categoriesChanged();
+    // TODO Remove filter active property
     filterActive = true;
     filterEmojiListView();
-    validateEditingOptions();
-
-    emit changed(true);
 }
 
 
@@ -205,8 +168,59 @@ void EmojiRunnerConfig::defaults() {
     emit changed(true);
 }
 
+
+void EmojiRunnerConfig::connectSignals() {
+    // Initialize function pointers
+    const auto changedSlotPointer = static_cast<void (EmojiRunnerConfig::*)()>(&EmojiRunnerConfig::changed);
+    const auto comboBoxIndexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
+    const auto listWidgetRowChanged = static_cast<void (QListWidget::*)(int)>(&QListWidget::currentRowChanged);
+    const auto listWidgetItemChanged = static_cast<void (QListWidget::*)(QListWidgetItem *)>(&QListWidget::itemChanged);
+
+    // Connect slots for filters
+    connect(m_ui->emojiListView, &QListWidget::itemChanged, this, changedSlotPointer);
+    connect(m_ui->enableGlobalSearch, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->singleRunnerModePaste, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->favouriteFilter, &QLineEdit::textChanged, this, &EmojiRunnerConfig::filterEmojiListView);
+    connect(m_ui->favouriteFilterName, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
+    connect(m_ui->favouriteFilterDescription, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
+    connect(m_ui->favouriteFilterTags, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
+    connect(m_ui->favouriteFilterDescription_2, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->favouriteFilterTags_2, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->favouriteFilterCustom, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->favouriteFilterCustom, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
+    // Unicode Versions change
+    connect(m_ui->unicodeComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::unicodeVersionChanged);
+    connect(m_ui->unicodeComboBox, comboBoxIndexChanged, this, changedSlotPointer);
+    connect(m_ui->iosComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::iosVersionChanged);
+    connect(m_ui->iosComboBox, comboBoxIndexChanged, this, changedSlotPointer);
+    // Disable categories
+    connect(m_ui->categoryListView, listWidgetItemChanged, this, changedSlotPointer);
+    connect(m_ui->categoryListView, listWidgetItemChanged, this, &EmojiRunnerConfig::categoriesChanged);
+    // Sort favourites
+    connect(m_ui->sortFavourites, &QCheckBox::clicked, this, &EmojiRunnerConfig::showOnlyFavourites);
+    connect(m_ui->emojiListView, listWidgetItemChanged, this, &EmojiRunnerConfig::checkMaxFavourites);
+    // For Drag/Drop events
+    connect(m_ui->emojiListView, listWidgetRowChanged, this, changedSlotPointer);
+    // Slider for font size
+    connect(m_ui->fontSizeSlider, &QSlider::valueChanged, this, changedSlotPointer);
+    connect(m_ui->fontSizeSlider, &QSlider::valueChanged, this, &EmojiRunnerConfig::changeFontSize);
+    // Buttons for adding/updating/deleting emojis
+    connect(m_ui->emojiListView, listWidgetRowChanged, this, &EmojiRunnerConfig::validateEditingOptions);
+    connect(m_ui->addEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->addEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::addEmoji);
+    connect(m_ui->editEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->editEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::editEmoji);
+    connect(m_ui->deleteEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
+    connect(m_ui->deleteEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::deleteEmoji);
+    // Toggle favourite search options
+    connect(m_ui->toggleFavouritesPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::toggleFavouriteOptions);
+
+}
+
 void EmojiRunnerConfig::filterEmojiListView() {
-    if (!filterActive) return;
+    if (!filterActive) {
+        return;
+    }
 
     const QString text = m_ui->favouriteFilter->text().toLower();
     const int count = m_ui->emojiListView->count();
@@ -219,6 +233,12 @@ void EmojiRunnerConfig::filterEmojiListView() {
         bool filterTags = favouriteFilters.contains("tags");
         bool custom = favouriteFilters.contains("custom");
         for (int i = 0; i < count; ++i) {
+
+            // Process events, otherwise the search delays the GUI updates
+            if (i % 100 == 0) {
+                QApplication::processEvents();
+            }
+
             auto *item = m_ui->emojiListView->item(i);
             const auto emoji = allEmojis.value(item->data(Qt::UserRole).toString());
             bool hidden = true;
@@ -248,7 +268,9 @@ void EmojiRunnerConfig::filterEmojiListView() {
             }
             if (emoji.matchesVersions(configUnicodeVersion, configIosVersion) || item->checkState() == Qt::Checked) {
                 item->setHidden(hidden);
-            } else item->setHidden(true);
+            } else {
+                item->setHidden(true);
+            }
         }
     }
 
@@ -256,7 +278,8 @@ void EmojiRunnerConfig::filterEmojiListView() {
 }
 
 
-void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
+void EmojiRunnerConfig::filtersChanged() {
+    // TODO converte filters to class variables
     // Enable/Disable the filter checkboxes and trigger search event
     int checked = 0;
     favouriteFilters.clear();
@@ -294,7 +317,9 @@ void EmojiRunnerConfig::filtersChanged(bool reloadFilter) {
         m_ui->favouriteFilterDescription->setDisabled(false);
     }
 
-    if (reloadFilter && (!m_ui->favouriteFilter->text().isEmpty() || customFilterChanged)) filterEmojiListView();
+    if (!m_ui->favouriteFilter->text().isEmpty() || customFilterChanged) {
+        filterEmojiListView();
+    }
 }
 
 void EmojiRunnerConfig::categoriesChanged() {
@@ -352,6 +377,10 @@ void EmojiRunnerConfig::unhideAll() {
     const bool custom = favouriteFilters.contains("custom");
 
     for (int i = 0; i < itemCount; ++i) {
+        // Process events, otherwise the search delays the GUI updates
+        if (i % 100 == 0) {
+            QApplication::processEvents();
+        }
         auto *item = m_ui->emojiListView->item(i);
         const auto emoji = allEmojis.value(item->data(Qt::UserRole).toString());
         item->setHidden(
@@ -392,9 +421,12 @@ void EmojiRunnerConfig::checkMaxFavourites() {
 }
 
 void EmojiRunnerConfig::changeFontSize(int value) {
-    auto f = QFont(m_ui->emojiListView->font());
-    f.setPixelSize(value / 2);
-    m_ui->emojiListView->setFont(f);
+    this->newFontSize = value;
+    QTimer::singleShot(0, this, [this]() {
+        auto f = QFont(m_ui->emojiListView->font());
+        f.setPixelSize(newFontSize / 2);
+        m_ui->emojiListView->setFont(f);
+    });
 }
 
 void EmojiRunnerConfig::addEmoji() {

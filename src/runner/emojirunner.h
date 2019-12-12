@@ -37,7 +37,7 @@ public:
 
     /**
      * Emits the Ctrl+V key combination. If the xdo.h file was available at compile time it uses the api,
-     * otherwise ist starts a new xdotool process
+     * otherwise it starts a new xdotool process
      */
     void emitCTRLV();
 

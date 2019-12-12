@@ -26,6 +26,7 @@ private:
     bool customFilterChecked = false;
     float configUnicodeVersion;
     float configIosVersion;
+    int newFontSize;
 
     QList<EmojiCategory> emojiCategories;
     QMap<QString, Emoji> allEmojis;
@@ -43,6 +44,8 @@ public Q_SLOTS:
 
     void defaults() override;
 
+    void connectSignals();
+
     /**
      * Filters emojis based on filters and the search term
      */
@@ -52,7 +55,7 @@ public Q_SLOTS:
      * Enable/Disable filter checkboxes and search with new filters
      * @param reloadFilter
      */
-    void filtersChanged(bool reloadFilter = true);
+    void filtersChanged();
 
     /**
      * Check for newly enabled/disabled categories and add/remove the emojis

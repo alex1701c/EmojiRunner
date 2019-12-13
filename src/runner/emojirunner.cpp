@@ -28,7 +28,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     }
     // Add file watcher for config
     watcher.addPath(configFolder + Config::ConfigFileName);
-    connect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(reloadPluginConfiguration(QString)));
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &EmojiRunner::reloadPluginConfiguration);
     if (QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
     reloadPluginConfiguration();
 }
@@ -52,7 +52,9 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
         if (QFile::exists(configFile)) {
             watcher.addPath(configFile);
         }
-        if (configFile != customEmojiFile && QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
+        if (configFile != customEmojiFile && QFile::exists(customEmojiFile)) {
+            watcher.addPath(customEmojiFile);
+        }
     }
 
     FileReader reader(config);

@@ -21,17 +21,19 @@ Q_OBJECT
 private:
     EmojiRunnerConfigForm *m_ui;
     KConfigGroup config;
-    bool filterActive = false;
     bool customEntriesExist = false;
-    bool customFilterChecked = false;
+    bool customFilterWasChecked = false;
     float configUnicodeVersion;
     float configIosVersion;
-    int newFontSize;
+
+    bool filterName = true;
+    bool filterDescription = false;
+    bool filterTags = false;
+    bool filterCustom = false;
 
     QList<EmojiCategory> emojiCategories;
     QMap<QString, Emoji> allEmojis;
     QStringList disabledEmojiCategoryNames;
-    QStringList favouriteFilters = {"name"};
 
 public:
     explicit EmojiRunnerConfig(QWidget *parent = nullptr, const QVariantList &args = QVariantList());

@@ -100,8 +100,6 @@ void EmojiRunnerConfig::load() {
     m_ui->maxFavouritesLabel->setHidden(true);
     validateEditingOptions();
     categoriesChanged();
-    // TODO Remove filter active property
-    filterActive = true;
     filterEmojiListView();
 }
 
@@ -170,7 +168,7 @@ void EmojiRunnerConfig::defaults() {
 
 
 void EmojiRunnerConfig::connectSignals() {
-    // Initialize function pointers
+    // Initialize function pointers that require method overloading
     const auto changedSlotPointer = static_cast<void (EmojiRunnerConfig::*)()>(&EmojiRunnerConfig::changed);
     const auto comboBoxIndexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
     const auto listWidgetRowChanged = static_cast<void (QListWidget::*)(int)>(&QListWidget::currentRowChanged);
@@ -218,20 +216,12 @@ void EmojiRunnerConfig::connectSignals() {
 }
 
 void EmojiRunnerConfig::filterEmojiListView() {
-    if (!filterActive) {
-        return;
-    }
-
     const QString text = m_ui->favouriteFilter->text().toLower();
     const int count = m_ui->emojiListView->count();
 
     if (text.isEmpty()) {
         unhideAll();
     } else {
-        bool filterName = favouriteFilters.contains("name");
-        bool filterDescription = favouriteFilters.contains("description");
-        bool filterTags = favouriteFilters.contains("tags");
-        bool custom = favouriteFilters.contains("custom");
         for (int i = 0; i < count; ++i) {
 
             // Process events, otherwise the search delays the GUI updates
@@ -250,7 +240,7 @@ void EmojiRunnerConfig::filterEmojiListView() {
             }
 
             // If custom is selected only the custom entries are filtered by the criterias
-            if (custom && emoji.category != Config::CustomCategory) {
+            if (filterCustom && emoji.category != Config::CustomCategory) {
                 item->setHidden(true);
                 continue;
             }
@@ -281,36 +271,37 @@ void EmojiRunnerConfig::filterEmojiListView() {
 void EmojiRunnerConfig::filtersChanged() {
     // TODO converte filters to class variables
     // Enable/Disable the filter checkboxes and trigger search event
-    int checked = 0;
-    favouriteFilters.clear();
-    if (m_ui->favouriteFilterName->isChecked()) {
-        checked++;
-        favouriteFilters.append("name");
-    }
-    if (m_ui->favouriteFilterTags->isChecked()) {
-        checked++;
-        favouriteFilters.append("tags");
-    }
-    if (m_ui->favouriteFilterDescription->isChecked()) {
-        checked++;
-        favouriteFilters.append("description");
-    }
+    filterName = m_ui->favouriteFilterName->isChecked();
+    filterTags = m_ui->favouriteFilterTags->isChecked();
+    filterDescription = m_ui->favouriteFilterDescription->isChecked();
+
+    // The custom filter changes the results, even if there is no query typed
     bool customFilterChanged = false;
-    if (m_ui->favouriteFilterCustom->isChecked()) {
-        favouriteFilters.append("custom");
-        if (!customFilterChecked) customFilterChanged = true;
-        customFilterChecked = true;
+    filterCustom = m_ui->favouriteFilterCustom->isChecked();
+    if (filterCustom) {
+        if (!customFilterWasChecked) customFilterChanged = true;
+        customFilterWasChecked = true;
     } else {
-        if (customFilterChecked) {
+        if (customFilterWasChecked) {
             customFilterChanged = true;
         }
-        customFilterChecked = false;
+        customFilterWasChecked = false;
+    }
+    int checked = 0;
+    if (filterName) {
+        ++checked;
+    }
+    if (filterTags) {
+        ++checked;
+    }
+    if (filterDescription) {
+        ++checked;
     }
 
-    if (checked == 1) {
-        if (m_ui->favouriteFilterName->isChecked()) m_ui->favouriteFilterName->setDisabled(true);
-        else if (m_ui->favouriteFilterTags->isChecked()) m_ui->favouriteFilterTags->setDisabled(true);
-        else m_ui->favouriteFilterDescription->setDisabled(true);
+    if (checked == 0) {
+        m_ui->favouriteFilterName->setDisabled(true);
+        m_ui->favouriteFilterTags->setDisabled(true);
+        m_ui->favouriteFilterDescription->setDisabled(true);
     } else {
         m_ui->favouriteFilterName->setDisabled(false);
         m_ui->favouriteFilterTags->setDisabled(false);
@@ -347,14 +338,12 @@ void EmojiRunnerConfig::showOnlyFavourites() {
 
 
     if (checked) {
-        filterActive = false;
         for (int i = 0; i < itemCount; ++i) {
             auto *item = m_ui->emojiListView->item(i);
             item->setHidden(item->checkState() == Qt::Unchecked);
         }
     } else {
         unhideAll();
-        filterActive = true;
     }
 
     displayVisibleItems();
@@ -374,7 +363,6 @@ void EmojiRunnerConfig::iosVersionChanged() {
 
 void EmojiRunnerConfig::unhideAll() {
     const int itemCount = m_ui->emojiListView->count();
-    const bool custom = favouriteFilters.contains("custom");
 
     for (int i = 0; i < itemCount; ++i) {
         // Process events, otherwise the search delays the GUI updates
@@ -389,7 +377,7 @@ void EmojiRunnerConfig::unhideAll() {
                          disabledEmojiCategoryNames.contains(emoji.category)
                  )
                  && item->checkState() == Qt::Unchecked) ||
-                (custom && emoji.category != "Custom")
+                (filterCustom && emoji.category != "Custom")
         );
     }
 }
@@ -421,10 +409,9 @@ void EmojiRunnerConfig::checkMaxFavourites() {
 }
 
 void EmojiRunnerConfig::changeFontSize(int value) {
-    this->newFontSize = value;
-    QTimer::singleShot(0, this, [this]() {
+    QTimer::singleShot(0, this, [this, value]() {
         auto f = QFont(m_ui->emojiListView->font());
-        f.setPixelSize(newFontSize / 2);
+        f.setPixelSize(value / 2);
         m_ui->emojiListView->setFont(f);
     });
 }
@@ -432,7 +419,7 @@ void EmojiRunnerConfig::changeFontSize(int value) {
 void EmojiRunnerConfig::addEmoji() {
     auto *popup = new EmojiRunnerPopup(this);
     popup->show();
-    connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
+    connect(popup, &EmojiRunnerPopup::finished, this, &EmojiRunnerConfig::applyEmojiPopupResults);
 }
 
 void EmojiRunnerConfig::editEmoji() {
@@ -440,7 +427,7 @@ void EmojiRunnerConfig::editEmoji() {
     if (item != nullptr) {
         auto *popup = new EmojiRunnerPopup(this, allEmojis.value(item->data(Qt::UserRole).toString()));
         popup->show();
-        connect(popup, SIGNAL(finished(Emoji, QString)), this, SLOT(applyEmojiPopupResults(Emoji, QString)));
+        connect(popup, &EmojiRunnerPopup::finished, this, &EmojiRunnerConfig::applyEmojiPopupResults);
     }
 }
 

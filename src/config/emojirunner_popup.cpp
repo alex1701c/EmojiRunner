@@ -10,9 +10,9 @@ EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji) : QDialog(paren
     this->originalName = this->emoji.name;
     setDataOfEmoji();
 
-    connect(this->buttonBox, SIGNAL(accepted()), this, SLOT(writeDataToEmoji()));
-    connect(this->nameLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validateButtonBox()));
-    connect(this->emojiLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validateButtonBox()));
+    connect(this->buttonBox, &QDialogButtonBox::accepted, this, &EmojiRunnerPopup::writeDataToEmoji);
+    connect(this->nameLineEdit, &QLineEdit::textChanged, this, &EmojiRunnerPopup::validateButtonBox);
+    connect(this->emojiLineEdit, &QLineEdit::textChanged, this, &EmojiRunnerPopup::validateButtonBox);
     validateButtonBox();
 }
 

@@ -351,6 +351,9 @@
                <property name="dragDropMode">
                 <enum>QAbstractItemView::InternalMove</enum>
                </property>
+               <property name="uniformItemSizes">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>

@@ -26,9 +26,9 @@ public:
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
-    bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste = false;
+    bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste;
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance);
+    Plasma::QueryMatch createQueryMatch(const Emoji *emoji, qreal relevance);
 
 #ifdef XDO_LIB
     xdo_t *xdo = xdo_new(nullptr);

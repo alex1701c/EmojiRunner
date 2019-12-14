@@ -32,7 +32,6 @@ private:
     bool filterCustom = false;
 
     QList<EmojiCategory> emojiCategories;
-    QMap<QString, Emoji> allEmojis;
     QStringList disabledEmojiCategoryNames;
 
 public:
@@ -46,6 +45,9 @@ public Q_SLOTS:
 
     void defaults() override;
 
+    /**
+     * Connect all the signals and slots
+     */
     void connectSignals();
 
     /**
@@ -80,14 +82,9 @@ public Q_SLOTS:
     void iosVersionChanged();
 
     /**
-     * Show all items if they mathe the unicode version or if they are checked
-     */
-    void unhideAll();
-
-    /**
      * Count visible items and update the value in the UI
      */
-    void displayVisibleItems() const;
+    void displayVisibleItems();
 
     /**
      * Checks if the number of favourites is greater than 20, if true it shows the maxFavouritesLabel with a warning
@@ -120,7 +117,7 @@ public Q_SLOTS:
      * @param emoji
      * @param originalName
      */
-    void applyEmojiPopupResults(const Emoji &emoji, const QString &originalName = "");
+    void applyEmojiPopupResults(Emoji *emoji, int idx);
 
     /**
      * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView

@@ -1,13 +1,12 @@
 #include "emojirunner_popup.h"
 
-#include <utility>
 #include <core/Config.h>
 
-EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji) : QDialog(parent) {
+EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji *emoji, int idx) : QDialog(parent) {
     setupUi(this);
 
-    this->emoji = std::move(emoji);
-    this->originalName = this->emoji.name;
+    this->idx = idx;
+    this->emoji = emoji;
     setDataOfEmoji();
 
     connect(this->buttonBox, &QDialogButtonBox::accepted, this, &EmojiRunnerPopup::writeDataToEmoji);
@@ -17,20 +16,20 @@ EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji) : QDialog(paren
 }
 
 void EmojiRunnerPopup::setDataOfEmoji() {
-    this->emojiLineEdit->setText(emoji.emoji);
-    this->nameLineEdit->setText(emoji.name);
-    this->tagsLineEdit->setText(emoji.tags.join(","));
-    this->descriptionLineEdit->setText(emoji.description);
+    this->emojiLineEdit->setText(emoji->emoji);
+    this->nameLineEdit->setText(emoji->name);
+    this->tagsLineEdit->setText(emoji->tags.join(","));
+    this->descriptionLineEdit->setText(emoji->description);
 }
 
 void EmojiRunnerPopup::writeDataToEmoji() {
-    emoji.category = Config::CustomCategory;
-    emoji.emoji = this->emojiLineEdit->text();
-    emoji.name = this->nameLineEdit->text();
-    emoji.tags = this->tagsLineEdit->text().toLower().split(",", QString::SkipEmptyParts);
-    emoji.description = this->descriptionLineEdit->text();
+    emoji->category = Config::CustomCategory;
+    emoji->emoji = this->emojiLineEdit->text();
+    emoji->name = this->nameLineEdit->text();
+    emoji->tags = this->tagsLineEdit->text().toLower().split(",", QString::SkipEmptyParts);
+    emoji->description = this->descriptionLineEdit->text();
     // Give name as parameter to find the existing item if the emoji has been updated
-    emit finished(this->emoji, this->originalName);
+    emit finished(this->emoji, idx);
 }
 
 void EmojiRunnerPopup::validateButtonBox() {

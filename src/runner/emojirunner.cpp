@@ -37,7 +37,6 @@ EmojiRunner::~EmojiRunner() {
 #ifdef XDO_LIB
     xdo_free(xdo);
 #endif
-
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
@@ -95,14 +94,14 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     }
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
-        for (const auto &emoji :favouriteCategory.emojis.values()) {
-            matches.append(createQueryMatch(emoji, emoji.favourite / 21));
+        for (auto *emoji :favouriteCategory.emojis) {
+            matches.append(createQueryMatch(emoji, emoji->favourite / 21));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category:emojiCategories) {
             if (category.name == Config::FavouritesCategory) continue;
-            for (const auto &emoji :category.emojis.values()) {
-                const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
+            for (const auto &emoji :category.emojis) {
+                const double relevance = emoji->getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
                 matches.append(createQueryMatch(emoji, relevance));
             }
@@ -125,15 +124,15 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     }
 }
 
-Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal relevance) {
+Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal relevance) {
     Plasma::QueryMatch match(this);
-    match.setText(emoji.emoji);
+    match.setText(emoji->emoji);
 #ifndef stage_dev
-    match.setSubtext(emoji.name);
+    match.setSubtext(emoji->name);
 #else
-    match.setSubtext(QString(emoji.name).replace("_", " ") + " ---- " + QString::number(relevance));
+    match.setSubtext(QString(emoji->name).replace("_", " ") + " ---- " + QString::number(relevance));
 #endif
-    match.setData(emoji.emoji);
+    match.setData(emoji->emoji);
     match.setRelevance(relevance);
     return match;
 }

@@ -11,11 +11,11 @@ namespace Utilities {
  * Returns a QListWidgetItem with the data of the emoji
  * @return QListWidgetItem
  */
-    QListWidgetItem *toListWidgetItem(const Emoji &emoji) {
-        auto *item = new QListWidgetItem(emoji.emoji + " " + emoji.name);
+    QListWidgetItem *toListWidgetItem(const Emoji *emoji) {
+        auto *item = new QListWidgetItem(emoji->emoji + " " + emoji->name);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(emoji.favourite != 0 ? Qt::Checked : Qt::Unchecked);
-        item->setData(Qt::UserRole, emoji.name);
+        item->setCheckState(emoji->favourite != 0 ? Qt::Checked : Qt::Unchecked);
+        item->setData(Qt::UserRole, QVariant::fromValue(reinterpret_cast<quintptr>(emoji)));
         return item;
     }
 }

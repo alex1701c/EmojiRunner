@@ -8,10 +8,11 @@
 
 class EmojiRunnerPopup : public QDialog, public Ui::Dialog {
 Q_OBJECT
-    QString originalName;
-    Emoji emoji;
+    Emoji *emoji;
+    // Index of item that gets changes/created
+    int idx;
 public:
-    explicit EmojiRunnerPopup(QWidget *parent, Emoji emoji = Emoji());
+    explicit EmojiRunnerPopup(QWidget *parent, Emoji *emoji = new Emoji(), int idx = -1);
 
     void setDataOfEmoji();
 
@@ -23,7 +24,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void finished(Emoji, QString);
+    void finished(Emoji *, int);
 };
 
 

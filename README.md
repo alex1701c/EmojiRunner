@@ -1,6 +1,6 @@
 ## Emoji Runner
 
-This plugin allows you to search, copy and  paste emojis/symbols.
+This plugin allows you to search, copy and paste emojis/symbols.
 
 Additionally you can configure favourites, set the unicode version, enable/disable categories and add custom emojis.  
 If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/ 
@@ -86,5 +86,4 @@ You must provide a name and and emoji, the description and tags are optional
 ![Add a custom emoji](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/enter_custom_emoji.png)  
 
 This gets saved in the ~/.local/share/emojirunner/customemojis.json file.  
-In this file you can also override the existing emojis, but you have to do that manually.  
 ![Custom emojis file](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/custom_emojis_file.png)    

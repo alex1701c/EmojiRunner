@@ -38,8 +38,8 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
         for (auto &category:customEmojiMap.values()) {
             if (preconfiguredEmojis.contains(category.name)) {
                 const EmojiCategory existingCategory = preconfiguredEmojis.value(category.name);
-                for (const auto &emoji:existingCategory.emojis.values()) {
-                    category.emojis.insert(emoji.name, emoji);
+                for (auto *emoji:existingCategory.emojis) {
+                    category.emojis.append(emoji);
                 }
             }
             preconfiguredEmojis.insert(category.name, category);
@@ -75,18 +75,18 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
         // Add emojis to category
         for (const auto &item:items) {
             if (!item.isObject()) continue;
-            Emoji customEmoji = Emoji::fromJSON(item.toObject(), key);
+            Emoji *newEmoji = Emoji::fromJSON(item.toObject(), key);
             // Add emoji to the favourites list
-            const int favouritesIdx = favouriteIds.indexOf(customEmoji.id);
+            const int favouritesIdx = favouriteIds.indexOf(newEmoji->id);
             // Favourites have extra list for overview
             if (favouritesIdx != -1) {
-                customEmoji.favourite = 21 - favouritesIdx;
-                favourites.emojis.insert(customEmoji.name, customEmoji);
+                newEmoji->favourite = 21 - favouritesIdx;
+                favourites.emojis.append(newEmoji);
             }
             // Add emoji to category
-            if (getAllEmojis || customEmoji.favourite != 0 ||
-                (!categoryDisabled && customEmoji.matchesVersions(configUnicodeVersion, configIosVersion))) {
-                category.emojis.insert(customEmoji.name, customEmoji);
+            if (getAllEmojis || newEmoji->favourite != 0 ||
+                (!categoryDisabled && newEmoji->matchesVersions(configUnicodeVersion, configIosVersion))) {
+                category.emojis.append(newEmoji);
             }
         }
         if (!category.emojis.isEmpty()) categories.insert(category.name, category);

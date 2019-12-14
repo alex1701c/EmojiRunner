@@ -10,7 +10,7 @@
 class EmojiCategory {
 public:
     QString name;
-    QMap<QString, Emoji> emojis;
+    QList<Emoji *> emojis;
 
     EmojiCategory() = default;
 

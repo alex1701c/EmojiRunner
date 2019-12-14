@@ -12,7 +12,7 @@ double Emoji::getEmojiRelevance(const QString &search, const bool tagSearch, con
     double res = getMatchTextRelevance(search, tagSearch, descriptionSearch);
 
     if (res == -1) return res;
-    if (this->favourite != 0) res += 0.5;
+    if (this->favourite != 0) res += 0.25;
     if (this->category == Config::SmileysEmotionsCategory || this->category == Config::CustomCategory) res *= 2;
     return res;
 }

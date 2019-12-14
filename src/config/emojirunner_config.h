@@ -21,6 +21,7 @@ Q_OBJECT
 private:
     EmojiRunnerConfigForm *m_ui;
     KConfigGroup config;
+    bool loaded = false;
     bool customEntriesExist = false;
     bool customFilterWasChecked = false;
     float configUnicodeVersion;
@@ -36,6 +37,8 @@ private:
 
 public:
     explicit EmojiRunnerConfig(QWidget *parent = nullptr, const QVariantList &args = QVariantList());
+
+    ~EmojiRunnerConfig() override;
 
 public Q_SLOTS:
 

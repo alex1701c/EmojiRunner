@@ -41,6 +41,11 @@ public:
      */
     void emitCTRLV();
 
+    /**
+     * Deletes the emojis
+     */
+    void deleteEmojiPointers();
+
 public: // Plasma::AbstractRunner API
 
     void match(Plasma::RunnerContext &context) override;

@@ -4,7 +4,6 @@
 #include <KPluginFactory>
 #include <krunner/abstractrunner.h>
 #include <core/FileReader.h>
-#include <QDebug>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QInputDialog>
@@ -43,7 +42,23 @@ EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args) 
 
 }
 
+EmojiRunnerConfig::~EmojiRunnerConfig() {
+    for (auto &category:emojiCategories) {
+        if (category.name == Config::FavouritesCategory) {
+            continue;
+        }
+        qDeleteAll(category.emojis);
+        category.emojis.clear();
+    }
+}
+
 void EmojiRunnerConfig::load() {
+    // Load method gets also called when exiting config dialog without saving
+    if (loaded) {
+        return;
+    }
+    loaded = true;
+
     m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
     m_ui->singleRunnerModePaste->setChecked(config.readEntry(Config::SingleRunnerModePaste, true));
     m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
@@ -214,8 +229,6 @@ void EmojiRunnerConfig::connectSignals() {
 }
 
 void EmojiRunnerConfig::filterEmojiListView() {
-    qInfo() << "filter emoji list view";
-    QTime t = QTime::currentTime();
     const QString text = m_ui->favouriteFilter->text().toLower();
     const int count = m_ui->emojiListView->count();
     const bool unhideAllEnabledEmojis = filterName && filterTags && filterTags && text.isEmpty();
@@ -278,7 +291,6 @@ void EmojiRunnerConfig::filterEmojiListView() {
         }
     }
     displayVisibleItems();
-    qInfo() << t.msecsTo(QTime::currentTime());
 }
 
 

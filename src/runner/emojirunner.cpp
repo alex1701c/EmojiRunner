@@ -9,7 +9,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 
 
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
@@ -37,9 +36,11 @@ EmojiRunner::~EmojiRunner() {
 #ifdef XDO_LIB
     xdo_free(xdo);
 #endif
+    deleteEmojiPointers();
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
+    deleteEmojiPointers();
     KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName)
             ->group(Config::RootGroup);
     // Force sync from file
@@ -95,7 +96,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
         for (auto *emoji :favouriteCategory.emojis) {
-            matches.append(createQueryMatch(emoji, emoji->favourite / 21));
+            matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category:emojiCategories) {
@@ -130,7 +131,7 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal
 #ifndef stage_dev
     match.setSubtext(emoji->name);
 #else
-    match.setSubtext(QString(emoji->name).replace("_", " ") + " ---- " + QString::number(relevance));
+    match.setText(emoji->emoji + " " + emoji->name + " ---- " + QString::number(relevance));
 #endif
     match.setData(emoji->emoji);
     match.setRelevance(relevance);
@@ -149,6 +150,16 @@ void EmojiRunner::emitCTRLV() {
     // Does not always work
     // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
 #endif
+}
+
+void EmojiRunner::deleteEmojiPointers() {
+    // Delete pointers if config reloads
+    for (const auto &category:emojiCategories) {
+        if (category.name == Config::FavouritesCategory) {
+            continue;
+        }
+        qDeleteAll(category.emojis);
+    }
 }
 
 

@@ -1,21 +1,21 @@
 add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.emojirunner\")
 
-set(emojirunner_SRCS runner/emojirunner.cpp core/Emoji.cpp core/EmojiCategory.h core/FileReader.cpp core/Config.h)
+set(emojirunner_SRCS runner/emojirunner.cpp core/Emoji.cpp core/EmojiCategory.h core/FileReader.cpp)
 add_library(krunner_emojirunner MODULE ${emojirunner_SRCS})
 
 
 find_path(XDO_HEADER xdo.h)
 find_library(XDO_LIB "xdo")
-if(NOT XDO_LIB)
+if (NOT XDO_LIB)
     message(WARNING "Could not find libxdo-dev, proceeding with xdotool https://github.com/jordansissel/xdotool")
     target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets)
-else()
+else ()
     add_definitions(-DXDO_LIB)
     target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
     target_link_libraries(krunner_emojirunner KF5::Runner KF5::I18n Qt5::Widgets ${XDO_LIB})
-endif()
+endif ()
 
-set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp core/Config.h config/utilities.h)
+set(kcm_krunner_emojirunner_SRCS config/emojirunner_config.cpp core/Emoji.cpp core/FileReader.cpp config/emojirunner_popup.cpp)
 
 #add_subdirectory(tests)
 ki18n_wrap_ui(kcm_krunner_emojirunner_SRCS config/emojirunner_config.ui)

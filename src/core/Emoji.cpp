@@ -25,7 +25,7 @@ double Emoji::getMatchTextRelevance(const QString &search, const bool tagSearch,
         return (double) search.size() / (this->description.length() * 8);
     }
     if (tagSearch) {
-        for (const auto &tag:this->tags) {
+        for (const auto &tag: qAsConst(this->tags)) {
             if (tag.contains(search)) return (double) search.size() / (tag.length() * 8);
         }
     }

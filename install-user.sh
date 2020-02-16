@@ -22,7 +22,7 @@ if [[ -z "${QT_PLUGIN_PATH}" || "${QT_PLUGIN_PATH}" != *".local/lib/qt/plugins/"
     export QT_PLUGIN_PATH=~/.local/lib/qt/plugins/:$QT_PLUGIN_PATH
 fi
 
-cmake -DQT_PLUGIN_INSTALL_DIR="~/.local/lib/qt/plugins" -DKDE_INSTALL_KSERVICES5DIR="~/.local/share/kservices5" -DEMOJI_FILE_INSTALL_DIR="~/.local/share/emojirunner/" -DCMAKE_BUILD_TYPE=Release  ..
+cmake -DKDE_INSTALL_QTPLUGINDIR="~/.local/lib/qt/plugins" -DKDE_INSTALL_KSERVICES5DIR="~/.local/share/kservices5" -DEMOJI_FILE_INSTALL_DIR="~/.local/share/emojirunner/" -DCMAKE_BUILD_TYPE=Release  ..
 make -j$(nproc)
 make install
 

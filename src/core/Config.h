@@ -1,12 +1,18 @@
 #ifndef EMOJIRUNNER_CONFIG_H
 #define EMOJIRUNNER_CONFIG_H
 
-
+namespace {
 struct Config {
     // General config keys
     constexpr static const auto ConfigFileName = "emojirunnerrc";
+    const static QString ConfigFilePath;
+    const static QString GlobalEmojiFilePath;
+    const static QString LocalEmojiFilePath;
+    const static QString CustomEmojiFilePath;
     constexpr static const auto RootGroup = "Config";
     constexpr static const auto GlobalSearch = "globalSearch";
+    constexpr static const auto PasteAction = "pasteAction";
+    constexpr static const auto PasteTimeout = "pasteTimeout";
     constexpr static const auto SearchByTags = "searchByTags";
     constexpr static const auto SearchByDescription = "searchByDescription";
     constexpr static const auto SingleRunnerModePaste = "singleRunnerModePaste";
@@ -36,4 +42,10 @@ struct JSONEmoji {
     constexpr static const auto IosVersion = "ios_version";
     constexpr static const auto Tags = "tags";
 };
+
+const QString Config::ConfigFilePath = QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName;
+const QString Config::CustomEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
+const QString Config::LocalEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/emojis.json";
+const QString Config::GlobalEmojiFilePath = "/usr/share/emojirunner/emojis.json";
+}
 #endif //EMOJIRUNNER_CONFIG_H

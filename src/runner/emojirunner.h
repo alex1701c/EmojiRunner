@@ -21,12 +21,14 @@ public:
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
-    const QString customEmojiFile = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
-    QRegExp prefixRegex = QRegExp(R"(emoji(?: +(.*))?)");
+    const QRegularExpression prefixRegex = QRegularExpression(R"(emoji(?: +(.*))?)");
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
+    int pasteTimeout;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste;
+    const QLatin1String queryPrefix = QLatin1String("emoji");
+    QList<QAction *> matchActionList;
 
     Plasma::QueryMatch createQueryMatch(const Emoji *emoji, qreal relevance);
 
@@ -47,13 +49,11 @@ public:
     void deleteEmojiPointers();
 
 public: // Plasma::AbstractRunner API
-
     void match(Plasma::RunnerContext &context) override;
-
+    QList<QAction*> actionsForMatch(const Plasma::QueryMatch &match) override;
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
 
 public Q_SLOTS:
-
     void reloadPluginConfiguration(const QString &configFile = "");
 };
 

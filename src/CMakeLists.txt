@@ -35,7 +35,7 @@ add_dependencies(krunner_emojirunner kcm_krunner_emojirunner)
 
 set(EMOJI_FILE_INSTALL_DIR "/usr/share/emojirunner" CACHE STRING "Default installation directory")
 
-install(TARGETS krunner_emojirunner kcm_krunner_emojirunner DESTINATION ${PLUGIN_INSTALL_DIR})
-install(FILES plasma-runner-emojirunner.desktop config/plasma-runner-emojirunner_config.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
+install(TARGETS krunner_emojirunner kcm_krunner_emojirunner DESTINATION ${KDE_INSTALL_QTPLUGINDIR})
+install(FILES runner/plasma-runner-emojirunner.desktop config/plasma-runner-emojirunner_config.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 # Location gets changed for installation without admin priviledget
 install(FILES core/emojis.json DESTINATION ${EMOJI_FILE_INSTALL_DIR})

@@ -10,7 +10,6 @@
 #include <QApplication>
 #include <QClipboard>
 
-
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
     setObjectName(QStringLiteral("EmojiRunner"));
@@ -20,7 +19,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     const QDir configDir(configFolder);
     if (!configDir.exists()) configDir.mkpath(configFolder);
     // Create file
-    QFile configFile(configFolder + Config::ConfigFileName);
+    QFile configFile(Config::ConfigFileName);
     if (!configFile.exists()) {
         configFile.open(QIODevice::WriteOnly);
         configFile.close();
@@ -28,7 +27,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     // Add file watcher for config
     watcher.addPath(configFolder + Config::ConfigFileName);
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &EmojiRunner::reloadPluginConfiguration);
-    if (QFile::exists(customEmojiFile)) watcher.addPath(customEmojiFile);
+    if (QFile::exists(Config::CustomEmojiFilePath)) watcher.addPath(Config::CustomEmojiFilePath);
     reloadPluginConfiguration();
 }
 
@@ -52,8 +51,8 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
         if (QFile::exists(configFile)) {
             watcher.addPath(configFile);
         }
-        if (configFile != customEmojiFile && QFile::exists(customEmojiFile)) {
-            watcher.addPath(customEmojiFile);
+        if (configFile != Config::CustomEmojiFilePath && QFile::exists(Config::CustomEmojiFilePath)) {
+            watcher.addPath(Config::CustomEmojiFilePath);
         }
     }
 
@@ -66,11 +65,18 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     singleRunnerModePaste = config.readEntry(Config::SingleRunnerModePaste, true);
 
     // Items only change in reload config method => read once and reuse
-    for (const auto &category:emojiCategories) {
+    for (const auto &category: qAsConst(emojiCategories)) {
         if (category.name == Config::FavouritesCategory) {
             favouriteCategory = category;
             break;
         }
+    }
+
+    pasteTimeout = config.readEntry(Config::PasteTimeout, 100);
+    if (config.readEntry(Config::PasteAction,  true)) {
+       matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
+    } else {
+        matchActionList.clear();
     }
 }
 
@@ -85,21 +91,21 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     qInfo() << total;
 #endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ").toLower();// Remove escape character
-    const bool prefixed = term.startsWith("emoji");
+    const bool prefixed = term.startsWith(queryPrefix);
     if (!globalSearchEnabled && !prefixed) return;
 
     QString search = term;
     if (prefixed) {
-        prefixRegex.indexIn(term);
-        search = prefixRegex.cap(1).simplified();
+        search = prefixRegex.match(search).captured(1).simplified();
     }
+
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
         for (auto *emoji :favouriteCategory.emojis) {
             matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
-        for (const auto &category:emojiCategories) {
+        for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji :category.emojis) {
                 const double relevance = emoji->getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
@@ -111,19 +117,25 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     context.addMatches(matches);
 }
 
+QList<QAction *> EmojiRunner::actionsForMatch(const Plasma::QueryMatch &match) {
+    Q_UNUSED(match)
+
+    return matchActionList;
+}
+
 void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
     Q_UNUSED(context)
 
     QApplication::clipboard()->setText(match.text());
-    if (context.singleRunnerQueryMode() && singleRunnerModePaste) {
-
+    if (match.selectedAction() || (context.singleRunnerQueryMode() && singleRunnerModePaste)) {
         // Wait for krunner to be closed before typing
-        QTimer::singleShot(10, this, [this]() {
+        QTimer::singleShot(pasteTimeout, this, [this]() {
             emitCTRLV();
         });
 
     }
 }
+
 
 Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal relevance) {
     Plasma::QueryMatch match(this);
@@ -137,7 +149,6 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal
     match.setRelevance(relevance);
     return match;
 }
-
 
 void EmojiRunner::emitCTRLV() {
 #ifdef XDO_LIB
@@ -154,7 +165,7 @@ void EmojiRunner::emitCTRLV() {
 
 void EmojiRunner::deleteEmojiPointers() {
     // Delete pointers if config reloads
-    for (const auto &category:emojiCategories) {
+    for (const auto &category: qAsConst(emojiCategories)) {
         if (category.name == Config::FavouritesCategory) {
             continue;
         }

@@ -18,8 +18,8 @@ FileReader::FileReader(const KConfigGroup &config) {
 
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
     // Emojis for user level install
-    QFile globalFile("/usr/share/emojirunner/emojis.json");
-    QFile localFile(QDir::homePath() + "/.local/share/emojirunner/emojis.json");
+    QFile globalFile(Config::GlobalEmojiFilePath);
+    QFile localFile(Config::LocalEmojiFilePath);
     QMap<QString, EmojiCategory> preconfiguredEmojis;
     if (globalFile.exists() && globalFile.open(QIODevice::ReadOnly)) {
         preconfiguredEmojis = parseEmojiFile(getAllEmojis, globalFile);
@@ -30,7 +30,7 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
     }
 
     // Read custom emojis
-    QFile customEmojis(QDir::homePath() + "/.local/share/emojirunner/customemojis.json");
+    QFile customEmojis(Config::CustomEmojiFilePath);
     if (customEmojis.exists() && customEmojis.open(QFile::ReadOnly)) {
         auto customEmojiMap = parseEmojiFile(getAllEmojis, customEmojis);
         customEmojis.close();

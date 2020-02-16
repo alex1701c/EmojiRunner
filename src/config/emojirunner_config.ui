@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>726</width>
-    <height>580</height>
+    <height>583</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,6 +29,13 @@
     <widget class="QCheckBox" name="singleRunnerModePaste">
      <property name="text">
       <string>Automatically paste emojis when using shortcuts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="pasteActionCheckBox">
+     <property name="text">
+      <string>Show paste command as action</string>
      </property>
     </widget>
    </item>
@@ -339,7 +346,7 @@
                 <string notr="true">color:red</string>
                </property>
                <property name="text">
-                <string/>
+                <string>You can not select more than 20 Favourites!</string>
                </property>
               </widget>
              </item>

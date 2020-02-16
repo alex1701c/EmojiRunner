@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=EmojiRunner
 Comment=Emoji picker for Krunner
-Icon=planetkde
+Icon=preferences-desktop-emoticons
 
 X-KDE-ServiceTypes=Plasma/Runner
 Type=Service

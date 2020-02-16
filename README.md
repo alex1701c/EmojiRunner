@@ -5,23 +5,25 @@ This plugin allows you to search, copy and paste emojis/symbols.
 Additionally you can configure favourites, set the unicode version, enable/disable categories and add custom emojis.  
 If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/ 
 
+You can build this package from source of use the deb/rpm packages from https://github.com/alex1701c/EmojiRunner/releases.
+
 ### Required Dependencies
 
 Note: If the xdo.h file is not at compile time available the plugin will use the `xdotool` program to paste emojis, 
 but having the library installed is recommended.  
 
 Debian/Ubuntu:  
-`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext libxdo-dev`
+`sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev`
 
 openSUSE:  
 `sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel
-ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool-devel kconfigwidgets-devel`  
+ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool-devel kconfigwidgets-devel kcmutils-devel`  
 
 Fedora:  
-`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext xdotool`  
+`sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext xdotool kf5-kcmutils-devel`  
 
 Arch (Manjaro):  
-`sudo pacman -S cmake extra-cmake-modules xdotool`  
+`sudo pacman -S cmake extra-cmake-modules xdotool kcmutils`  
 *This xdotool package includes the xdo.h file*
 
 ### Build instructions  
@@ -38,8 +40,8 @@ git clone https://github.com/alex1701c/EmojiRunner
 cd EmojiRunner
 mkdir build
 cd build
-cmake -DQT_PLUGIN_INSTALL_DIR=`kf5-config --qt-plugins` -DCMAKE_BUILD_TYPE=Release  ..
-make
+cmake -DCMAKE_BUILD_TYPE=Release  ..
+make -j$(nproc)
 sudo make install
 kquitapp5 krunner 2> /dev/null; kstart5 --windowclass krunner krunner > /dev/null 2>&1 &
 ```

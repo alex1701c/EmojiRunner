@@ -1,9 +1,9 @@
 #ifndef EMOJIRUNNER_UTILITIES_H
 #define EMOJIRUNNER_UTILITIES_H
 
-#include <QtWidgets/QListWidgetItem>
-#include <core/Emoji.h>
-#include <core/Config.h>
+#include <QListWidgetItem>
+#include "Emoji.h"
+#include "Config.h"
 
 namespace Utilities {
 
@@ -24,11 +24,11 @@ namespace Utilities {
  * Create the config file and parent folder if they do not exist already
  */
 void createConfigFile() {
-    const QString configFolder = QDir::homePath() + "/.config/krunnerplugins/";
+    const QString configFolder = QDir::homePath() + Config::RelativeConfigFolder;
     const QDir configDir(configFolder);
     if (!configDir.exists()) configDir.mkpath(configFolder);
     // Create file
-    QFile configFile(configFolder + Config::ConfigFileName);
+    QFile configFile(Config::ConfigFilePath);
     if (!configFile.exists()) {
         configFile.open(QIODevice::WriteOnly);
         configFile.close();

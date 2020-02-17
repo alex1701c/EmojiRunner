@@ -6,7 +6,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QInputDialog>
-#include "utilities.h"
+#include "core/utilities.h"
 #include <core/Config.h>
 #include "kcmutils_version.h"
 
@@ -77,7 +77,7 @@ void EmojiRunnerConfig::load() {
     QList<Emoji *> favouriteEmojisToAdd;
     for (const auto &category: qAsConst(emojiCategories)) {
         if (category.name != Config::FavouritesCategory) continue;
-        for (const auto &emoji:category.emojis) {
+        for (const auto &emoji: qAsConst(category.emojis)) {
             favouriteEmojisToAdd.append(emoji);
         }
     }
@@ -107,7 +107,6 @@ void EmojiRunnerConfig::load() {
     m_ui->iosComboBox->setCurrentText(config.readEntry(Config::IosVersion, Config::DefaultIosVersion));
 
     m_ui->maxFavouritesLabel->setHidden(true);
-
     validateEditingOptions();
     categoriesChanged();
     filtersChanged();
@@ -391,11 +390,9 @@ void EmojiRunnerConfig::checkMaxFavourites() {
 }
 
 void EmojiRunnerConfig::changeFontSize(int value) {
-    QTimer::singleShot(0, this, [this, value]() {
-        auto f = QFont(m_ui->emojiListView->font());
-        f.setPixelSize(value / 2);
-        m_ui->emojiListView->setFont(f);
-    });
+    auto f = QFont(m_ui->emojiListView->font());
+    f.setPixelSize(value / 2);
+    m_ui->emojiListView->setFont(f);
 }
 
 void EmojiRunnerConfig::addEmoji() {

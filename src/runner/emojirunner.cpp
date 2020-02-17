@@ -1,9 +1,9 @@
 #include "emojirunner.h"
 #include "core/FileReader.h"
+#include "core/utilities.h"
 #include "core/Config.h"
 
 #include <KLocalizedString>
-#include <KConfigCore/KConfig>
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
 
@@ -15,19 +15,11 @@ EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
     setObjectName(QStringLiteral("EmojiRunner"));
     setIgnoredTypes(Plasma::RunnerContext::NetworkLocation);
 
-    const QString configFolder = QDir::homePath() + "/.config/krunnerplugins/";
-    const QDir configDir(configFolder);
-    if (!configDir.exists()) configDir.mkpath(configFolder);
-    // Create file
-    QFile configFile(Config::ConfigFileName);
-    if (!configFile.exists()) {
-        configFile.open(QIODevice::WriteOnly);
-        configFile.close();
-    }
     // Add file watcher for config
-    watcher.addPath(configFolder + Config::ConfigFileName);
+    createConfigFile();
+    watcher.addPath(Config::ConfigFilePath);
+    watcher.addPath(Config::CustomEmojiFilePath);
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &EmojiRunner::reloadPluginConfiguration);
-    if (QFile::exists(Config::CustomEmojiFilePath)) watcher.addPath(Config::CustomEmojiFilePath);
     reloadPluginConfiguration();
 }
 
@@ -40,20 +32,14 @@ EmojiRunner::~EmojiRunner() {
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     deleteEmojiPointers();
-    KConfigGroup config = KSharedConfig::openConfig(QDir::homePath() + "/.config/krunnerplugins/" + Config::ConfigFileName)
-            ->group(Config::RootGroup);
+    KConfigGroup config = KSharedConfig::openConfig(Config::ConfigFilePath)->group(Config::RootGroup);
     // Force sync from file
     if (!configFile.isEmpty()) config.config()->reparseConfiguration();
 
     // If the file gets edited with a text editor, it often gets replaced by the edited version
     // https://stackoverflow.com/a/30076119/9342842
     if (!configFile.isEmpty()) {
-        if (QFile::exists(configFile)) {
-            watcher.addPath(configFile);
-        }
-        if (configFile != Config::CustomEmojiFilePath && QFile::exists(Config::CustomEmojiFilePath)) {
-            watcher.addPath(Config::CustomEmojiFilePath);
-        }
+        watcher.addPath(configFile);
     }
 
     FileReader reader(config);
@@ -101,13 +87,14 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
-        for (auto *emoji :favouriteCategory.emojis) {
-            matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21));
+        for (auto *emoji : qAsConst(favouriteCategory.emojis)) {
+            matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21,
+                    Plasma::QueryMatch::ExactMatch));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
-            for (const auto &emoji :category.emojis) {
+            for (const auto &emoji: qAsConst(category.emojis)) {
                 const double relevance = emoji->getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
                 matches.append(createQueryMatch(emoji, relevance));
@@ -137,9 +124,10 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
 }
 
 
-Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal relevance) {
+Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal relevance, Plasma::QueryMatch::Type type){
     Plasma::QueryMatch match(this);
     match.setText(emoji->emoji);
+    match.setType(type);
 #ifndef stage_dev
     match.setSubtext(emoji->name);
 #else

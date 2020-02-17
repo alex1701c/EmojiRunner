@@ -17,4 +17,4 @@ sudo make install
 kquitapp5 krunner 2> /dev/null
 kstart5 --windowclass krunner krunner > /dev/null 2>&1 &
 
-echo "Installation finished !";
+echo "Installation finished!";

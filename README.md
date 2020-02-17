@@ -3,7 +3,6 @@
 This plugin allows you to search, copy and paste emojis/symbols.
 
 Additionally you can configure favourites, set the unicode version, enable/disable categories and add custom emojis.  
-If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/ 
 
 You can build this package from source of use the deb/rpm packages from https://github.com/alex1701c/EmojiRunner/releases.
 
@@ -67,8 +66,9 @@ The feature to paste the emojis can be disabled in the config dialog.
 ### Screenshots:
 
 #### Search for an emoji by name
-This global search can be enabled/disabled in the config dialog  
-![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search.png)
+This global search can be enabled/disabled in the config dialog.  
+Additionally this screenshot shows the past action, which is a new feature.  
+![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search_with_actions.png)
 
 #### Show favourites
 They are configured in the config dialog  
@@ -89,3 +89,10 @@ You must provide a name and and emoji, the description and tags are optional
 
 This gets saved in the ~/.local/share/emojirunner/customemojis.json file.  
 ![Custom emojis file](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/custom_emojis_file.png)    
+
+# Issues 
+ * If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/  
+ * If the emojis do not get pasted try to increase the timeout for the pasting action by adding `pasteTimeout=timeout_in_ms` 
+ to the `[Config]` group in ~/.config/krunnerplugins/emojirunnerrc .
+ If you have any other issues please let me know 😄.
+ 

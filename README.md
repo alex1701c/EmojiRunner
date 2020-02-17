@@ -39,7 +39,7 @@ git clone https://github.com/alex1701c/EmojiRunner
 cd EmojiRunner
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release  ..
+cmake -DCMAKE_BUILD_TYPE=Release -DKDE_INSTALL_QTPLUGINDIR=$(kf5-config --qt-plugins) ..
 make -j$(nproc)
 sudo make install
 kquitapp5 krunner 2> /dev/null; kstart5 --windowclass krunner krunner > /dev/null 2>&1 &

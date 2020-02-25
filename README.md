@@ -67,7 +67,7 @@ The feature to paste the emojis can be disabled in the config dialog.
 
 #### Search for an emoji by name
 This global search can be enabled/disabled in the config dialog.  
-Additionally this screenshot shows the past action, which is a new feature.  
+Additionally this screenshot shows the paste action, which is a new feature.  
 ![Search for an emoji by name](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/global_search_with_actions.png)
 
 #### Show favourites

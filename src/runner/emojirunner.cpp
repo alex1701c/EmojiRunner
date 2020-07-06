@@ -6,6 +6,7 @@
 #include <KLocalizedString>
 #include <KConfigCore/KSharedConfig>
 #include <KConfigCore/KConfigGroup>
+#include <krunner_version.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -162,7 +163,11 @@ void EmojiRunner::deleteEmojiPointers() {
 }
 
 
+#if KRUNNER_VERSION >= QT_VERSION_CHECK(5, 72, 0)
+K_EXPORT_PLASMA_RUNNER_WITH_JSON(EmojiRunner, "plasma-runner-emojirunner.json")
+#else
 K_EXPORT_PLASMA_RUNNER(emojirunner, EmojiRunner)
+#endif
 
 // needed for the QObject subclass declared as part of K_EXPORT_PLASMA_RUNNER
 #include "emojirunner.moc"

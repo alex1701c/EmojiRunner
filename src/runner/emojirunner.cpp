@@ -79,11 +79,12 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 #endif
     const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ").toLower();// Remove escape character
     const bool prefixed = term.startsWith(queryPrefix);
-    if (!globalSearchEnabled && !prefixed) return;
 
     QString search = term;
     if (prefixed) {
-        search = prefixRegex.match(search).captured(1).simplified();
+        const auto match = prefixRegex.match(search);
+        if (!match.hasMatch()) return;
+        search = match.captured(1).simplified();
     }
 
     QList<Plasma::QueryMatch> matches;
@@ -93,6 +94,10 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
                     Plasma::QueryMatch::ExactMatch));
         }
     } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
+        // Don't display many results when there is a unspecific query
+        if (!context.singleRunnerQueryMode() && search.count() < 3) {
+            return;
+        }
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji: qAsConst(category.emojis)) {

@@ -21,7 +21,7 @@ public:
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
-    const QRegularExpression prefixRegex = QRegularExpression(R"(emoji(?: +(.*))?)");
+    const QRegularExpression prefixRegex = QRegularExpression(R"(^emoji(?: +(.*))?$)");
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;

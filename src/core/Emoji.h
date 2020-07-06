@@ -43,7 +43,7 @@ public:
      * @param configIosVersion
      * @return bool
      */
-    bool matchesVersions(const float &configUnicodeVersion, const float &configIosVersion) const;
+    bool matchesVersions(const float configUnicodeVersion, const float configIosVersion) const;
 
     /**
      * Returns an Emoji instance based on the data from the JSON object
@@ -59,7 +59,9 @@ public:
      * @param filePath File location, if empty the default customemojis.json file will be userd
      * @param category Category of emojis, by default "Custom"
      */
-    static void writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePath = "", const QString &category = "Custom");
+    static void writeToJSONFile(const QList<Emoji *> &emojis,
+                                const QString &filePath = QString(),
+                                const QString &category = QStringLiteral("Custom"));
 };
 
 #endif //EMOJIRUNNER_EMOJI_H

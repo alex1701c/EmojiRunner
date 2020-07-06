@@ -33,7 +33,7 @@ double Emoji::getMatchTextRelevance(const QString &search, const bool tagSearch,
 }
 
 
-bool Emoji::matchesVersions(const float &configUnicodeVersion, const float &configIosVersion) const {
+bool Emoji::matchesVersions(const float configUnicodeVersion, const float configIosVersion) const {
     if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion) return false;
     return !(unicodeVersion == 0 && iosVersion > configIosVersion);
 }
@@ -44,7 +44,8 @@ Emoji *Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey) {
     emoji->name = obj.value(JSONEmoji::Name).toString().toLower();
     emoji->emoji = obj.value(JSONEmoji::Emoji).toString();
     emoji->category = categoryKey;
-    for (const auto &tag:obj.value(JSONEmoji::Tags).toArray()) emoji->tags.append(tag.toString().toLower());
+    const auto tagsArray = obj.value(JSONEmoji::Tags).toArray();
+    for (const auto &tag : tagsArray) emoji->tags.append(tag.toString().toLower());
     emoji->description = obj.value(JSONEmoji::Description).toString().toLower();
     emoji->unicodeVersion = obj.value(JSONEmoji::UnicodeVersion).toString().toFloat();
     emoji->iosVersion = obj.value(JSONEmoji::IosVersion).toString().toFloat();
@@ -69,8 +70,7 @@ void Emoji::writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePat
     if (doc.isObject()) rootObject = doc.object();
 
     // Write emojis in json array
-    const int customEmojiCount = emojis.count();
-    for (int i = 0; i < customEmojiCount; ++i) {
+    for (int i = 0, customEmojiCount = emojis.count(); i < customEmojiCount; ++i) {
         const Emoji *e = emojis.at(i);
         QJsonObject customObj;
         customObj.insert(JSONEmoji::Emoji, e->emoji);

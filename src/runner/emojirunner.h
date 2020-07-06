@@ -21,7 +21,7 @@ public:
 public:
     EmojiRunner(QObject *parent, const QVariantList &args);
 
-    const QRegularExpression prefixRegex = QRegularExpression(R"(^emoji(?: +(.*))?$)");
+    const QRegularExpression prefixRegex = QRegularExpression(QStringLiteral(R"(^emoji(?: +(.*))?$)"));
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
@@ -55,7 +55,7 @@ public: // Plasma::AbstractRunner API
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
 
 public Q_SLOTS:
-    void reloadPluginConfiguration(const QString &configFile = "");
+    void reloadPluginConfiguration(const QString &configFile = QString());
 };
 
 #endif

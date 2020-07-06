@@ -6,14 +6,15 @@
 #include <core/Config.h>
 
 FileReader::FileReader(const KConfigGroup &config) {
-    for (const auto &idString: config.readEntry(Config::Favourites, Config::DefaultFavourites)
-            .split(";", QString::SplitBehavior::SkipEmptyParts)) {
+    const auto idStringList = config.readEntry(Config::Favourites, Config::DefaultFavourites)
+                            .split(';', QString::SplitBehavior::SkipEmptyParts);
+    for (const auto &idString : idStringList) {
         favouriteIds.append(idString.toInt());
     }
 
     configUnicodeVersion = config.readEntry(Config::UnicodeVersion, QVariant(Config::DefaultUnicodeVersion).toFloat());
     configIosVersion = config.readEntry(Config::IosVersion, QVariant(Config::DefaultIosVersion).toFloat());
-    disabledCategories = config.readEntry(Config::DisabledCategories).split(";", QString::SplitBehavior::SkipEmptyParts);
+    disabledCategories = config.readEntry(Config::DisabledCategories).split(';', QString::SplitBehavior::SkipEmptyParts);
 }
 
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
@@ -35,7 +36,10 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
         auto customEmojiMap = parseEmojiFile(getAllEmojis, customEmojis);
         customEmojis.close();
         // Combine the two maps
-        for (auto &category:customEmojiMap.values()) {
+        auto customEmojiIT = customEmojiMap.constBegin();
+        while (customEmojiIT != customEmojiMap.constEnd()) {
+            auto category = customEmojiIT.value();
+            ++customEmojiIT;
             if (preconfiguredEmojis.contains(category.name)) {
                 const EmojiCategory existingCategory = preconfiguredEmojis.value(category.name);
                 for (auto *emoji:existingCategory.emojis) {
@@ -53,16 +57,19 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
     // Initialize emojis object and check exit conditions
     const QJsonDocument emojis = QJsonDocument::fromJson(emojiJSONFile.readAll());
     QMap<QString, EmojiCategory> categories;
-    if (!emojis.isObject() || emojis.object().keys().isEmpty()) return categories;
+    if (!emojis.isObject()) return categories;
 
     // Initialize config variables
     auto favourites = EmojiCategory(Config::FavouritesCategory);
 
     // Read categories and items from object
     const QJsonObject emojiRootObject = emojis.object();
-    for (const auto &key:emojiRootObject.keys()) {
+     auto emojiRootIT = emojiRootObject.constBegin();
+    while (emojiRootIT != emojiRootObject.constEnd()) {
         // Get items array and check continue conditions
-        const QJsonValue value = emojiRootObject.value(key);
+        const QString key = emojiRootIT.key();
+        const QJsonValue value = emojiRootIT.value();
+        ++emojiRootIT;
         if (!value.isArray()) continue;
         const QJsonArray items = value.toArray();
         if (items.isEmpty()) continue;

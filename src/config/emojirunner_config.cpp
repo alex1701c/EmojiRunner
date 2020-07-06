@@ -8,11 +8,13 @@
 #include <QtWidgets/QInputDialog>
 #include "core/utilities.h"
 #include <core/Config.h>
+#include "core/macros.h"
 #include "kcmutils_version.h"
 
 K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kcm_krunner_emojirunner");)
 
 #define itemEmoji(item) reinterpret_cast<Emoji *>(item->data(Qt::UserRole).value<qintptr>())
+
 
 EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent) : QWidget(parent) {
     setupUi(this);
@@ -129,7 +131,7 @@ void EmojiRunnerConfig::save() {
     const int categoryCount = m_ui->categoryListView->count();
     for (int i = 0; i < categoryCount; ++i) {
         const auto *item = m_ui->categoryListView->item(i);
-        if (item->checkState() == Qt::Unchecked) disabledCategories.append(item->text() + ";");
+        if (item->checkState() == Qt::Unchecked) disabledCategories.append(item->text() + ';');
     }
     config.writeEntry(Config::DisabledCategories, disabledCategories);
 
@@ -141,7 +143,7 @@ void EmojiRunnerConfig::save() {
         const auto *item = m_ui->emojiListView->item(i);
         auto *emoji = itemEmoji(item);
         if (item->checkState() == Qt::Checked) {
-            favouriteIDs.append(QString::number(emoji->id) + ";");
+            favouriteIDs.append(QString::number(emoji->id) + ';');
         }
         if (emoji->category == Config::CustomCategory) customEmojis.append(emoji);
     }
@@ -159,8 +161,8 @@ void EmojiRunnerConfig::defaults() {
     m_ui->pasteActionCheckBox->setChecked(true);
     m_ui->favouriteFilterDescription_2->setChecked(false);
     m_ui->favouriteFilterTags_2->setChecked(false);
-    m_ui->unicodeComboBox->setCurrentText("11");
-    m_ui->iosComboBox->setCurrentText("13");
+    m_ui->unicodeComboBox->setCurrentText(QSL("11"));
+    m_ui->iosComboBox->setCurrentText(QSL("13"));
 
     for (int i = 0; i < m_ui->categoryListView->count(); ++i) {
         m_ui->categoryListView->item(i)->setCheckState(Qt::Checked);
@@ -173,7 +175,7 @@ void EmojiRunnerConfig::defaults() {
     m_ui->sortFavourites->setChecked(false);
 
 #if KCMUTILS_VERSION >= QT_VERSION_CHECK(5, 64, 0)
-   emit markAsChanged();
+   markAsChanged();
 #else
     emit changed();
 #endif
@@ -411,8 +413,8 @@ void EmojiRunnerConfig::editEmoji() {
 }
 
 void EmojiRunnerConfig::deleteEmoji() {
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Confirm Delete",
-            "Do you want to delete this custom emoji ?", QMessageBox::Yes | QMessageBox::No);
+    QMessageBox::StandardButton reply = QMessageBox::question(this, QSL("Confirm Delete"),
+            QSL("Do you want to delete this custom emoji ?"), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         delete m_ui->emojiListView->takeItem(m_ui->emojiListView->currentRow());
     }
@@ -427,7 +429,7 @@ void EmojiRunnerConfig::applyEmojiPopupResults(Emoji *emoji, const int idx) {
         if (!customEntriesExist) {
             customEntriesExist = true;
             auto *item = new QListWidgetItem();
-            item->setText("Custom");
+            item->setText(QSL("Custom"));
             item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
             item->setCheckState(Qt::Checked);
             m_ui->categoryListView->addItem(item);
@@ -455,7 +457,7 @@ void EmojiRunnerConfig::validateEditingOptions() {
 
 void EmojiRunnerConfig::toggleFavouriteOptions() {
     const bool hide = !m_ui->favouriteFilterGroupBox->isHidden();
-    m_ui->toggleFavouritesPushButton->setIcon(QIcon::fromTheme(hide ? "arrow-down" : "arrow-up"));
+    m_ui->toggleFavouritesPushButton->setIcon(QIcon::fromTheme(hide ? QSL("arrow-down") : QSL("arrow-up")));
     m_ui->favouriteFilterGroupBox->setHidden(hide);
     m_ui->sortFavourites->setHidden(hide);
     m_ui->customButtonsWidget->setHidden(hide);

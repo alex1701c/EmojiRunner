@@ -77,7 +77,8 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     }
     qInfo() << total;
 #endif
-    const auto term = QString(context.query()).replace(QString::fromWCharArray(L"\u001B"), " ").toLower();// Remove escape character
+    // Remove escape character, fixed Plasma 5.20
+    const auto term = QString(context.query()).remove(QString::fromWCharArray(L"\u001B")).toLower();
     const bool prefixed = term.startsWith(queryPrefix);
 
     QString search = term;
@@ -158,12 +159,11 @@ void EmojiRunner::emitCTRLV() {
 }
 
 void EmojiRunner::deleteEmojiPointers() {
-    // Delete pointers if config reloads
+    // Delete pointers if config reloads, the favourites are also contained in the other categories
     for (const auto &category: qAsConst(emojiCategories)) {
-        if (category.name == Config::FavouritesCategory) {
-            continue;
+        if (category.name != Config::FavouritesCategory) {
+            qDeleteAll(category.emojis);
         }
-        qDeleteAll(category.emojis);
     }
 }
 

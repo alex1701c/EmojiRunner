@@ -47,6 +47,6 @@ struct JSONEmoji {
 const QString Config::ConfigFilePath = QDir::homePath() + Config::RelativeConfigFolder + Config::ConfigFileName;
 const QString Config::CustomEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
 const QString Config::LocalEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/emojis.json";
-const QString Config::GlobalEmojiFilePath = "/usr/share/emojirunner/emojis.json";
+const QString Config::GlobalEmojiFilePath = QStringLiteral("/usr/share/emojirunner/emojis.json");
 }
 #endif //EMOJIRUNNER_CONFIG_H

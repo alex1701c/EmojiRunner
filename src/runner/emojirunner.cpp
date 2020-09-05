@@ -94,17 +94,13 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21,
                     Plasma::QueryMatch::ExactMatch));
         }
-    } else if (prefixed || globalSearchEnabled || context.singleRunnerQueryMode()) {
-        // Don't display many results when there is a unspecific query
-        if (!context.singleRunnerQueryMode() && search.count() < 3) {
-            return;
-        }
+    } else if (prefixed || (globalSearchEnabled && term.count() > 2) || context.singleRunnerQueryMode()) {
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji: qAsConst(category.emojis)) {
                 const double relevance = emoji->getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
-                matches.append(createQueryMatch(emoji, relevance));
+                matches.append(createQueryMatch(emoji, relevance, prefixed ? Plasma::QueryMatch::ExactMatch : Plasma::QueryMatch::CompletionMatch));
             }
         }
     }

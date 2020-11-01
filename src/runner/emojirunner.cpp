@@ -60,7 +60,10 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     }
 
     pasteTimeout = config.readEntry(Config::PasteTimeout, 100);
-    matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
+#ifndef XDO_LIB
+    if (!QStandardPaths::findExecutable(QStringLiteral("xdotool")).isEmpty())
+#endif
+        matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {

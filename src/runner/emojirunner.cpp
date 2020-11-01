@@ -68,15 +68,6 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
-    if (!context.isValid()) return;
-
-#ifdef stage_dev
-    int total = 0;
-    for (const auto &c:emojiCategories) {
-        total += c.emojis.count();
-    }
-    qInfo() << total;
-#endif
     // Remove escape character, fixed Plasma 5.20
     const auto term = QString(context.query()).remove(QString::fromWCharArray(L"\u001B")).toLower();
     const bool prefixed = term.startsWith(queryPrefix);
@@ -131,11 +122,7 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal
     Plasma::QueryMatch match(this);
     match.setText(emoji->emoji);
     match.setType(type);
-#ifndef stage_dev
     match.setSubtext(emoji->name);
-#else
-    match.setText(emoji->emoji + " " + emoji->name + " ---- " + QString::number(relevance));
-#endif
     match.setData(emoji->emoji);
     match.setRelevance(relevance);
     return match;

@@ -63,7 +63,6 @@ void Emoji::writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePat
     QFile existingEmojisFile(filePath.isEmpty() ? QDir::homePath() + "/.local/share/emojirunner/customemojis.json" : filePath);
     if (existingEmojisFile.exists() && existingEmojisFile.open(QFile::ReadOnly)) {
         doc = QJsonDocument::fromJson(existingEmojisFile.readAll());
-        existingEmojisFile.close();
     }
 
     // If the user overrides existing emojis manually the changes are kept
@@ -96,6 +95,5 @@ void Emoji::writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePat
     QFile configFile(configFolder + "customemojis.json");
     if (configFile.open(QIODevice::WriteOnly)) {
         configFile.write(doc.toJson());
-        configFile.close();
     }
 }

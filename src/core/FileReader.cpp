@@ -33,17 +33,14 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
     QMap<QString, EmojiCategory> preconfiguredEmojis;
     if (globalFile.exists() && globalFile.open(QIODevice::ReadOnly)) {
         preconfiguredEmojis = parseEmojiFile(getAllEmojis, globalFile);
-        globalFile.close();
     } else if (localFile.exists() && localFile.open(QIODevice::ReadOnly)) {
         preconfiguredEmojis = parseEmojiFile(getAllEmojis, localFile);
-        localFile.close();
     }
 
     // Read custom emojis
     QFile customEmojis(Config::CustomEmojiFilePath);
     if (customEmojis.exists() && customEmojis.open(QFile::ReadOnly)) {
         auto customEmojiMap = parseEmojiFile(getAllEmojis, customEmojis);
-        customEmojis.close();
         // Combine the two maps
         auto customEmojiIT = customEmojiMap.constBegin();
         while (customEmojiIT != customEmojiMap.constEnd()) {

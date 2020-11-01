@@ -21,7 +21,6 @@ Q_OBJECT
 private:
     EmojiRunnerConfigForm *m_ui;
     KConfigGroup config;
-    bool loaded = false;
     bool customEntriesExist = false;
     bool customFilterWasChecked = false;
     float configUnicodeVersion;

@@ -52,6 +52,7 @@ EmojiRunnerConfig::~EmojiRunnerConfig() {
 
 void EmojiRunnerConfig::load() {
     // Load method gets also called when exiting config dialog without saving
+    static bool loaded = false;
     if (loaded) {
         return;
     }

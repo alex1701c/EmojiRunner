@@ -31,7 +31,6 @@ void createConfigFile() {
     QFile configFile(Config::ConfigFilePath);
     if (!configFile.exists()) {
         configFile.open(QIODevice::WriteOnly);
-        configFile.close();
     }
 }
 

@@ -6,15 +6,24 @@
 #include <core/Config.h>
 
 FileReader::FileReader(const KConfigGroup &config) {
-    const auto idStringList = config.readEntry(Config::Favourites, Config::DefaultFavourites)
-                            .split(';', QString::SplitBehavior::SkipEmptyParts);
+    const auto idStringList = config.readEntry(Config::Favourites, Config::DefaultFavourites).split(';', 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    QString::SplitBehavior::SkipEmptyParts);
+#else
+    Qt::SkipEmptyParts);
+#endif
     for (const auto &idString : idStringList) {
         favouriteIds.append(idString.toInt());
     }
 
     configUnicodeVersion = config.readEntry(Config::UnicodeVersion, QVariant(Config::DefaultUnicodeVersion).toFloat());
     configIosVersion = config.readEntry(Config::IosVersion, QVariant(Config::DefaultIosVersion).toFloat());
-    disabledCategories = config.readEntry(Config::DisabledCategories).split(';', QString::SplitBehavior::SkipEmptyParts);
+    disabledCategories = config.readEntry(Config::DisabledCategories).split(';',
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    QString::SplitBehavior::SkipEmptyParts);
+#else
+    Qt::SkipEmptyParts);
+#endif
 }
 
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {

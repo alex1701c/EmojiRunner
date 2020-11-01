@@ -9,7 +9,6 @@
 #include "core/utilities.h"
 #include <core/Config.h>
 #include "core/macros.h"
-#include "kcmutils_version.h"
 
 K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kcm_krunner_emojirunner");)
 
@@ -112,6 +111,8 @@ void EmojiRunnerConfig::load() {
     categoriesChanged();
     filtersChanged();
     connectSignals();
+
+    Q_EMIT changed(true);
 }
 
 
@@ -171,64 +172,40 @@ void EmojiRunnerConfig::defaults() {
     m_ui->favouriteFilterDescription->setChecked(false);
     m_ui->sortFavourites->setChecked(false);
 
-#if KCMUTILS_VERSION >= QT_VERSION_CHECK(5, 64, 0)
-   markAsChanged();
-#else
-    emit changed();
-#endif
+    Q_EMIT changed(true);
 }
 
 
 void EmojiRunnerConfig::connectSignals() {
     // Initialize function pointers that require method overloading
-#if KCMUTILS_VERSION >= QT_VERSION_CHECK(5, 64, 0)
-    const auto changedSlotPointer = &EmojiRunnerConfig::markAsChanged;
-#else
-    const auto changedSlotPointer = static_cast<void (EmojiRunnerConfig::*)()>(&EmojiRunnerConfig::changed);
-#endif
     const auto comboBoxIndexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
     const auto listWidgetRowChanged = static_cast<void (QListWidget::*)(int)>(&QListWidget::currentRowChanged);
     const auto listWidgetItemChanged = static_cast<void (QListWidget::*)(QListWidgetItem *)>(&QListWidget::itemChanged);
 
     // Connect slots for filters
-    connect(m_ui->emojiListView, &QListWidget::itemChanged, this, changedSlotPointer);
-    connect(m_ui->enableGlobalSearch, &QCheckBox::clicked, this, changedSlotPointer);
-    connect(m_ui->singleRunnerModePaste, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->favouriteFilter, &QLineEdit::textChanged, this, &EmojiRunnerConfig::filterEmojiListView);
     connect(m_ui->favouriteFilterName, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     connect(m_ui->favouriteFilterDescription, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     connect(m_ui->favouriteFilterTags, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
-    connect(m_ui->favouriteFilterDescription_2, &QCheckBox::clicked, this, changedSlotPointer);
-    connect(m_ui->favouriteFilterTags_2, &QCheckBox::clicked, this, changedSlotPointer);
-    connect(m_ui->favouriteFilterCustom, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->favouriteFilterCustom, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     // Unicode Versions change
     connect(m_ui->unicodeComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::unicodeVersionChanged);
-    connect(m_ui->unicodeComboBox, comboBoxIndexChanged, this, changedSlotPointer);
     connect(m_ui->iosComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::iosVersionChanged);
-    connect(m_ui->iosComboBox, comboBoxIndexChanged, this, changedSlotPointer);
     // Disable categories
-    connect(m_ui->categoryListView, listWidgetItemChanged, this, changedSlotPointer);
     connect(m_ui->categoryListView, listWidgetItemChanged, this, &EmojiRunnerConfig::categoriesChanged);
     // Sort favourites
     connect(m_ui->sortFavourites, &QCheckBox::clicked, this, &EmojiRunnerConfig::showOnlyFavourites);
     connect(m_ui->emojiListView, listWidgetItemChanged, this, &EmojiRunnerConfig::checkMaxFavourites);
     // For Drag/Drop events
-    connect(m_ui->emojiListView, listWidgetRowChanged, this, changedSlotPointer);
     // Slider for font size
-    connect(m_ui->fontSizeSlider, &QSlider::valueChanged, this, changedSlotPointer);
     connect(m_ui->fontSizeSlider, &QSlider::valueChanged, this, &EmojiRunnerConfig::changeFontSize);
     // Buttons for adding/updating/deleting emojis
     connect(m_ui->emojiListView, listWidgetRowChanged, this, &EmojiRunnerConfig::validateEditingOptions);
-    connect(m_ui->addEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->addEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::addEmoji);
-    connect(m_ui->editEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->editEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::editEmoji);
-    connect(m_ui->deleteEmojiPushButton, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->deleteEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::deleteEmoji);
     // Toggle favourite search options
     connect(m_ui->toggleFavouritesPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::toggleFavouriteOptions);
-
 }
 
 void EmojiRunnerConfig::filterEmojiListView() {

@@ -59,7 +59,6 @@ void EmojiRunnerConfig::load() {
     loaded = true;
 
     m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
-    m_ui->pasteActionCheckBox->setChecked(config.readEntry(Config::PasteAction, true));
     m_ui->singleRunnerModePaste->setChecked(config.readEntry(Config::SingleRunnerModePaste, true));
     m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
     m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, false));
@@ -120,7 +119,6 @@ void EmojiRunnerConfig::save() {
     // Save general settings
     config.writeEntry(Config::GlobalSearch, m_ui->enableGlobalSearch->isChecked());
     config.writeEntry(Config::SingleRunnerModePaste, m_ui->singleRunnerModePaste->isChecked());
-    config.writeEntry(Config::PasteAction, m_ui->pasteActionCheckBox->isChecked());
     config.writeEntry(Config::SearchByTags, m_ui->favouriteFilterTags_2->isChecked());
     config.writeEntry(Config::SearchByDescription, m_ui->favouriteFilterDescription_2->isChecked());
     config.writeEntry(Config::UnicodeVersion, m_ui->unicodeComboBox->currentText());
@@ -158,7 +156,6 @@ void EmojiRunnerConfig::save() {
 void EmojiRunnerConfig::defaults() {
     m_ui->enableGlobalSearch->setChecked(true);
     m_ui->singleRunnerModePaste->setChecked(true);
-    m_ui->pasteActionCheckBox->setChecked(true);
     m_ui->favouriteFilterDescription_2->setChecked(false);
     m_ui->favouriteFilterTags_2->setChecked(false);
     m_ui->unicodeComboBox->setCurrentText(QSL("11"));
@@ -197,7 +194,6 @@ void EmojiRunnerConfig::connectSignals() {
     connect(m_ui->emojiListView, &QListWidget::itemChanged, this, changedSlotPointer);
     connect(m_ui->enableGlobalSearch, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->singleRunnerModePaste, &QCheckBox::clicked, this, changedSlotPointer);
-    connect(m_ui->pasteActionCheckBox, &QCheckBox::clicked, this, changedSlotPointer);
     connect(m_ui->favouriteFilter, &QLineEdit::textChanged, this, &EmojiRunnerConfig::filterEmojiListView);
     connect(m_ui->favouriteFilterName, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     connect(m_ui->favouriteFilterDescription, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);

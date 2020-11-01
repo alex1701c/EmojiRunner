@@ -60,11 +60,7 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     }
 
     pasteTimeout = config.readEntry(Config::PasteTimeout, 100);
-    if (config.readEntry(Config::PasteAction,  true)) {
-       matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
-    } else {
-        matchActionList.clear();
-    }
+    matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {

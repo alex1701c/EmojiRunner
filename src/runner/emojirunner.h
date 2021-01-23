@@ -26,7 +26,7 @@ public:
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
     int pasteTimeout;
-    bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled, singleRunnerModePaste;
+    bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled;
     const QLatin1String queryPrefix = QLatin1String("emoji");
     QList<QAction *> matchActionList;
 

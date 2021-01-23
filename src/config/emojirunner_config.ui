@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>726</width>
-    <height>583</height>
+    <height>587</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -22,13 +22,6 @@
     <widget class="QCheckBox" name="enableGlobalSearch">
      <property name="text">
       <string>Search for emojis globally (without &lt;emoji&gt; prefix)</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="singleRunnerModePaste">
-     <property name="text">
-      <string>Automatically paste emojis when using shortcuts</string>
      </property>
     </widget>
    </item>

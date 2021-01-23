@@ -49,7 +49,6 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
     globalSearchEnabled = config.readEntry(Config::GlobalSearch, true);
     tagSearchEnabled = config.readEntry(Config::SearchByTags, false);
     descriptionSearchEnabled = config.readEntry(Config::SearchByDescription, false);
-    singleRunnerModePaste = config.readEntry(Config::SingleRunnerModePaste, true);
 
     // Items only change in reload config method => read once and reuse
     for (const auto &category: qAsConst(emojiCategories)) {
@@ -107,7 +106,7 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
     Q_UNUSED(context)
 
     QApplication::clipboard()->setText(match.text());
-    if (match.selectedAction() || (context.singleRunnerQueryMode() && singleRunnerModePaste)) {
+    if (match.selectedAction()) {
         // Wait for krunner to be closed before typing
         QTimer::singleShot(pasteTimeout, this, [this]() {
             emitCTRLV();

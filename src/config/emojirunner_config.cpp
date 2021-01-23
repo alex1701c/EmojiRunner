@@ -59,7 +59,6 @@ void EmojiRunnerConfig::load() {
     loaded = true;
 
     m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
-    m_ui->singleRunnerModePaste->setChecked(config.readEntry(Config::SingleRunnerModePaste, true));
     m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
     m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, false));
 
@@ -120,7 +119,6 @@ void EmojiRunnerConfig::load() {
 void EmojiRunnerConfig::save() {
     // Save general settings
     config.writeEntry(Config::GlobalSearch, m_ui->enableGlobalSearch->isChecked());
-    config.writeEntry(Config::SingleRunnerModePaste, m_ui->singleRunnerModePaste->isChecked());
     config.writeEntry(Config::SearchByTags, m_ui->favouriteFilterTags_2->isChecked());
     config.writeEntry(Config::SearchByDescription, m_ui->favouriteFilterDescription_2->isChecked());
     config.writeEntry(Config::UnicodeVersion, m_ui->unicodeComboBox->currentText());
@@ -157,7 +155,6 @@ void EmojiRunnerConfig::save() {
 
 void EmojiRunnerConfig::defaults() {
     m_ui->enableGlobalSearch->setChecked(true);
-    m_ui->singleRunnerModePaste->setChecked(true);
     m_ui->favouriteFilterDescription_2->setChecked(false);
     m_ui->favouriteFilterTags_2->setChecked(false);
     m_ui->unicodeComboBox->setCurrentText(QSL("11"));

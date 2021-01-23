@@ -16,7 +16,6 @@ struct Config {
     constexpr static const auto PasteTimeout = "pasteTimeout";
     constexpr static const auto SearchByTags = "searchByTags";
     constexpr static const auto SearchByDescription = "searchByDescription";
-    constexpr static const auto SingleRunnerModePaste = "singleRunnerModePaste";
     constexpr static const auto Favourites = "favourites";
     constexpr static const auto DefaultFavourites = "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168";
     // Unicode/Ios version data

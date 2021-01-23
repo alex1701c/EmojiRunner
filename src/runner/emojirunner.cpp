@@ -11,11 +11,14 @@
 #include <QApplication>
 #include <QClipboard>
 
+#if KRUNNER_VERSION >= QT_VERSION_CHECK(5, 77, 0)
+EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args)
+        : Plasma::AbstractRunner(parent, pluginMetaData, args) {
+#else
 EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
         : Plasma::AbstractRunner(parent, args) {
+#endif
     setObjectName(QStringLiteral("EmojiRunner"));
-    setIgnoredTypes(Plasma::RunnerContext::NetworkLocation);
-
     // Add file watcher for config
     createConfigFile();
     watcher.addPath(Config::ConfigFilePath);

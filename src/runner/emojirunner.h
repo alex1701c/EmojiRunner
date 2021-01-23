@@ -2,6 +2,7 @@
 #define EMOJIRUNNER_H
 
 #include <KRunner/AbstractRunner>
+#include <krunner_version.h>
 #include "core/EmojiCategory.h"
 #include <QtCore>
 
@@ -16,10 +17,12 @@ extern "C" {
 class EmojiRunner : public Plasma::AbstractRunner {
 Q_OBJECT
 public:
-    ~EmojiRunner() override;
-
-public:
+#if KRUNNER_VERSION >= QT_VERSION_CHECK(5, 77, 0)
+    EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args);
+#else
     EmojiRunner(QObject *parent, const QVariantList &args);
+#endif
+    ~EmojiRunner() override;
 
     const QRegularExpression prefixRegex = QRegularExpression(QStringLiteral(R"(^emoji(?: +(.*))?$)"));
     QList<EmojiCategory> emojiCategories;

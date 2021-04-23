@@ -1,4 +1,6 @@
 #!/bin/bash
 
-kquitapp5 krunner
-kstart5 --windowclass krunner krunner
+if pgrep -x krunner > /dev/null
+then
+    killall krunner
+fi

@@ -30,6 +30,8 @@ Arch (Manjaro):
 The easiest way to install is:  
 `curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh | bash`  
 
+You can also find the plugin at the AUR: https://aur.archlinux.org/packages/plasma5-runners-emoji/
+
 Or you can do it manually:
 
 ```

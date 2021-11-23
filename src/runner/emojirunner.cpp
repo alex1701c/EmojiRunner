@@ -11,13 +11,8 @@
 #include <QApplication>
 #include <QClipboard>
 
-#if KRUNNER_VERSION >= QT_VERSION_CHECK(5, 77, 0)
 EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args)
         : Plasma::AbstractRunner(parent, pluginMetaData, args) {
-#else
-EmojiRunner::EmojiRunner(QObject *parent, const QVariantList &args)
-        : Plasma::AbstractRunner(parent, args) {
-#endif
     setObjectName(QStringLiteral("EmojiRunner"));
     // Add file watcher for config
     createConfigFile();
@@ -65,7 +60,7 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
 #ifndef XDO_LIB
     if (!QStandardPaths::findExecutable(QStringLiteral("xdotool")).isEmpty())
 #endif
-        matchActionList = {addAction("paste-action", QIcon::fromTheme("edit-paste"), "Paste emoji")};
+        matchActionList = {new QAction(QIcon::fromTheme("edit-paste"), "Paste emoji", this)};
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
@@ -152,11 +147,7 @@ void EmojiRunner::deleteEmojiPointers() {
 }
 
 
-#if KRUNNER_VERSION >= QT_VERSION_CHECK(5, 72, 0)
-K_EXPORT_PLASMA_RUNNER_WITH_JSON(EmojiRunner, "plasma-runner-emojirunner.json")
-#else
-K_EXPORT_PLASMA_RUNNER(emojirunner, EmojiRunner)
-#endif
+K_EXPORT_PLASMA_RUNNER_WITH_JSON(EmojiRunner, "emojirunner.json")
 
 // needed for the QObject subclass declared as part of K_EXPORT_PLASMA_RUNNER
 #include "emojirunner.moc"

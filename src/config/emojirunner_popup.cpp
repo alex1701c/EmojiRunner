@@ -26,11 +26,7 @@ void EmojiRunnerPopup::writeDataToEmoji() {
     emoji->category = Config::CustomCategory;
     emoji->emoji = this->emojiLineEdit->text();
     emoji->name = this->nameLineEdit->text();
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-    emoji->tags = this->tagsLineEdit->text().toLower().split(',', QString::SkipEmptyParts);
-#else
     emoji->tags = this->tagsLineEdit->text().toLower().split(',', Qt::SkipEmptyParts);
-#endif
     emoji->description = this->descriptionLineEdit->text();
     // Give name as parameter to find the existing item if the emoji has been updated
     emit finished(this->emoji, idx);

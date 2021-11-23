@@ -1,0 +1,17 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "alex1701c.dev@gmx.net",
+                "Name": "Alex1701c"
+            }
+        ],
+        "Description": "Emoji picker for Krunner",
+        "EnabledByDefault": true,
+        "Icon": "preferences-desktop-emoticons",
+        "Id": "emojirunner",
+        "License": "GLP V3",
+        "Name": "EmojiRunner"
+    },
+    "X-Plasma-Runner-Min-Letter-Count": 2
+}

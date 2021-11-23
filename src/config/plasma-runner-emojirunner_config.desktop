@@ -3,6 +3,5 @@ Type=Service
 X-KDE-ServiceTypes=KCModule
 X-KDE-Library=kcm_krunner_emojirunner
 X-KDE-ParentComponents=emojirunner
-X-KDE-PluginKeyword=kcm_krunner_emojirunner
 
 Name=emojirunner

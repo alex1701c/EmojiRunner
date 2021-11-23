@@ -10,7 +10,7 @@
 #include <core/Config.h>
 #include "core/macros.h"
 
-K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>("kcm_krunner_emojirunner");)
+K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>();)
 
 #define itemEmoji(item) reinterpret_cast<Emoji *>(item->data(Qt::UserRole).value<qintptr>())
 

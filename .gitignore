@@ -8,3 +8,6 @@ src/config/ui_*.h
 #Otherwise the changes do not take effect
 *.swap
 /.kdev4
+compile_commands.json
+.cache
+.clangd

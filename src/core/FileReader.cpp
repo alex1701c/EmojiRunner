@@ -40,7 +40,7 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const {
             ++customEmojiIT;
             if (preconfiguredEmojis.contains(category.name)) {
                 const EmojiCategory existingCategory = preconfiguredEmojis.value(category.name);
-                for (auto *emoji:existingCategory.emojis) {
+                for (const auto &emoji:existingCategory.emojis) {
                     category.emojis.append(emoji);
                 }
             }
@@ -80,17 +80,17 @@ QMap<QString, EmojiCategory> FileReader::parseEmojiFile(bool getAllEmojis, QFile
         // Add emojis to category
         for (const auto &item:items) {
             if (!item.isObject()) continue;
-            Emoji *newEmoji = Emoji::fromJSON(item.toObject(), key);
+            Emoji newEmoji = Emoji::fromJSON(item.toObject(), key);
             // Add emoji to the favourites list
-            const int favouritesIdx = favouriteIds.indexOf(newEmoji->id);
+            const int favouritesIdx = favouriteIds.indexOf(newEmoji.id);
             // Favourites have extra list for overview
             if (favouritesIdx != -1) {
-                newEmoji->favourite = 21 - favouritesIdx;
+                newEmoji.favourite = 21 - favouritesIdx;
                 favourites.emojis.append(newEmoji);
             }
             // Add emoji to category
-            if (getAllEmojis || newEmoji->favourite != 0 ||
-                (!categoryDisabled && newEmoji->matchesVersions(configUnicodeVersion, configIosVersion))) {
+            if (getAllEmojis || newEmoji.favourite != 0 ||
+                (!categoryDisabled && newEmoji.matchesVersions(configUnicodeVersion, configIosVersion))) {
                 category.emojis.append(newEmoji);
             }
         }

@@ -119,7 +119,7 @@ public Q_SLOTS:
      * @param emoji
      * @param originalName
      */
-    void applyEmojiPopupResults(Emoji *emoji, int idx);
+    void applyEmojiPopupResults(const Emoji &emoji, int idx);
 
     /**
      * Enable/Disable the edit and delete buttons based on the current emoji of the emojiListView

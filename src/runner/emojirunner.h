@@ -30,7 +30,7 @@ public:
     const QLatin1String queryPrefix = QLatin1String("emoji");
     QList<QAction *> matchActionList;
 
-    Plasma::QueryMatch createQueryMatch(const Emoji *emoji, qreal relevance,
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance,
             Plasma::QueryMatch::Type type = Plasma::QueryMatch::CompletionMatch);
 
 #ifdef XDO_LIB
@@ -43,11 +43,6 @@ public:
      * otherwise it starts a new xdotool process
      */
     void emitCTRLV();
-
-    /**
-     * Deletes the emojis
-     */
-    void deleteEmojiPointers();
 
 public: // Plasma::AbstractRunner API
     void match(Plasma::RunnerContext &context) override;

@@ -51,7 +51,7 @@ public:
      * @param categoryKey
      * @return Emoji
      */
-    static Emoji *fromJSON(const QJsonObject &obj, const QString &categoryKey);
+    static Emoji fromJSON(const QJsonObject &obj, const QString &categoryKey);
 
     /**
      * Writes emojis to given file
@@ -59,9 +59,11 @@ public:
      * @param filePath File location, if empty the default customemojis.json file will be userd
      * @param category Category of emojis, by default "Custom"
      */
-    static void writeToJSONFile(const QList<Emoji *> &emojis,
+    static void writeToJSONFile(const QList<Emoji> &emojis,
                                 const QString &filePath = QString(),
                                 const QString &category = QStringLiteral("Custom"));
 };
+
+Q_DECLARE_METATYPE(Emoji)
 
 #endif //EMOJIRUNNER_EMOJI_H

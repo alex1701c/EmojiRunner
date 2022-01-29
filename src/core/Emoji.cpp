@@ -38,22 +38,22 @@ bool Emoji::matchesVersions(const float configUnicodeVersion, const float config
     return !(unicodeVersion == 0 && iosVersion > configIosVersion);
 }
 
-Emoji *Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey) {
-    auto *emoji = new Emoji();
-    emoji->id = obj.value(JSONEmoji::Id).toInt();
-    emoji->name = obj.value(JSONEmoji::Name).toString().toLower();
-    emoji->emoji = obj.value(JSONEmoji::Emoji).toString();
-    emoji->category = categoryKey;
+Emoji Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey) {
+    Emoji emoji;
+    emoji.id = obj.value(JSONEmoji::Id).toInt();
+    emoji.name = obj.value(JSONEmoji::Name).toString().toLower();
+    emoji.emoji = obj.value(JSONEmoji::Emoji).toString();
+    emoji.category = categoryKey;
     const auto tagsArray = obj.value(JSONEmoji::Tags).toArray();
-    for (const auto &tag : tagsArray) emoji->tags.append(tag.toString().toLower());
-    emoji->description = obj.value(JSONEmoji::Description).toString().toLower();
-    emoji->unicodeVersion = obj.value(JSONEmoji::UnicodeVersion).toString().toFloat();
-    emoji->iosVersion = obj.value(JSONEmoji::IosVersion).toString().toFloat();
+    for (const auto &tag : tagsArray) emoji.tags.append(tag.toString().toLower());
+    emoji.description = obj.value(JSONEmoji::Description).toString().toLower();
+    emoji.unicodeVersion = obj.value(JSONEmoji::UnicodeVersion).toString().toFloat();
+    emoji.iosVersion = obj.value(JSONEmoji::IosVersion).toString().toFloat();
     return emoji;
 }
 
 
-void Emoji::writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePath, const QString &category) {
+void Emoji::writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath, const QString &category) {
     // Initialize values
     QJsonDocument doc;
     QJsonArray emojiJsonArray;
@@ -70,13 +70,13 @@ void Emoji::writeToJSONFile(const QList<Emoji *> &emojis, const QString &filePat
 
     // Write emojis in json array
     for (int i = 0, customEmojiCount = emojis.count(); i < customEmojiCount; ++i) {
-        const Emoji *e = emojis.at(i);
+        const Emoji e = emojis.at(i);
         QJsonObject customObj;
-        customObj.insert(JSONEmoji::Emoji, e->emoji);
-        customObj.insert(JSONEmoji::Name, e->name.toLower());
+        customObj.insert(JSONEmoji::Emoji, e.emoji);
+        customObj.insert(JSONEmoji::Name, e.name.toLower());
         customObj.insert(JSONEmoji::Id, QJsonValue(2000 + i));
-        customObj.insert(JSONEmoji::Tags, QJsonArray::fromStringList(e->tags));
-        customObj.insert(JSONEmoji::Description, e->description.toLower());
+        customObj.insert(JSONEmoji::Tags, QJsonArray::fromStringList(e.tags));
+        customObj.insert(JSONEmoji::Description, e.description.toLower());
         customObj.insert(JSONEmoji::UnicodeVersion, 1);
         customObj.insert(JSONEmoji::IosVersion, 0);
         emojiJsonArray.append(QJsonValue(customObj));

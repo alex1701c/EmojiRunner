@@ -26,11 +26,9 @@ EmojiRunner::~EmojiRunner() {
 #ifdef XDO_LIB
     xdo_free(xdo);
 #endif
-    deleteEmojiPointers();
 }
 
 void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
-    deleteEmojiPointers();
     KConfigGroup config = KSharedConfig::openConfig(Config::ConfigFilePath)->group(Config::RootGroup);
     // Force sync from file
     if (!configFile.isEmpty()) config.config()->reparseConfiguration();
@@ -77,15 +75,15 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
 
     QList<Plasma::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
-        for (auto *emoji : qAsConst(favouriteCategory.emojis)) {
-            matches.append(createQueryMatch(emoji, (float) emoji->favourite / 21,
+        for (const auto &emoji : qAsConst(favouriteCategory.emojis)) {
+            matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21,
                     Plasma::QueryMatch::ExactMatch));
         }
     } else if (prefixed || (globalSearchEnabled && term.count() > 2) || context.singleRunnerQueryMode()) {
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji: qAsConst(category.emojis)) {
-                const double relevance = emoji->getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
+                const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
                 matches.append(createQueryMatch(emoji, relevance, prefixed ? Plasma::QueryMatch::ExactMatch : Plasma::QueryMatch::CompletionMatch));
             }
@@ -114,12 +112,12 @@ void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryM
 }
 
 
-Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji *emoji, const qreal relevance, Plasma::QueryMatch::Type type){
+Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal relevance, Plasma::QueryMatch::Type type){
     Plasma::QueryMatch match(this);
-    match.setText(emoji->emoji);
+    match.setText(emoji.emoji);
     match.setType(type);
-    match.setSubtext(emoji->name);
-    match.setData(emoji->emoji);
+    match.setSubtext(emoji.name);
+    match.setData(emoji.emoji);
     match.setRelevance(relevance);
     return match;
 }
@@ -136,16 +134,6 @@ void EmojiRunner::emitCTRLV() {
     // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
 #endif
 }
-
-void EmojiRunner::deleteEmojiPointers() {
-    // Delete pointers if config reloads, the favourites are also contained in the other categories
-    for (const auto &category: qAsConst(emojiCategories)) {
-        if (category.name != Config::FavouritesCategory) {
-            qDeleteAll(category.emojis);
-        }
-    }
-}
-
 
 K_EXPORT_PLASMA_RUNNER_WITH_JSON(EmojiRunner, "emojirunner.json")
 

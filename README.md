@@ -126,8 +126,8 @@ This gets saved in the ~/.local/share/emojirunner/customemojis.json file.
 ![Custom emojis file](https://raw.githubusercontent.com/alex1701c/Screenshots/master/EmojiRunner/custom_emojis_file.png)    
 
 # Issues 
-- If you don't have colorful emojis please try the solution from https://github.com/alex1701c/EmojiRunner/issues/1/  
-- If the emojis do not get pasted try to increase the timeout for the pasting action by adding `pasteTimeout=timeout_in_ms` to the `[Config]` group in ~/.config/krunnerplugins/emojirunnerrc .
+- If you don't have colorful emojis please try [this solution](https://github.com/alex1701c/EmojiRunner/issues/1/).
+- If the emojis do not get pasted try to increase the timeout for the pasting action by adding `pasteTimeout=timeout_in_ms` to the `[Config]` group in `~/.config/krunnerplugins/emojirunnerrc`.
 
 If you have any other issues please let me know 😄.
  

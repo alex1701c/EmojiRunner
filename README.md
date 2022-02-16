@@ -1,7 +1,7 @@
 ## Emoji Runner
 
-- [Search emojis](user-content-search-for-an-emoji-by-name) and copy & paste them
-- Configure [favourite emojis](show-favourites)
+- [Search emojis](#user-content-search-for-an-emoji-by-name) and copy & paste them
+- Configure [favourite emojis](#show-favourites)
 - Set unicode version
 - Enable/disable categories
 - Add custom emojis

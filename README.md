@@ -4,7 +4,7 @@
 - Configure [favourite emojis](#show-favourites)
 - Set unicode version
 - Enable/disable categories
-- Add custom emojis
+- [Add custom emojis](#add-a-custom-emoji)
 
 You can build this package from source or use the deb/rpm packages from [the releases page](https://github.com/alex1701c/EmojiRunner/releases).
 

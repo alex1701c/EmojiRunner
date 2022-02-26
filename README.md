@@ -52,18 +52,15 @@ sudo pacman -S cmake extra-cmake-modules xdotool kcmutils
 
 ### Build instructions  
 
-<details>
-<summary>Option A: Easy oneliner method</summary>
+#### Option A: Easy oneliner method
  
 ```bash
 curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh | bash
 ```
 
-</details>
+#### Option B: Get it from the [AUR](https://aur.archlinux.org/packages/plasma5-runners-emoji/)
 
-Option B: Get it from the [AUR](https://aur.archlinux.org/packages/plasma5-runners-emoji/)
-
-The `emoji.json` file is a modified version from [gemoji](https://github.com/github/gemoji).
+**Info:** The `emoji.json` file is a modified version from [gemoji](https://github.com/github/gemoji).
 
 ### Enable Shortcuts
 This project has a EmojiRunnerCommands.khotkeys file.

@@ -60,6 +60,14 @@ curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh |
 
 #### Option B: Get it from the [AUR](https://aur.archlinux.org/packages/plasma5-runners-emoji/)
 
+#### Option C: Manual installation method
+
+```bash
+git clone https://github.com/alex1701c/EmojiRunner
+cd EmojiRunner
+bash install.sh
+```
+
 **Info:** The `emoji.json` file is a modified version from [gemoji](https://github.com/github/gemoji).
 
 ### Enable Shortcuts

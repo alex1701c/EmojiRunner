@@ -90,15 +90,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     context.addMatches(matches);
 }
 
-QList<QAction *> EmojiRunner::actionsForMatch(const Plasma::QueryMatch &match) {
-    Q_UNUSED(match)
-
-    return matchActionList;
-}
-
-void EmojiRunner::run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) {
-    Q_UNUSED(context)
-
+void EmojiRunner::run(const Plasma::RunnerContext &/*context*/, const Plasma::QueryMatch &match) {
     QApplication::clipboard()->setText(match.text());
     if (match.selectedAction()) {
         // Wait for krunner to be closed before typing

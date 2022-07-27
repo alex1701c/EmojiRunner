@@ -46,7 +46,9 @@ public:
 
 public: // Plasma::AbstractRunner API
     void match(Plasma::RunnerContext &context) override;
-    QList<QAction*> actionsForMatch(const Plasma::QueryMatch &match) override;
+    QList<QAction*> actionsForMatch(const Plasma::QueryMatch &/*match*/) override {
+        return matchActionList;
+    };
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
 
 public Q_SLOTS:

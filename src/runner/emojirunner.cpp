@@ -65,11 +65,11 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile)
         matchActionList = {new QAction(QIcon::fromTheme("edit-paste"), "Paste emoji", this)};
 
     QList<Plasma::RunnerSyntax> syntaxes;
-    syntaxes.append(Plasma::RunnerSyntax(QStringLiteral("emoji :q"),
+    syntaxes.append(Plasma::RunnerSyntax(QStringLiteral("emoji :q:"),
                                          QStringLiteral("Searches for emojis matching the query. If no query is specified, the favourites are shown")));
     if (globalSearchEnabled) {
         syntaxes.append(
-            Plasma::RunnerSyntax(QStringLiteral(":q"),
+            Plasma::RunnerSyntax(QStringLiteral(":q:"),
                                  QStringLiteral("Searches for emojis matching the query without requiring a keyword. This can be disabled in the settings")));
     }
     setSyntaxes(syntaxes);

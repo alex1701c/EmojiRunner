@@ -125,7 +125,6 @@ void EmojiRunner::emitCTRLV() {
 #endif
 }
 
-K_EXPORT_PLASMA_RUNNER_WITH_JSON(EmojiRunner, "emojirunner.json")
+K_PLUGIN_CLASS_WITH_JSON(EmojiRunner, "emojirunner.json")
 
-// needed for the QObject subclass declared as part of K_EXPORT_PLASMA_RUNNER
 #include "emojirunner.moc"

@@ -21,13 +21,13 @@ public:
     EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args);
     ~EmojiRunner() override;
 
-    const QRegularExpression prefixRegex = QRegularExpression(QStringLiteral(R"(^emoji(?: +(.*))?$)"));
+    const QRegularExpression prefixRegex{QStringLiteral(R"(^emoji(?: +(.*))?$)")};
     QList<EmojiCategory> emojiCategories;
     EmojiCategory favouriteCategory;
     QFileSystemWatcher watcher;
     int pasteTimeout;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled;
-    const QLatin1String queryPrefix = QLatin1String("emoji");
+    const QLatin1String queryPrefix{"emoji"};
     QList<QAction *> matchActionList;
 
     Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance,

@@ -76,7 +76,7 @@ void EmojiRunnerConfig::load() {
     QList<Emoji> favouriteEmojisToAdd;
     for (const auto &category: qAsConst(emojiCategories)) {
         if (category.name != Config::FavouritesCategory) continue;
-        for (const auto &emoji: qAsConst(category.emojis)) {
+        for (const auto &emoji: category.emojis) {
             favouriteEmojisToAdd.append(emoji);
         }
     }

@@ -82,7 +82,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
     } else if (prefixed || (globalSearchEnabled && term.count() > 2) || context.singleRunnerQueryMode()) {
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
-            for (const auto &emoji: qAsConst(category.emojis)) {
+            for (const auto &emoji: category.emojis) {
                 const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1) continue;
                 matches.append(createQueryMatch(emoji, relevance, prefixed ? Plasma::QueryMatch::ExactMatch : Plasma::QueryMatch::CompletionMatch));

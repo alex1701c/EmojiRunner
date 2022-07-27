@@ -62,11 +62,9 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile) {
 }
 
 void EmojiRunner::match(Plasma::RunnerContext &context) {
-    // Remove escape character, fixed Plasma 5.20
-    const auto term = QString(context.query()).remove(QString::fromWCharArray(L"\u001B")).toLower();
-    const bool prefixed = term.startsWith(queryPrefix);
+    QString search = context.query();
+    const bool prefixed = search.startsWith(queryPrefix);
 
-    QString search = term;
     if (prefixed) {
         const auto match = prefixRegex.match(search);
         if (!match.hasMatch()) return;
@@ -79,7 +77,7 @@ void EmojiRunner::match(Plasma::RunnerContext &context) {
             matches.append(createQueryMatch(emoji, (float) emoji.favourite / 21,
                     Plasma::QueryMatch::ExactMatch));
         }
-    } else if (prefixed || (globalSearchEnabled && term.count() > 2) || context.singleRunnerQueryMode()) {
+    } else if (prefixed || (globalSearchEnabled && search.count() > 2) || context.singleRunnerQueryMode()) {
         for (const auto &category: qAsConst(emojiCategories)) {
             if (category.name == Config::FavouritesCategory) continue;
             for (const auto &emoji: category.emojis) {

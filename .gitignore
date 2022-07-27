@@ -11,3 +11,4 @@ src/config/ui_*.h
 compile_commands.json
 .cache
 .clangd
+.clang-format

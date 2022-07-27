@@ -2,10 +2,10 @@
 #ifndef EMOJIRUNNER_FILEREADER_H
 #define EMOJIRUNNER_FILEREADER_H
 
-
 #include "EmojiCategory.h"
 
-class FileReader {
+class FileReader
+{
 public:
     QList<int> favouriteIds;
     float configUnicodeVersion;
@@ -35,5 +35,4 @@ public:
     QMap<QString, EmojiCategory> parseEmojiFile(bool getAllEmojis, QFile &emojiJSONFile) const;
 };
 
-
-#endif //EMOJIRUNNER_FILEREADER_H
+#endif // EMOJIRUNNER_FILEREADER_H

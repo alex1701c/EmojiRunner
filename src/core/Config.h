@@ -1,7 +1,8 @@
 #ifndef EMOJIRUNNER_CONFIG_H
 #define EMOJIRUNNER_CONFIG_H
 
-namespace {
+namespace
+{
 struct Config {
     // General config keys
     constexpr static const auto ConfigFileName = "emojirunnerrc";
@@ -48,4 +49,4 @@ const QString Config::CustomEmojiFilePath = QDir::homePath() + "/.local/share/em
 const QString Config::LocalEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/emojis.json";
 const QString Config::GlobalEmojiFilePath = QStringLiteral("/usr/share/emojirunner/emojis.json");
 }
-#endif //EMOJIRUNNER_CONFIG_H
+#endif // EMOJIRUNNER_CONFIG_H

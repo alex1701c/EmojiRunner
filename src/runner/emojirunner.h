@@ -1,11 +1,11 @@
 #ifndef EMOJIRUNNER_H
 #define EMOJIRUNNER_H
 
-#include <KRunner/AbstractRunner>
-#include <krunner_version.h>
 #include "core/EmojiCategory.h"
-#include <QtCore>
+#include <KRunner/AbstractRunner>
 #include <QAction>
+#include <QtCore>
+#include <krunner_version.h>
 
 #ifdef XDO_LIB
 // For autotyping
@@ -14,9 +14,9 @@ extern "C" {
 }
 #endif
 
-
-class EmojiRunner : public Plasma::AbstractRunner {
-Q_OBJECT
+class EmojiRunner : public Plasma::AbstractRunner
+{
+    Q_OBJECT
 public:
     EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args);
     ~EmojiRunner() override;
@@ -30,8 +30,7 @@ public:
     const QLatin1String queryPrefix{"emoji"};
     QList<QAction *> matchActionList;
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance,
-            Plasma::QueryMatch::Type type = Plasma::QueryMatch::CompletionMatch);
+    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance, Plasma::QueryMatch::Type type = Plasma::QueryMatch::CompletionMatch);
 
 #ifdef XDO_LIB
     xdo_t *xdo = xdo_new(nullptr);
@@ -46,7 +45,8 @@ public:
 
 public: // Plasma::AbstractRunner API
     void match(Plasma::RunnerContext &context) override;
-    QList<QAction*> actionsForMatch(const Plasma::QueryMatch &/*match*/) override {
+    QList<QAction *> actionsForMatch(const Plasma::QueryMatch & /*match*/) override
+    {
         return matchActionList;
     };
     void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;

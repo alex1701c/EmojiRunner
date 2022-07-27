@@ -2,11 +2,11 @@
 #define EMOJIRUNNER_EMOJI_H
 
 #include <QtCore>
-#include <utility>
 #include <QtWidgets/QListWidgetItem>
+#include <utility>
 
-
-class Emoji {
+class Emoji
+{
 public:
     int id = 0;
     int favourite = 0;
@@ -36,7 +36,6 @@ public:
      */
     double getMatchTextRelevance(const QString &search, bool tagSearch, bool descriptionSearch) const;
 
-
     /**
      * If the emoji matches the unicode version or the fallback ios version
      * @param configUnicodeVersion
@@ -59,11 +58,9 @@ public:
      * @param filePath File location, if empty the default customemojis.json file will be userd
      * @param category Category of emojis, by default "Custom"
      */
-    static void writeToJSONFile(const QList<Emoji> &emojis,
-                                const QString &filePath = QString(),
-                                const QString &category = QStringLiteral("Custom"));
+    static void writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath = QString(), const QString &category = QStringLiteral("Custom"));
 };
 
 Q_DECLARE_METATYPE(Emoji)
 
-#endif //EMOJIRUNNER_EMOJI_H
+#endif // EMOJIRUNNER_EMOJI_H

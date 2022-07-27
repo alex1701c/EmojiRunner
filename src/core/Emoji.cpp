@@ -1,59 +1,67 @@
-#include <QtCore/QFile>
-#include <QtCore/QDir>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QJsonObject>
 #include "Emoji.h"
 #include "Config.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
 
-
-double Emoji::getEmojiRelevance(const QString &search, const bool tagSearch, const bool descriptionSearch) const {
+double Emoji::getEmojiRelevance(const QString &search, const bool tagSearch, const bool descriptionSearch) const
+{
     double res = getMatchTextRelevance(search, tagSearch, descriptionSearch);
 
-    if (res == -1) return res;
-    if (this->favourite != 0) res += 0.25;
-    if (this->category == Config::SmileysEmotionsCategory || this->category == Config::CustomCategory) res *= 2;
+    if (res == -1)
+        return res;
+    if (this->favourite != 0)
+        res += 0.25;
+    if (this->category == Config::SmileysEmotionsCategory || this->category == Config::CustomCategory)
+        res *= 2;
     return res;
 }
 
-double Emoji::getMatchTextRelevance(const QString &search, const bool tagSearch, const bool descriptionSearch) const {
+double Emoji::getMatchTextRelevance(const QString &search, const bool tagSearch, const bool descriptionSearch) const
+{
     if (this->name.contains(search)) {
-        return (double) search.size() / (this->name.length() * 8);
+        return (double)search.size() / (this->name.length() * 8);
     }
     if (descriptionSearch && this->description.contains(search)) {
-        return (double) search.size() / (this->description.length() * 8);
+        return (double)search.size() / (this->description.length() * 8);
     }
     if (tagSearch) {
-        for (const auto &tag: qAsConst(this->tags)) {
-            if (tag.contains(search)) return (double) search.size() / (tag.length() * 8);
+        for (const auto &tag : qAsConst(this->tags)) {
+            if (tag.contains(search))
+                return (double)search.size() / (tag.length() * 8);
         }
     }
     return -1;
 }
 
-
-bool Emoji::matchesVersions(const float configUnicodeVersion, const float configIosVersion) const {
-    if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion) return false;
+bool Emoji::matchesVersions(const float configUnicodeVersion, const float configIosVersion) const
+{
+    if (unicodeVersion != 0 && unicodeVersion > configUnicodeVersion)
+        return false;
     return !(unicodeVersion == 0 && iosVersion > configIosVersion);
 }
 
-Emoji Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey) {
+Emoji Emoji::fromJSON(const QJsonObject &obj, const QString &categoryKey)
+{
     Emoji emoji;
     emoji.id = obj.value(JSONEmoji::Id).toInt();
     emoji.name = obj.value(JSONEmoji::Name).toString().toLower();
     emoji.emoji = obj.value(JSONEmoji::Emoji).toString();
     emoji.category = categoryKey;
     const auto tagsArray = obj.value(JSONEmoji::Tags).toArray();
-    for (const auto &tag : tagsArray) emoji.tags.append(tag.toString().toLower());
+    for (const auto &tag : tagsArray)
+        emoji.tags.append(tag.toString().toLower());
     emoji.description = obj.value(JSONEmoji::Description).toString().toLower();
     emoji.unicodeVersion = obj.value(JSONEmoji::UnicodeVersion).toString().toFloat();
     emoji.iosVersion = obj.value(JSONEmoji::IosVersion).toString().toFloat();
     return emoji;
 }
 
-
-void Emoji::writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath, const QString &category) {
+void Emoji::writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath, const QString &category)
+{
     // Initialize values
     QJsonDocument doc;
     QJsonArray emojiJsonArray;
@@ -66,7 +74,8 @@ void Emoji::writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath,
     }
 
     // If the user overrides existing emojis manually the changes are kept
-    if (doc.isObject()) rootObject = doc.object();
+    if (doc.isObject())
+        rootObject = doc.object();
 
     // Write emojis in json array
     for (int i = 0, customEmojiCount = emojis.count(); i < customEmojiCount; ++i) {
@@ -89,7 +98,8 @@ void Emoji::writeToJSONFile(const QList<Emoji> &emojis, const QString &filePath,
     // Make sure that folder exists
     const QString configFolder = QDir::homePath() + "/.local/share/emojirunner/";
     const QDir configDir(configFolder);
-    if (!configDir.exists()) configDir.mkpath(configFolder);
+    if (!configDir.exists())
+        configDir.mkpath(configFolder);
 
     // Write to file
     QFile configFile(configFolder + "customemojis.json");

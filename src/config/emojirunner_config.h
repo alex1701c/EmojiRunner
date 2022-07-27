@@ -1,22 +1,24 @@
 #ifndef EmojiRunnerCONFIG_H
 #define EmojiRunnerCONFIG_H
 
+#include "emojirunner_popup.h"
 #include "ui_emojirunner_config.h"
+#include "ui_emojirunner_popup.h"
 #include <KCModule>
 #include <KConfigCore/KConfigGroup>
 #include <core/EmojiCategory.h>
-#include "ui_emojirunner_popup.h"
-#include "emojirunner_popup.h"
 
-class EmojiRunnerConfigForm : public QWidget, public Ui::EmojiRunnerConfigUi {
-Q_OBJECT
+class EmojiRunnerConfigForm : public QWidget, public Ui::EmojiRunnerConfigUi
+{
+    Q_OBJECT
 
 public:
     explicit EmojiRunnerConfigForm(QWidget *parent);
 };
 
-class EmojiRunnerConfig : public KCModule {
-Q_OBJECT
+class EmojiRunnerConfig : public KCModule
+{
+    Q_OBJECT
 
 private:
     EmojiRunnerConfigForm *m_ui;

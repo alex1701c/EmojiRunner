@@ -126,12 +126,10 @@ void EmojiRunner::emitCTRLV()
     xdo_send_keysequence_window(xdo, CURRENTWINDOW, "ctrl+v", 0);
 #else
     // Works but is slower and starts new process
-    QProcess::startDetached("xdotool",
-                            QStringList() << "key"
-                                          << "ctrl+v");
+    QProcess::startDetached("xdotool", QStringList{"key", "ctrl+v"});
 
     // Does not always work
-    // QProcess::startDetached("bash", QStringList() << "-c" << "sleep 0.2; xdotool type \"" + match.text() + "\"");
+    // QProcess::startDetached("bash", QStringList{"-c", "sleep 0.2; xdotool type \"" + match.text() + "\""});
 #endif
 }
 

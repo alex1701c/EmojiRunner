@@ -13,5 +13,6 @@
         "License": "GLP V3",
         "Name": "EmojiRunner"
     },
-    "X-Plasma-Runner-Min-Letter-Count": 2
+    "X-Plasma-Runner-Min-Letter-Count": 2,
+    "X-KDE-ConfigModule": "kcm_krunner_emojirunner"
 }

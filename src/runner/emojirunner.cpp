@@ -47,7 +47,7 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile)
     emojiCategories = reader.getEmojiCategories(false);
 
     globalSearchEnabled = config.readEntry(Config::GlobalSearch, true);
-    tagSearchEnabled = config.readEntry(Config::SearchByTags, false);
+    tagSearchEnabled = config.readEntry(Config::SearchByTags, true);
     descriptionSearchEnabled = config.readEntry(Config::SearchByDescription, false);
 
     // Items only change in reload config method => read once and reuse

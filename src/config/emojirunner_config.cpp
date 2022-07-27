@@ -65,7 +65,7 @@ void EmojiRunnerConfig::load()
 
     m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
     m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
-    m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, false));
+    m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, true));
 
     // Load categories
     for (const auto &category : qAsConst(emojiCategories)) {
@@ -170,7 +170,7 @@ void EmojiRunnerConfig::defaults()
 {
     m_ui->enableGlobalSearch->setChecked(true);
     m_ui->favouriteFilterDescription_2->setChecked(false);
-    m_ui->favouriteFilterTags_2->setChecked(false);
+    m_ui->favouriteFilterTags_2->setChecked(true);
     m_ui->unicodeComboBox->setCurrentText(QSL("11"));
     m_ui->iosComboBox->setCurrentText(QSL("13"));
 

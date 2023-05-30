@@ -14,7 +14,6 @@
 EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args)
     : Plasma::AbstractRunner(parent, pluginMetaData, args)
 {
-    setObjectName(QStringLiteral("EmojiRunner"));
     // Add file watcher for config
     createConfigFile();
     watcher.addPath(Config::ConfigFilePath);

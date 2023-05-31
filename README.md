@@ -17,7 +17,7 @@ but having the library installed is recommended.
 <summary><b>Debian/Ubuntu</b></summary>
 
 ```bash
-sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libkf5textwidgets-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev
+sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev
 ```
 
 </details>
@@ -26,7 +26,7 @@ sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev libk
 <summary><b>OpenSUSE</b></summary>
 
 ```bash
-sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel ktextwidgets-devel kservice-devel krunner-devel gettext-tools xdotool-devel kconfigwidgets-devel kcmutils-devel
+sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-qtlocation-devel ki18n-devel krunner-devel gettext-tools xdotool-devel kconfigwidgets-devel kcmutils-devel
 ```
 
 </details>
@@ -35,7 +35,7 @@ sudo zypper install cmake extra-cmake-modules libQt5Widgets5 libQt5Core5 libqt5-
 <summary><b>Fedora</b></summary>
 
 ```bash
-sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-kservice-devel kf5-krunner-devel kf5-ktextwidgets-devel gettext xdotool kf5-kcmutils-devel
+sudo dnf install cmake extra-cmake-modules kf5-ki18n-devel kf5-krunner-devel gettext xdotool kf5-kcmutils-devel
 ```
 
 </details>

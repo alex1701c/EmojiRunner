@@ -10,7 +10,7 @@
 #include <core/Config.h>
 #include <core/FileReader.h>
 
-K_PLUGIN_FACTORY(EmojiRunnerConfigFactory, registerPlugin<EmojiRunnerConfig>();)
+K_PLUGIN_CLASS(EmojiRunnerConfig)
 
 #define itemEmoji(item) item->data(Qt::UserRole).value<Emoji>()
 

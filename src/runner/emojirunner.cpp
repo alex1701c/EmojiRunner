@@ -125,6 +125,7 @@ Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal
     match.setSubtext(emoji.name);
     match.setData(emoji.emoji);
     match.setRelevance(relevance);
+    match.setActions(matchActionList);
     return match;
 }
 

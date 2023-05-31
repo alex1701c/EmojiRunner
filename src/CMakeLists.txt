@@ -1,8 +1,8 @@
 add_definitions(-DTRANSLATION_DOMAIN=\"plasma_runner_org.kde.emojirunner\")
 set(CMAKE_AUTOUIC ON)
 
-kcoreaddons_add_plugin(krunner_emojirunner SOURCES runner/emojirunner.cpp core/Emoji.cpp core/FileReader.cpp INSTALL_NAMESPACE "kf5/krunner")
-target_link_libraries(krunner_emojirunner KF5::Runner Qt::Widgets) # Widgets for QAction, this will change to Qt::Gui in Qt6
+kcoreaddons_add_plugin(emojirunner SOURCES runner/emojirunner.cpp core/Emoji.cpp core/FileReader.cpp INSTALL_NAMESPACE "kf5/krunner")
+target_link_libraries(emojirunner KF5::Runner Qt::Widgets) # Widgets for QAction, this will change to Qt::Gui in Qt6
 
 find_path(XDO_HEADER xdo.h)
 find_library(XDO_LIB "xdo")
@@ -10,8 +10,8 @@ if (NOT XDO_LIB)
     message(WARNING "Could not find libxdo-dev, proceeding with xdotool https://github.com/jordansissel/xdotool")
 else ()
     add_definitions(-DXDO_LIB)
-    target_include_directories(krunner_emojirunner PRIVATE ${XDO_HEADER})
-    target_link_libraries(krunner_emojirunner ${XDO_LIB})
+    target_include_directories(emojirunner PRIVATE ${XDO_HEADER})
+    target_link_libraries(emojirunner ${XDO_LIB})
 endif ()
 
 add_library(kcm_krunner_emojirunner MODULE config/emojirunner_config.ui config/emojirunner_popup.ui)

@@ -9,7 +9,6 @@
         "Description": "Emoji picker for Krunner",
         "EnabledByDefault": true,
         "Icon": "preferences-desktop-emoticons",
-        "Id": "emojirunner",
         "License": "GLP V3",
         "Name": "EmojiRunner"
     },

@@ -56,13 +56,6 @@ EmojiRunnerConfig::~EmojiRunnerConfig()
 
 void EmojiRunnerConfig::load()
 {
-    // Load method gets also called when exiting config dialog without saving
-    static bool loaded = false;
-    if (loaded) {
-        return;
-    }
-    loaded = true;
-
     m_ui->enableGlobalSearch->setChecked(config.readEntry(Config::GlobalSearch, true));
     m_ui->favouriteFilterDescription_2->setChecked(config.readEntry(Config::SearchByDescription, false));
     m_ui->favouriteFilterTags_2->setChecked(config.readEntry(Config::SearchByTags, true));

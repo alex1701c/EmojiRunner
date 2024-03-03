@@ -8,8 +8,7 @@ struct Config {
     constexpr static const auto ConfigFileName = "emojirunnerrc";
     constexpr static const auto RelativeConfigFolder = "/.config/krunnerplugins/";
     const static QString ConfigFilePath;
-    const static QString GlobalEmojiFilePath;
-    const static QString LocalEmojiFilePath;
+    const static QString SharedEmojiFileName;
     const static QString CustomEmojiFilePath;
     constexpr static const auto RootGroup = "Config";
     constexpr static const auto GlobalSearch = "globalSearch";
@@ -46,7 +45,6 @@ struct JSONEmoji {
 
 const QString Config::ConfigFilePath = QDir::homePath() + Config::RelativeConfigFolder + Config::ConfigFileName;
 const QString Config::CustomEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
-const QString Config::LocalEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/emojis.json";
-const QString Config::GlobalEmojiFilePath = QStringLiteral("/usr/share/emojirunner/emojis.json");
+const QString Config::SharedEmojiFileName = "emojirunner/emojis.json";
 }
 #endif // EMOJIRUNNER_CONFIG_H

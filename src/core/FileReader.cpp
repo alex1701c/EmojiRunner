@@ -20,13 +20,11 @@ FileReader::FileReader(const KConfigGroup &config)
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const
 {
     // Emojis for user level install
-    QFile globalFile(Config::GlobalEmojiFilePath);
-    QFile localFile(Config::LocalEmojiFilePath);
+    QString emojisFilePath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, Config::SharedEmojiFileName, QStandardPaths::LocateFile);
+    QFile emojisFile(emojisFilePath);
     QMap<QString, EmojiCategory> preconfiguredEmojis;
-    if (globalFile.exists() && globalFile.open(QIODevice::ReadOnly)) {
-        preconfiguredEmojis = parseEmojiFile(getAllEmojis, globalFile);
-    } else if (localFile.exists() && localFile.open(QIODevice::ReadOnly)) {
-        preconfiguredEmojis = parseEmojiFile(getAllEmojis, localFile);
+    if (emojisFile.exists() && emojisFile.open(QIODevice::ReadOnly)) {
+        preconfiguredEmojis = parseEmojiFile(getAllEmojis, emojisFile);
     }
 
     // Read custom emojis

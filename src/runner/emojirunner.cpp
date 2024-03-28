@@ -3,16 +3,29 @@
 #include "core/FileReader.h"
 #include "core/utilities.h"
 
-#include <KConfigCore/KConfigGroup>
-#include <KConfigCore/KSharedConfig>
+#include <KConfigGroup>
 #include <KLocalizedString>
+#include <KSharedConfig>
 #include <krunner_version.h>
 
 #include <QApplication>
 #include <QClipboard>
+#include <QFile>
+#include <QTimer>
+
+#ifdef XDO_LIB
+// For autotyping
+extern "C" {
+#include <xdo.h>
+}
+#endif
 
 EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData, const QVariantList &args)
-    : Plasma::AbstractRunner(parent, pluginMetaData, args)
+#if KRUNNER_VERSION_MAJOR == 5
+    : KRunner::AbstractRunner(parent, pluginMetaData, args)
+#else
+    : KRunner::AbstractRunner(parent, pluginMetaData)
+#endif
 {
     // Add file watcher for config
     createConfigFile();
@@ -20,6 +33,9 @@ EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData,
     watcher.addPath(Config::CustomEmojiFilePath);
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &EmojiRunner::reloadPluginConfiguration);
     reloadPluginConfiguration();
+#ifdef XDO_LIB
+    xdo = xdo_new(nullptr);
+#endif
 }
 
 EmojiRunner::~EmojiRunner()
@@ -61,20 +77,24 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile)
 #ifndef XDO_LIB
     if (!QStandardPaths::findExecutable(QStringLiteral("xdotool")).isEmpty())
 #endif
+#if KRUNNER_VERSION_MAJOR == 5
         matchActionList = {new QAction(QIcon::fromTheme("edit-paste"), "Paste emoji", this)};
+#else
+    matchActionList = {KRunner::Action("paste", "edit-paste", "Paste emoji")};
+#endif
 
-    QList<Plasma::RunnerSyntax> syntaxes;
-    syntaxes.append(Plasma::RunnerSyntax(QStringLiteral("emoji :q:"),
-                                         QStringLiteral("Searches for emojis matching the query. If no query is specified, the favourites are shown")));
+    QList<KRunner::RunnerSyntax> syntaxes;
+    syntaxes.append(KRunner::RunnerSyntax(QStringLiteral("emoji :q:"),
+                                          QStringLiteral("Searches for emojis matching the query. If no query is specified, the favourites are shown")));
     if (globalSearchEnabled) {
         syntaxes.append(
-            Plasma::RunnerSyntax(QStringLiteral(":q:"),
-                                 QStringLiteral("Searches for emojis matching the query without requiring a keyword. This can be disabled in the settings")));
+            KRunner::RunnerSyntax(QStringLiteral(":q:"),
+                                  QStringLiteral("Searches for emojis matching the query without requiring a keyword. This can be disabled in the settings")));
     }
     setSyntaxes(syntaxes);
 }
 
-void EmojiRunner::match(Plasma::RunnerContext &context)
+void EmojiRunner::match(KRunner::RunnerContext &context)
 {
     QString search = context.query();
     const bool prefixed = search.startsWith(queryPrefix);
@@ -86,10 +106,10 @@ void EmojiRunner::match(Plasma::RunnerContext &context)
         search = match.captured(1).simplified();
     }
 
-    QList<Plasma::QueryMatch> matches;
+    QList<KRunner::QueryMatch> matches;
     if (prefixed && search.isEmpty()) {
         for (const auto &emoji : qAsConst(favouriteCategory.emojis)) {
-            matches.append(createQueryMatch(emoji, (float)emoji.favourite / 21, Plasma::QueryMatch::ExactMatch));
+            matches.append(createQueryMatch(emoji, (float)emoji.favourite / 21, true));
         }
     } else if (prefixed || (globalSearchEnabled && search.count() > 2) || context.singleRunnerQueryMode()) {
         for (const auto &category : qAsConst(emojiCategories)) {
@@ -99,14 +119,14 @@ void EmojiRunner::match(Plasma::RunnerContext &context)
                 const double relevance = emoji.getEmojiRelevance(search, tagSearchEnabled, descriptionSearchEnabled);
                 if (relevance == -1)
                     continue;
-                matches.append(createQueryMatch(emoji, relevance, prefixed ? Plasma::QueryMatch::ExactMatch : Plasma::QueryMatch::CompletionMatch));
+                matches.append(createQueryMatch(emoji, relevance, prefixed));
             }
         }
     }
     context.addMatches(matches);
 }
 
-void EmojiRunner::run(const Plasma::RunnerContext & /*context*/, const Plasma::QueryMatch &match)
+void EmojiRunner::run(const KRunner::RunnerContext & /*context*/, const KRunner::QueryMatch &match)
 {
     QApplication::clipboard()->setText(match.text());
     if (match.selectedAction()) {
@@ -117,11 +137,15 @@ void EmojiRunner::run(const Plasma::RunnerContext & /*context*/, const Plasma::Q
     }
 }
 
-Plasma::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal relevance, Plasma::QueryMatch::Type type)
+KRunner::QueryMatch EmojiRunner::createQueryMatch(const Emoji &emoji, const qreal relevance, bool isExactMatch)
 {
-    Plasma::QueryMatch match(this);
+    KRunner::QueryMatch match(this);
     match.setText(emoji.emoji);
-    match.setType(type);
+#if KRUNNER_VERSION < QT_VERSION_CHECK(5, 113, 0)
+    match.setType(isExactMatch ? KRunner::QueryMatch::ExactMatch : KRunner::QueryMatch::CompletionMatch);
+#else
+    match.setCategoryRelevance(isExactMatch ? KRunner::QueryMatch::CategoryRelevance::Highest : KRunner::QueryMatch::CategoryRelevance::Moderate);
+#endif
     match.setSubtext(emoji.name);
     match.setData(emoji.emoji);
     match.setRelevance(relevance);

@@ -1,11 +1,10 @@
 #ifndef EmojiRunnerCONFIG_H
 #define EmojiRunnerCONFIG_H
 
-#include "emojirunner_popup.h"
 #include "ui_emojirunner_config.h"
 #include "ui_emojirunner_popup.h"
 #include <KCModule>
-#include <KConfigCore/KConfigGroup>
+#include <KConfigGroup>
 #include <core/EmojiCategory.h>
 
 class EmojiRunnerConfigForm : public QWidget, public Ui::EmojiRunnerConfigUi
@@ -37,7 +36,7 @@ private:
     QStringList disabledEmojiCategoryNames;
 
 public:
-    explicit EmojiRunnerConfig(QWidget *parent = nullptr, const QVariantList &args = QVariantList());
+    explicit EmojiRunnerConfig(QObject *parent, const QVariantList &args);
 
     ~EmojiRunnerConfig() override;
 

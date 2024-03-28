@@ -1,5 +1,7 @@
 #include "emojirunner_popup.h"
 
+#include <QPushButton>
+
 #include <core/Config.h>
 
 EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji, int idx)

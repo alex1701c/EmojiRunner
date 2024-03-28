@@ -2,9 +2,9 @@
 #define EMOJIRUNNER_EMOJIRUNNER_POPUP_H
 
 #include "ui_emojirunner_popup.h"
-#include <QtCore>
-#include <QtWidgets>
 #include <core/Emoji.h>
+
+#include <QDialog>
 
 class EmojiRunnerPopup : public QDialog, public Ui::Dialog
 {

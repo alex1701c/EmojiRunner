@@ -3,6 +3,7 @@
 
 #include "EmojiCategory.h"
 
+class QFile;
 class KConfigGroup;
 
 class FileReader

@@ -3,18 +3,17 @@
 
 #include "core/EmojiCategory.h"
 #include <KRunner/AbstractRunner>
-#include <QAction>
-#include <QtCore>
+#include <QFileSystemWatcher>
 #include <krunner_version.h>
 
-#ifdef XDO_LIB
-// For autotyping
-extern "C" {
-#include <xdo.h>
-}
+#if KRUNNER_VERSION_MAJOR == 5
+#include <QAction>
+#else
+#include <KRunner/Action>
 #endif
 
-class EmojiRunner : public Plasma::AbstractRunner
+struct xdo;
+class EmojiRunner : public KRunner::AbstractRunner
 {
     Q_OBJECT
 public:
@@ -28,13 +27,16 @@ public:
     int pasteTimeout;
     bool tagSearchEnabled, descriptionSearchEnabled, globalSearchEnabled;
     const QLatin1String queryPrefix{"emoji"};
+#if KRUNNER_VERSION_MAJOR == 5
     QList<QAction *> matchActionList;
+#else
+    KRunner::Actions matchActionList;
+#endif
 
-    Plasma::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance, Plasma::QueryMatch::Type type = Plasma::QueryMatch::CompletionMatch);
+    KRunner::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance, bool isExactMatch = false);
 
 #ifdef XDO_LIB
-    xdo_t *xdo = xdo_new(nullptr);
-
+    xdo *xdo;
 #endif
 
     /**
@@ -44,8 +46,8 @@ public:
     void emitCTRLV();
 
 public: // Plasma::AbstractRunner API
-    void match(Plasma::RunnerContext &context) override;
-    void run(const Plasma::RunnerContext &context, const Plasma::QueryMatch &match) override;
+    void match(KRunner::RunnerContext &context) override;
+    void run(const KRunner::RunnerContext &context, const KRunner::QueryMatch &match) override;
 
 public Q_SLOTS:
     void reloadPluginConfiguration(const QString &configFile = QString());

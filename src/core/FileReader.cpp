@@ -1,9 +1,11 @@
 #include "FileReader.h"
-#include <KConfigCore/KConfigGroup>
-#include <KConfigCore/KSharedConfig>
-#include <QMap>
-#include <QtCore>
 #include <core/Config.h>
+
+#include <KConfigGroup>
+#include <KSharedConfig>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QMap>
 
 FileReader::FileReader(const KConfigGroup &config)
 {

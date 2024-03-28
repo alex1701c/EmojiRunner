@@ -1,6 +1,9 @@
 #ifndef EMOJIRUNNER_CONFIG_H
 #define EMOJIRUNNER_CONFIG_H
 
+#include <QDir>
+#include <QString>
+
 namespace
 {
 struct Config {

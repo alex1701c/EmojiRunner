@@ -1,9 +1,7 @@
-#ifndef EMOJIRUNNER_EMOJI_H
-#define EMOJIRUNNER_EMOJI_H
+#pragma once
 
-#include <QtCore>
-#include <QtWidgets/QListWidgetItem>
-#include <utility>
+#include <QJsonObject>
+#include <QString>
 
 class Emoji
 {
@@ -62,5 +60,3 @@ public:
 };
 
 Q_DECLARE_METATYPE(Emoji)
-
-#endif // EMOJIRUNNER_EMOJI_H

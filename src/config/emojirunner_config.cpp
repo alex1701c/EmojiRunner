@@ -4,9 +4,10 @@
 #include "emojirunner_popup.h"
 #include <KPluginFactory>
 #include <KSharedConfig>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QInputDialog>
-#include <QtWidgets/QMainWindow>
+#include <QDialog>
+#include <QInputDialog>
+#include <QMainWindow>
+#include <QMessageBox>
 #include <core/Config.h>
 #include <core/FileReader.h>
 
@@ -20,11 +21,11 @@ EmojiRunnerConfigForm::EmojiRunnerConfigForm(QWidget *parent)
     setupUi(this);
 }
 
-EmojiRunnerConfig::EmojiRunnerConfig(QWidget *parent, const QVariantList &args)
-    : KCModule(parent, args)
+EmojiRunnerConfig::EmojiRunnerConfig(QObject *parent, const QVariantList &)
+    : KCModule(qobject_cast<QWidget *>(parent))
 {
-    m_ui = new EmojiRunnerConfigForm(this);
-    auto *layout = new QGridLayout(this);
+    m_ui = new EmojiRunnerConfigForm(widget());
+    auto *layout = new QGridLayout(widget());
     layout->addWidget(m_ui, 0, 0);
 
     createConfigFile();
@@ -115,7 +116,7 @@ void EmojiRunnerConfig::load()
     filtersChanged();
     connectSignals();
 
-    Q_EMIT changed(true);
+    markAsChanged();
 }
 
 void EmojiRunnerConfig::save()
@@ -177,7 +178,7 @@ void EmojiRunnerConfig::defaults()
     m_ui->favouriteFilterDescription->setChecked(false);
     m_ui->sortFavourites->setChecked(false);
 
-    Q_EMIT changed(true);
+    markAsChanged();
 }
 
 void EmojiRunnerConfig::connectSignals()
@@ -352,8 +353,8 @@ void EmojiRunnerConfig::iosVersionChanged()
 void EmojiRunnerConfig::displayVisibleItems()
 {
     int visibleItems = 0;
-    for (int i = 0; i < this->m_ui->emojiListView->count(); ++i) {
-        if (!this->m_ui->emojiListView->item(i)->isHidden()) {
+    for (int i = 0; i < m_ui->emojiListView->count(); ++i) {
+        if (!m_ui->emojiListView->item(i)->isHidden()) {
             ++visibleItems;
         }
     }
@@ -364,8 +365,8 @@ void EmojiRunnerConfig::displayVisibleItems()
 void EmojiRunnerConfig::checkMaxFavourites()
 {
     int favourites = 0;
-    for (int i = 0; i < this->m_ui->emojiListView->count(); ++i) {
-        if (this->m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
+    for (int i = 0; i < m_ui->emojiListView->count(); ++i) {
+        if (m_ui->emojiListView->item(i)->checkState() == Qt::Checked) {
             ++favourites;
         }
     }
@@ -382,7 +383,7 @@ void EmojiRunnerConfig::changeFontSize(int value)
 
 void EmojiRunnerConfig::addEmoji()
 {
-    auto *popup = new EmojiRunnerPopup(this);
+    auto *popup = new EmojiRunnerPopup(widget());
     popup->show();
     connect(popup, &EmojiRunnerPopup::finished, this, &EmojiRunnerConfig::applyEmojiPopupResults);
 }
@@ -391,7 +392,7 @@ void EmojiRunnerConfig::editEmoji()
 {
     const auto *item = m_ui->emojiListView->currentItem();
     if (item != nullptr) {
-        auto *popup = new EmojiRunnerPopup(this, itemEmoji(item), m_ui->emojiListView->currentRow());
+        auto *popup = new EmojiRunnerPopup(widget(), itemEmoji(item), m_ui->emojiListView->currentRow());
         popup->show();
         connect(popup, &EmojiRunnerPopup::finished, this, &EmojiRunnerConfig::applyEmojiPopupResults);
     }
@@ -400,7 +401,7 @@ void EmojiRunnerConfig::editEmoji()
 void EmojiRunnerConfig::deleteEmoji()
 {
     QMessageBox::StandardButton reply =
-        QMessageBox::question(this, QSL("Confirm Delete"), QSL("Do you want to delete this custom emoji ?"), QMessageBox::Yes | QMessageBox::No);
+        QMessageBox::question(widget(), QSL("Confirm Delete"), QSL("Do you want to delete this custom emoji ?"), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         delete m_ui->emojiListView->takeItem(m_ui->emojiListView->currentRow());
     }

@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFile>
+#include <QProcess>
 #include <QTimer>
 
 #ifdef XDO_LIB
@@ -27,6 +28,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData,
     : KRunner::AbstractRunner(parent, pluginMetaData)
 #endif
 {
+    Q_UNUSED(args)
     // Add file watcher for config
     createConfigFile();
     watcher.addPath(Config::ConfigFilePath);

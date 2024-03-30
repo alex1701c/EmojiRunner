@@ -170,3 +170,4 @@ void EmojiRunner::emitCTRLV()
 K_PLUGIN_CLASS_WITH_JSON(EmojiRunner, "emojirunner.json")
 
 #include "emojirunner.moc"
+#include "moc_emojirunner.cpp"

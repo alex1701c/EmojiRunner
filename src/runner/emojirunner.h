@@ -12,7 +12,7 @@
 #include <KRunner/Action>
 #endif
 
-struct xdo;
+typedef struct xdo xdo_t;
 class EmojiRunner : public KRunner::AbstractRunner
 {
     Q_OBJECT
@@ -36,7 +36,7 @@ public:
     KRunner::QueryMatch createQueryMatch(const Emoji &emoji, qreal relevance, bool isExactMatch = false);
 
 #ifdef XDO_LIB
-    xdo *xdo;
+    xdo_t *xdo;
 #endif
 
     /**

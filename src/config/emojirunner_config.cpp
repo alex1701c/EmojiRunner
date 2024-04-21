@@ -183,11 +183,6 @@ void EmojiRunnerConfig::defaults()
 
 void EmojiRunnerConfig::connectSignals()
 {
-    // Initialize function pointers that require method overloading
-    const auto comboBoxIndexChanged = static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged);
-    const auto listWidgetRowChanged = static_cast<void (QListWidget::*)(int)>(&QListWidget::currentRowChanged);
-    const auto listWidgetItemChanged = static_cast<void (QListWidget::*)(QListWidgetItem *)>(&QListWidget::itemChanged);
-
     // Connect slots for filters
     connect(m_ui->favouriteFilter, &QLineEdit::textChanged, this, &EmojiRunnerConfig::filterEmojiListView);
     connect(m_ui->favouriteFilterName, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
@@ -195,18 +190,18 @@ void EmojiRunnerConfig::connectSignals()
     connect(m_ui->favouriteFilterTags, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     connect(m_ui->favouriteFilterCustom, &QCheckBox::clicked, this, &EmojiRunnerConfig::filtersChanged);
     // Unicode Versions change
-    connect(m_ui->unicodeComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::unicodeVersionChanged);
-    connect(m_ui->iosComboBox, comboBoxIndexChanged, this, &EmojiRunnerConfig::iosVersionChanged);
+    connect(m_ui->unicodeComboBox, &QComboBox::currentIndexChanged, this, &EmojiRunnerConfig::unicodeVersionChanged);
+    connect(m_ui->iosComboBox, &QComboBox::currentIndexChanged, this, &EmojiRunnerConfig::iosVersionChanged);
     // Disable categories
-    connect(m_ui->categoryListView, listWidgetItemChanged, this, &EmojiRunnerConfig::categoriesChanged);
+    connect(m_ui->categoryListView, &QListWidget::itemChanged, this, &EmojiRunnerConfig::categoriesChanged);
     // Sort favourites
     connect(m_ui->sortFavourites, &QCheckBox::clicked, this, &EmojiRunnerConfig::showOnlyFavourites);
-    connect(m_ui->emojiListView, listWidgetItemChanged, this, &EmojiRunnerConfig::checkMaxFavourites);
+    connect(m_ui->emojiListView, &QListWidget::itemChanged, this, &EmojiRunnerConfig::checkMaxFavourites);
     // For Drag/Drop events
     // Slider for font size
     connect(m_ui->fontSizeSlider, &QSlider::valueChanged, this, &EmojiRunnerConfig::changeFontSize);
     // Buttons for adding/updating/deleting emojis
-    connect(m_ui->emojiListView, listWidgetRowChanged, this, &EmojiRunnerConfig::validateEditingOptions);
+    connect(m_ui->emojiListView, &QListWidget::currentRowChanged, this, &EmojiRunnerConfig::validateEditingOptions);
     connect(m_ui->addEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::addEmoji);
     connect(m_ui->editEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::editEmoji);
     connect(m_ui->deleteEmojiPushButton, &QCheckBox::clicked, this, &EmojiRunnerConfig::deleteEmoji);

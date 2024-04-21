@@ -1,5 +1,6 @@
 ## Emoji Runner
 
+- Support for Plasma5 and Plasma6!
 - [Search emojis](#user-content-search-for-an-emoji-by-name) and copy & paste them
 - Configure [favourite emojis](#show-favourites)
 - Set unicode version

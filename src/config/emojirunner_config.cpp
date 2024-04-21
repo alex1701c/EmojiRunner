@@ -215,11 +215,6 @@ void EmojiRunnerConfig::filterEmojiListView()
     const bool unhideAllEnabledEmojis = filterName && filterTags && filterTags && text.isEmpty();
 
     for (int i = 0; i < m_ui->emojiListView->count(); ++i) {
-        // Process events, otherwise the search delays the GUI updates
-        if (i % 100 == 0) {
-            QApplication::processEvents();
-        }
-
         auto *item = m_ui->emojiListView->item(i);
         const Emoji &emoji = itemEmoji(item);
 

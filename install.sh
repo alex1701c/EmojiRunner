@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Exit immediately if something fails
 set -e
@@ -21,7 +21,7 @@ fi
 
 cmake .. -DCMAKE_BUILD_TYPE=Release -DKDE_INSTALL_USE_QT_SYS_PATHS=ON $BUILD_QT6_OPTION
 make -j$(nproc)
-sudo make install
+sudo make install/fast
 
 # KRunner needs to be restarted for the changes to be applied
 if pgrep -x krunner > /dev/null

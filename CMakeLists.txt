@@ -20,7 +20,7 @@ include(ECMDeprecationSettings)
 
 # Find the required Libaries
 find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} REQUIRED CONFIG COMPONENTS Widgets Core)
-find_package(KF${QT_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS I18n Runner ConfigWidgets KCMUtils)
+find_package(KF${QT_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS I18n Runner KCMUtils)
 
 ecm_set_disabled_deprecation_versions(
 	KF ${KF_MIN_VERSION}

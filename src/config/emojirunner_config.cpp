@@ -300,9 +300,7 @@ void EmojiRunnerConfig::filtersChanged()
 
 void EmojiRunnerConfig::categoriesChanged()
 {
-    const QStringList previouslyDisabled = disabledEmojiCategoryNames;
     disabledEmojiCategoryNames.clear();
-
     // Update list of disabled categories
     for (int i = 0; i < m_ui->categoryListView->count(); ++i) {
         const auto *item = m_ui->categoryListView->item(i);

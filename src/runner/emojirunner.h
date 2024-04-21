@@ -46,11 +46,9 @@ public:
     void emitCTRLV();
 
 public: // Plasma::AbstractRunner API
+    void reloadConfiguration() override;
     void match(KRunner::RunnerContext &context) override;
     void run(const KRunner::RunnerContext &context, const KRunner::QueryMatch &match) override;
-
-public Q_SLOTS:
-    void reloadPluginConfiguration(const QString &configFile = QString());
 };
 
 #endif

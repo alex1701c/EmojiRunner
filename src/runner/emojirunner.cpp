@@ -1,7 +1,6 @@
 #include "emojirunner.h"
 #include "core/Config.h"
 #include "core/FileReader.h"
-#include "core/utilities.h"
 
 #include <KConfigGroup>
 #include <KLocalizedString>
@@ -30,11 +29,11 @@ EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData,
 {
     Q_UNUSED(args)
     // Add file watcher for config
-    createConfigFile();
-    watcher.addPath(Config::ConfigFilePath);
     watcher.addPath(Config::CustomEmojiFilePath);
-    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &EmojiRunner::reloadPluginConfiguration);
-    reloadPluginConfiguration();
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+        watcher.addPath(path);
+        reloadConfiguration();
+    });
 #ifdef XDO_LIB
     xdo = xdo_new(nullptr);
 #endif
@@ -47,25 +46,15 @@ EmojiRunner::~EmojiRunner()
 #endif
 }
 
-void EmojiRunner::reloadPluginConfiguration(const QString &configFile)
+void EmojiRunner::reloadConfiguration()
 {
-    KConfigGroup config = KSharedConfig::openConfig(Config::ConfigFilePath)->group(Config::RootGroup);
-    // Force sync from file
-    if (!configFile.isEmpty())
-        config.config()->reparseConfiguration();
-
-    // If the file gets edited with a text editor, it often gets replaced by the edited version
-    // https://stackoverflow.com/a/30076119/9342842
-    if (!configFile.isEmpty()) {
-        watcher.addPath(configFile);
-    }
-
-    FileReader reader(config);
+    KConfigGroup grp = config();
+    FileReader reader(grp);
     emojiCategories = reader.getEmojiCategories(false);
 
-    globalSearchEnabled = config.readEntry(Config::GlobalSearch, true);
-    tagSearchEnabled = config.readEntry(Config::SearchByTags, true);
-    descriptionSearchEnabled = config.readEntry(Config::SearchByDescription, false);
+    globalSearchEnabled = grp.readEntry(Config::GlobalSearch, true);
+    tagSearchEnabled = grp.readEntry(Config::SearchByTags, true);
+    descriptionSearchEnabled = grp.readEntry(Config::SearchByDescription, false);
 
     // Items only change in reload config method => read once and reuse
     for (const auto &category : qAsConst(emojiCategories)) {
@@ -75,7 +64,7 @@ void EmojiRunner::reloadPluginConfiguration(const QString &configFile)
         }
     }
 
-    pasteTimeout = config.readEntry(Config::PasteTimeout, 100);
+    pasteTimeout = grp.readEntry(Config::PasteTimeout, 100);
 #ifndef XDO_LIB
     if (!QStandardPaths::findExecutable(QStringLiteral("xdotool")).isEmpty())
 #endif

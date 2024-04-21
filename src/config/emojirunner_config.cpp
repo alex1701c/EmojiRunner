@@ -1,7 +1,7 @@
 #include "emojirunner_config.h"
 #include "core/macros.h"
-#include "core/utilities.h"
 #include "emojirunner_popup.h"
+#include "utilities.h"
 #include <KPluginFactory>
 #include <KSharedConfig>
 #include <QDialog>
@@ -28,8 +28,7 @@ EmojiRunnerConfig::EmojiRunnerConfig(QObject *parent, const QVariantList &)
     auto *layout = new QGridLayout(widget());
     layout->addWidget(m_ui, 0, 0);
 
-    createConfigFile();
-    config = KSharedConfig::openConfig(Config::ConfigFilePath)->group(Config::RootGroup);
+    config = KSharedConfig::openConfig("krunnerrc")->group("Runners").group("emojirunner");
     config.config()->reparseConfiguration();
 
     FileReader reader(config);

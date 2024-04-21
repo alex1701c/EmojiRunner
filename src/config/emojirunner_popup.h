@@ -9,24 +9,21 @@
 class EmojiRunnerPopup : public QDialog, public Ui::Dialog
 {
     Q_OBJECT
-    Emoji emoji;
-    // Index of item that gets changes/created
-    int idx;
 
 public:
     explicit EmojiRunnerPopup(QWidget *parent, Emoji emoji = {}, int idx = -1);
 
     void setDataOfEmoji();
-
-public Q_SLOTS:
-
     void writeDataToEmoji();
-
     void validateButtonBox();
 
 Q_SIGNALS:
-
     void finished(Emoji &, int);
+
+private:
+    Emoji emoji;
+    // Index of item that gets changes/created
+    int idx;
 };
 
 #endif // EMOJIRUNNER_EMOJIRUNNER_POPUP_H

@@ -2,7 +2,6 @@
 #define EmojiRunnerCONFIG_H
 
 #include "ui_emojirunner_config.h"
-#include "ui_emojirunner_popup.h"
 #include <KCModule>
 #include <KConfigGroup>
 #include <core/EmojiCategory.h>

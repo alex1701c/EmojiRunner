@@ -26,7 +26,11 @@ sudo make install/fast
 # KRunner needs to be restarted for the changes to be applied
 if pgrep -x krunner > /dev/null
 then
-    kquitapp5 krunner
+    if [[ "$krunner_version" == "6" ]]; then
+        kquitapp6 krunner
+    else
+        kquitapp5 krunner
+    fi
 fi
 
 echo "Installation finished!";

@@ -19,11 +19,11 @@ but having the library installed is recommended.
 
 Plasma5:  
 ```bash
-sudo apt install cmake extra-cmake-modules build-essential libkf5runner-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev
+sudo apt install git cmake extra-cmake-modules build-essential libkf5runner-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev
 ```
 Plasma6:  
 ```bash
-sudo apt install cmake extra-cmake-modules build-essential libkf6runner-dev libxdo-dev libkf6kcmutils-dev
+sudo apt install git cmake extra-cmake-modules build-essential libkf6runner-dev libxdo-dev libkf6kcmutils-dev
 ```
 
 </details>

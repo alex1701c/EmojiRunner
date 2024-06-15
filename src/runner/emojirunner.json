@@ -1,4 +1,5 @@
 {
+    "$schema": "https://autoconfig.kde.org/jsonschemas/krunner.schema.json",
     "KPlugin": {
         "Authors": [
             {

@@ -74,7 +74,7 @@ sudo pacman -S cmake extra-cmake-modules xdotool kcmutils
 curl https://raw.githubusercontent.com/alex1701c/EmojiRunner/master/install.sh | bash
 ```
 
-#### Option B: Get it from the [AUR](https://aur.archlinux.org/packages/plasma5-runners-emoji/)
+#### Option B: Get it from the [AUR](https://aur.archlinux.org/packages/plasma6-runners-emojirunner)
 
 #### Option C: Manual installation method
 

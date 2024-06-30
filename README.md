@@ -19,11 +19,11 @@ but having the library installed is recommended.
 
 Plasma5:  
 ```bash
-sudo apt install git cmake extra-cmake-modules build-essential libkf5runner-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev
+sudo apt install git cmake extra-cmake-modules build-essential libkf5runner-dev qtdeclarative5-dev gettext libxdo-dev libkf5kcmutils-dev libkf5dbusaddons-bin
 ```
 Plasma6:  
 ```bash
-sudo apt install git cmake extra-cmake-modules build-essential libkf6runner-dev libxdo-dev libkf6kcmutils-dev
+sudo apt install git cmake extra-cmake-modules build-essential libkf6runner-dev libxdo-dev libkf6kcmutils-dev kf6-kdbusaddons
 ```
 
 </details>
@@ -33,11 +33,11 @@ sudo apt install git cmake extra-cmake-modules build-essential libkf6runner-dev 
 
 Plasma5:  
 ```bash
-sudo zypper install git cmake extra-cmake-modules ki18n-devel krunner-devel kconfigwidgets-devel kcmutils-devel gettext-tools xdotool-devel
+sudo zypper install git cmake extra-cmake-modules ki18n-devel krunner-devel kconfigwidgets-devel kcmutils-devel gettext-tools xdotool-devel kdbusaddons-tools
 ```
 Plasma6:  
 ```bash
-sudo zypper install git cmake extra-cmake-modules kf6-ki18n-devel kf6-krunner-devel gettext-tools xdotool-devel kf6-kconfigwidgets-devel kf6-kcmutils-devel
+sudo zypper install git cmake extra-cmake-modules kf6-ki18n-devel kf6-krunner-devel gettext-tools xdotool-devel kf6-kconfigwidgets-devel kf6-kcmutils-devel kf6-kdbusaddons-tools
 ```
 
 </details>

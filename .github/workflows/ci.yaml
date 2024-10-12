@@ -1,0 +1,84 @@
+name: Build KRunner Plugins
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: ubuntu
+            image: invent-registry.kde.org/neon/docker-images/plasma:user
+          - name: ubuntu
+            image: ubuntu:24.04
+          - name: opensuse
+            image: opensuse/tumbleweed
+          - name: fedora
+            image: fedora
+        plasma_version: [plasma5, plasma6]
+        exclude:
+          - os:
+              image: invent-registry.kde.org/neon/docker-images/plasma:user
+            plasma_version: plasma5
+          - os:
+              image: ubuntu:24.04
+            plasma_version: plasma6
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os.image }}
+      options: --user root
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          echo "Dependencies for install-${{ matrix.os.name }}-${{ matrix.plasma_version }}"
+          CMD=$(sed -n '/```bash install-${{ matrix.os.name }}-${{ matrix.plasma_version }}/,/```/p' README.md | head -n -1 | tail -n +2 |sed 's/sudo //')
+          if [[ "${{ matrix.os.name }}" == "ubuntu" ]]; then
+            apt update
+            export DEBIAN_FRONTEND=noninteractive
+            echo 'APT::Get::Assume-Yes "true";' >>  /etc/apt/apt.conf
+          elif [[ "${{ matrix.os.name }}" == "fedora" ]]; then
+            echo "defaultyes=True" >> /etc/dnf/dnf.conf
+          elif [[ "${{ matrix.os.name }}" == "opensuse" ]]; then
+            zypper refresh
+            CMD=$(echo $CMD | sed 's/zypper/zypper --non-interactive/')
+          else
+            echo "Unsupported OS: ${{ matrix.os.name }}"
+            exit 1
+          fi
+          echo "$CMD"
+          eval $CMD
+
+      - name: Create build directory
+        run: |
+          mkdir -p build
+          cd build
+
+      - name: Build and install
+        shell: bash
+        run: |
+          cd build
+          if [[ "${{ matrix.plasma_version }}" == "plasma6" ]]; then
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=ON
+          else
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=OFF
+          fi
+          cmake --build .
+          cmake --install .
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+

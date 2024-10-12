@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - github_actions
   pull_request:
     branches:
       - master
@@ -32,12 +33,15 @@ jobs:
             plasma_version: plasma6
 
     runs-on: ubuntu-latest
+    name: ${{ matrix.os.name }}-${{ matrix.plasma_version }}
     container:
       image: ${{ matrix.os.image }}
       options: --user root
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            README.md
 
       - name: Install dependencies
         shell: bash
@@ -60,6 +64,10 @@ jobs:
           echo "$CMD"
           eval $CMD
 
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
       - name: Create build directory
         run: |
           mkdir -p build
@@ -70,9 +78,9 @@ jobs:
         run: |
           cd build
           if [[ "${{ matrix.plasma_version }}" == "plasma6" ]]; then
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=ON
+            cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_WITH_QT6=ON
           else
-            cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_QT6=OFF
+            cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_WITH_QT6=OFF
           fi
           cmake --build .
           cmake --install .
@@ -80,5 +88,5 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ctest --output-on-failure
+          ctest -V
 

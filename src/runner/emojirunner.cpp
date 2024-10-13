@@ -29,7 +29,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData,
 {
     Q_UNUSED(args)
     // Add file watcher for config
-    watcher.addPath(Config::CustomEmojiFilePath);
+    watcher.addPath(Config::emojiFilePath());
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
         watcher.addPath(path);
         reloadConfiguration();

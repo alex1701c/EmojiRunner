@@ -10,8 +10,7 @@ struct Config {
     // General config keys
     constexpr static const auto ConfigFileName = "emojirunnerrc";
     constexpr static const auto RelativeConfigFolder = "/.config/krunnerplugins/";
-    const static QString SharedEmojiFileName;
-    const static QString CustomEmojiFilePath;
+    constexpr static QLatin1String SharedEmojiFileName{"emojirunner/emojis.json"};
     constexpr static const auto RootGroup = "Config";
     constexpr static const auto GlobalSearch = "globalSearch";
     constexpr static const auto PasteAction = "pasteAction";
@@ -32,6 +31,11 @@ struct Config {
     constexpr static const auto CustomCategory = "Custom";
     constexpr static const auto SmileysEmotionsCategory = "Smileys & Emotion";
     constexpr static const auto DisabledCategories = "disabledCategories";
+
+    static QString emojiFilePath()
+    {
+        return QDir::homePath() + QLatin1String("/.local/share/emojirunner/customemojis.json");
+    }
 };
 
 // Keys of the emoji json object
@@ -44,8 +48,5 @@ struct JSONEmoji {
     constexpr static const auto IosVersion = "ios_version";
     constexpr static const auto Tags = "tags";
 };
-
-const QString Config::CustomEmojiFilePath = QDir::homePath() + "/.local/share/emojirunner/customemojis.json";
-const QString Config::SharedEmojiFileName = "emojirunner/emojis.json";
 }
 #endif // EMOJIRUNNER_CONFIG_H

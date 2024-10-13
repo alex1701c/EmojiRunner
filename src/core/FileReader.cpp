@@ -30,7 +30,7 @@ QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const
     }
 
     // Read custom emojis
-    QFile customEmojis(Config::CustomEmojiFilePath);
+    QFile customEmojis(Config::emojiFilePath());
     if (customEmojis.exists() && customEmojis.open(QFile::ReadOnly)) {
         auto customEmojiMap = parseEmojiFile(getAllEmojis, customEmojis);
         // Combine the two maps

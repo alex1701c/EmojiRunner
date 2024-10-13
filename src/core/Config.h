@@ -9,8 +9,6 @@ namespace
 struct Config {
     // General config keys
     constexpr static const auto ConfigFileName = "emojirunnerrc";
-    constexpr static const auto RelativeConfigFolder = "/.config/krunnerplugins/";
-    constexpr static QLatin1String SharedEmojiFileName{"emojirunner/emojis.json"};
     constexpr static const auto RootGroup = "Config";
     constexpr static const auto GlobalSearch = "globalSearch";
     constexpr static const auto PasteAction = "pasteAction";
@@ -32,7 +30,7 @@ struct Config {
     constexpr static const auto SmileysEmotionsCategory = "Smileys & Emotion";
     constexpr static const auto DisabledCategories = "disabledCategories";
 
-    static QString emojiFilePath()
+    static inline QString emojiFilePath()
     {
         return QDir::homePath() + QLatin1String("/.local/share/emojirunner/customemojis.json");
     }

@@ -22,7 +22,7 @@ FileReader::FileReader(const KConfigGroup &config)
 QList<EmojiCategory> FileReader::getEmojiCategories(bool getAllEmojis) const
 {
     // Emojis for user level install
-    QString emojisFilePath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, Config::SharedEmojiFileName, QStandardPaths::LocateFile);
+    QString emojisFilePath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("emojirunner/emojis.json"), QStandardPaths::LocateFile);
     QFile emojisFile(emojisFilePath);
     QMap<QString, EmojiCategory> preconfiguredEmojis;
     if (emojisFile.exists() && emojisFile.open(QIODevice::ReadOnly)) {

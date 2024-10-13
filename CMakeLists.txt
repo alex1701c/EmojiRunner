@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(emojirunner)
-set(CMAKE_PROJECT_VERSION "3.0.2")
+set(CMAKE_PROJECT_VERSION "3.0.3")
 
 set(QT_MIN_VERSION 5.15.0)
 set(KF_MIN_VERSION 5.105.0)

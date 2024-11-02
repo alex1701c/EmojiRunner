@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if pgrep -x krunner > /dev/null
+then
+    killall krunner
+fi

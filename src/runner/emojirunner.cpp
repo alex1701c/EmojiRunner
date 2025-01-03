@@ -26,6 +26,7 @@ EmojiRunner::EmojiRunner(QObject *parent, const KPluginMetaData &pluginMetaData,
 #else
     : KRunner::AbstractRunner(parent, pluginMetaData)
 #endif
+    , watcher(this)
 {
     Q_UNUSED(args)
     // Add file watcher for config

@@ -8,6 +8,7 @@ EmojiRunnerPopup::EmojiRunnerPopup(QWidget *parent, Emoji emoji, int idx)
     : QDialog(parent)
 {
     setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     this->idx = idx;
     this->emoji = emoji;

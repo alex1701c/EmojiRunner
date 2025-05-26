@@ -396,8 +396,6 @@ void EmojiRunnerConfig::deleteEmoji()
 
 void EmojiRunnerConfig::applyEmojiPopupResults(const Emoji &emoji, const int idx)
 {
-    // Delete Dialog that emitted the signal
-    delete sender();
     if (idx == -1) {
         m_ui->emojiListView->insertItem(0, Utilities::toListWidgetItem(emoji));
         // Add "Custom" category to category list view

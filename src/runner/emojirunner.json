@@ -10,7 +10,7 @@
         "Description": "Emoji picker for Krunner",
         "EnabledByDefault": true,
         "Icon": "preferences-desktop-emoticons",
-        "License": "GLP V3",
+        "License": "GPL-3.0",
         "Name": "EmojiRunner"
     },
     "X-Plasma-Runner-Min-Letter-Count": 2,

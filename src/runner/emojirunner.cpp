@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFile>
+#include <QMimeData>
 #include <QProcess>
 #include <QTimer>
 
@@ -120,12 +121,30 @@ void EmojiRunner::match(KRunner::RunnerContext &context)
 
 void EmojiRunner::run(const KRunner::RunnerContext & /*context*/, const KRunner::QueryMatch &match)
 {
-    QApplication::clipboard()->setText(match.text());
     if (match.selectedAction()) {
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setText(match.text());
+
+        // Add the sensitive hint to prevent emoji being shown in clipboard history
+        mimeData->setData("x-kde-passwordManagerHint", "secret");
+
+        QApplication::clipboard()->setMimeData(mimeData);
+
         // Wait for krunner to be closed before typing
         QTimer::singleShot(pasteTimeout, this, [this]() {
             emitCTRLV();
+
+            // Clear the clipboard so the previous content returns
+            QTimer::singleShot(250, this, [this]() {
+                QApplication::clipboard()->clear();
+
+                // A second ctrl-v is needed to bring whatever was in the clipboard back in.
+                // For some reason.
+                emitCTRLV();
+            });
         });
+    } else {
+        QApplication::clipboard()->setText(match.text());
     }
 }
 

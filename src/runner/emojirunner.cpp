@@ -135,12 +135,8 @@ void EmojiRunner::run(const KRunner::RunnerContext & /*context*/, const KRunner:
             emitCTRLV();
 
             // Clear the clipboard so the previous content returns
-            QTimer::singleShot(250, this, [this]() {
+            QTimer::singleShot(pasteTimeout, this, [this]() {
                 QApplication::clipboard()->clear();
-
-                // A second ctrl-v is needed to bring whatever was in the clipboard back in.
-                // For some reason.
-                emitCTRLV();
             });
         });
     } else {

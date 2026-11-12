@@ -36,7 +36,7 @@ void EmojiRunnerPopup::writeDataToEmoji()
     emoji.tags = this->tagsLineEdit->text().toLower().split(',', Qt::SkipEmptyParts);
     emoji.description = this->descriptionLineEdit->text();
     // Give name as parameter to find the existing item if the emoji has been updated
-    emit finished(this->emoji, idx);
+    Q_EMIT finished(this->emoji, idx);
 }
 
 void EmojiRunnerPopup::validateButtonBox()

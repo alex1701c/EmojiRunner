@@ -19,10 +19,10 @@ struct Config {
     constexpr static const auto DefaultFavourites = "7;1;37;14;18;154;77;36;10;111;59;23;33;87;167;168";
     // Unicode/Ios version data
     constexpr static const auto UnicodeVersion = "unicodeVersion";
-    constexpr static const auto DefaultUnicodeVersion = "11.0";
-    constexpr static const auto UnicodeVersionChoices = "3.0,3.2,4.0,4.1,5.1,5.2,6.0,6.1,7.0,8.0,9.0,11.0,12.0";
+    constexpr static const auto DefaultUnicodeVersion = "15.0";
+    constexpr static const auto UnicodeVersionChoices = "3.0,3.2,4.0,4.1,5.1,5.2,6.0,6.1,7.0,8.0,9.0,11.0,12.0,13.0,14.0,15.0";
     constexpr static const auto IosVersion = "iosVersion";
-    constexpr static const auto DefaultIosVersion = "13.0";
+    constexpr static const auto DefaultIosVersion = "16.0";
     constexpr static const auto IosVersionChoices = "6.0,8.3,9.0,9.1,10.0,10.2,12.1,13.0";
     // Category names
     constexpr static const auto FavouritesCategory = "Favourites";
